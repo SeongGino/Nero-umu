@@ -19,11 +19,11 @@ jobs:
     - uses: actions/checkout@v4
 
     - name: Install Qt
-      uses: jurplel/install-qt-action@v3
+      uses: jurplel/install-qt-action@v4
       with:
-        aqtversion: '==3.1.*'
+        # aqtversion: 'latest'
         version: '6.8.*'
-        archives: 'qt_translations qt_base icu'
+        archives: 'qttranslations qtbase icu'
 
     - name: Install additional deps
       run: sudo apt install -y libquazip1-qt6-dev
