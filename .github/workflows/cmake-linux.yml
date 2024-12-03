@@ -23,7 +23,7 @@ jobs:
       with:
         # aqtversion: 'latest'
         version: '6.8.*'
-        archives: 'qttranslations qtbase icu'
+        # archives: 'qttranslations qtbase icu'
 
     - name: Install additional deps
       run: sudo apt install -y libquazip1-qt6-dev
