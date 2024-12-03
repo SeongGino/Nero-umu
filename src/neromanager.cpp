@@ -441,7 +441,7 @@ void NeroManagerWindow::on_addButton_clicked()
 
             if(!shortcutAdd.appPath.isEmpty()) {
                 // hash function here
-                QString hashName(QCryptographicHash::hash(QString(LOLRANDOM).toLocal8Bit(), QCryptographicHash::Md5).toHex(0));
+                QString hashName(QCryptographicHash::hash(QByteArray::number(LOLRANDOM), QCryptographicHash::Md5).toHex(0));
 
                 QSettings *currentPrefixIni = NeroFS::GetCurrentPrefixCfg();
                 currentPrefixIni->beginGroup("Shortcuts");
@@ -449,10 +449,8 @@ void NeroManagerWindow::on_addButton_clicked()
                 // if this hash matches anything, repeatedly generate hashes until a unique one is found
                 while(true) {
                     if(currentPrefixIni->childKeys().contains(hashName)) {
-                        hashName = QCryptographicHash::hash(QString(LOLRANDOM+rand()).toLocal8Bit(), QCryptographicHash::Md5).toHex(0);
-                    } else {
-                        break;
-                    }
+                        hashName = QCryptographicHash::hash(QByteArray::number(LOLRANDOM+rand()), QCryptographicHash::Md5).toHex(0);
+                    } else break;
                 }
 
                 NeroFS::AddNewShortcut(hashName, shortcutAdd.shortcutName, shortcutAdd.appPath);
