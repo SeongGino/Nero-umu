@@ -24,6 +24,7 @@ jobs:
         version: '6.8.*'
         arch: 'linux_gcc_64'
         archives: 'qtbase qttools qttranslations icu'
+        modules: 'qt5compat'
 
     - name: Install additional deps
       run: sudo apt install -y libquazip1-qt6-dev
