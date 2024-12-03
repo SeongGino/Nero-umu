@@ -71,7 +71,8 @@ QString NeroIcoExtractor::GetIcon(QString sourceFile)
                         stdout = extProcess.readLine();
 
                         if(stdout.startsWith("--icon")) {
-                            index = stdout.remove("--icon --index=").leftRef(stdout.indexOf(' ')).toInt();
+                            // leftref is removed post-Qt6, shut up :<
+                            index = stdout.remove("--icon --index=").left(stdout.indexOf(' ')).toInt();
                             icotoolOutput = stdout.split(' ', Qt::SkipEmptyParts);
 
                             // trim these lines to get acceptable values
@@ -161,7 +162,8 @@ QString NeroIcoExtractor::GetIcon(QString sourceFile)
                         stdout = extProcess.readLine();
 
                         if(stdout.startsWith("--icon")) {
-                            index = stdout.remove("--icon --index=").leftRef(stdout.indexOf(' ')).toInt();
+                            // leftref is removed post-Qt6, shut up :<
+                            index = stdout.remove("--icon --index=").left(stdout.indexOf(' ')).toInt();
                             icotoolOutput = stdout.split(' ', Qt::SkipEmptyParts);
 
                             // trim these lines to get acceptable values
@@ -237,7 +239,8 @@ QString NeroIcoExtractor::GetIcon(QString sourceFile)
                 stdout = extProcess.readLine();
 
                 if(stdout.startsWith("--icon")) {
-                    index = stdout.remove("--icon --index=").leftRef(stdout.indexOf(' ')).toInt();
+                    // leftref is removed post-Qt6, shut up :<
+                    index = stdout.remove("--icon --index=").left(stdout.indexOf(' ')).toInt();
                     icotoolOutput = stdout.split(' ', Qt::SkipEmptyParts);
 
                     // trim these lines to get acceptable values
