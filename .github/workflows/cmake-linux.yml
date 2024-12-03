@@ -21,9 +21,9 @@ jobs:
     - name: Install Qt
       uses: jurplel/install-qt-action@v4
       with:
-        # aqtversion: 'latest'
         version: '6.8.*'
-        # archives: 'qttranslations qtbase icu'
+        arch: 'linux_gcc_64'
+        archives: 'qtbase qttranslations icu'
 
     - name: Install additional deps
       run: sudo apt install -y libquazip1-qt6-dev
