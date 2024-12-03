@@ -51,8 +51,10 @@ NeroManagerWindow::NeroManagerWindow(QWidget *parent)
     case 7: this->setWindowIcon(QIcon(":/ico/narikiri/kongman")); break;
     }
 
-    // required for good hidpi icon quality... because Qt doesn't set this automatically?
+    #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    // required for good hidpi icon quality because Qt < 6 didn't set this automatically.
     QGuiApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
+    #endif
 
     if(NeroFS::GetUmU().isEmpty()) {
         QMessageBox::critical(this,
