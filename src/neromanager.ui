@@ -72,7 +72,7 @@
         <item>
          <widget class="QLabel" name="topSubtitle">
           <property name="enabled">
-           <bool>false</bool>
+           <bool>true</bool>
           </property>
           <property name="sizePolicy">
            <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
@@ -84,6 +84,9 @@
            <font>
             <pointsize>9</pointsize>
            </font>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">color: gray</string>
           </property>
           <property name="text">
            <string>Subtitle</string>
@@ -261,7 +264,10 @@
         <item>
          <widget class="QLabel" name="missingPrefixesLabel">
           <property name="enabled">
-           <bool>false</bool>
+           <bool>true</bool>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">color: gray</string>
           </property>
           <property name="text">
            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:12pt; font-weight:700;&quot;&gt;There are no Proton prefixes available!&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Press the + button above to create one.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>

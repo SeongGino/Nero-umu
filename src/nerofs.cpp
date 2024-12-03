@@ -22,6 +22,7 @@
 
 #include <QMessageBox>
 #include <QFileDialog>
+#include <QStandardPaths>
 
 NeroFS::NeroFS() {}
 
@@ -38,7 +39,7 @@ QStringList NeroFS::prefixes;
 QStringList NeroFS::availableProtons;
 
 bool NeroFS::InitPaths() {
-    QSettings managerCfg(QString("%1/NeroLauncher.ini").arg(qEnvironmentVariable("XDG_CONFIG_HOME")), QSettings::IniFormat);
+    QSettings managerCfg(QStandardPaths::writableLocation(QStandardPaths::GenericConfigLocation) + "/Nero-UMU.ini", QSettings::IniFormat);
     managerCfg.beginGroup("NeroSettings");
 
     if(managerCfg.value("Home").toString().isEmpty()) {
@@ -52,27 +53,26 @@ bool NeroFS::InitPaths() {
         QString dir = QFileDialog::getExistingDirectory(NULL,
                                              "Select Nero Home Directory",
                                               qEnvironmentVariable("HOME"));
-        if(!dir.isEmpty()) {
-            managerCfg.setValue("Home", dir);
-        } else {
+        if(!dir.isEmpty()) managerCfg.setValue("Home", dir);
+        else {
             QMessageBox::critical(NULL,
-                                  "ERROR: No directory!",
+                                  "ERROR: No Home Directory!",
                                   "Directory is empty, or the operation was canceled.");
             return false;
         }
     }
     prefixesPath.setPath(managerCfg.value("Home").toString());
 
-    QDir steamDir(QString("%1/.steam/steam/compatibilitytools.d").arg(qEnvironmentVariable("HOME")));
+    QDir steamDir(qEnvironmentVariable("HOME") + "/.steam/steam/compatibilitytools.d");
     if(steamDir.exists()) {
         protonsPath.setPath(steamDir.path());
         printf("Steam detected, using existing compatibilitytools.d\n");
     } else {
         printf("Working Steam install not detected, using Nero data directory for Proton versions\n");
-        protonsPath.setPath(QString("%1/NeroLauncher/protons").arg(qEnvironmentVariable("XDG_DATA_HOME")));
+        protonsPath.setPath(QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + "/Nero-UMU/protons");
         if(!protonsPath.exists()) {
             printf("Nero directory doesn't exist! Creating paths...\n");
-            protonsPath.mkpath(QString("%1/NeroLauncher/protons").arg(qEnvironmentVariable("XDG_DATA_HOME")));
+            protonsPath.mkpath(".");
         }
     }
 
@@ -82,10 +82,10 @@ bool NeroFS::InitPaths() {
 QStringList NeroFS::GetPrefixes()
 {
     if(prefixes.isEmpty()) {
-        prefixes = NeroFS::GetPrefixesPath().entryList(QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name | QDir::IgnoreCase);
+        prefixes = prefixesPath.entryList(QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name | QDir::IgnoreCase);
         for(int i = prefixes.count()-1; i >= 0; i--) {
             // should we do ACTUAL ini verification? Or just checking to make sure it exists?
-            if(!QDir(NeroFS::GetPrefixesPath()).exists(QString("%1/nero-settings.ini").arg(prefixes.at(i)))) {
+            if(!prefixesPath.exists(prefixes.at(i) + "/nero-settings.ini")) {
                 prefixes.removeAt(i);
             }
         }
@@ -96,7 +96,7 @@ QStringList NeroFS::GetPrefixes()
 
 void NeroFS::CreateUserLinks(QString prefixName)
 {
-    QDir prefixDir(QString("%1/%2").arg(NeroFS::GetPrefixesPath().path(), prefixName));
+    QDir prefixDir(NeroFS::GetPrefixesPath().path() + '/' + prefixName);
     if(prefixDir.exists()) {
         // TODO: should we allow the user to selectively link certain directories?
         prefixDir.setPath(QString("%1/%2/drive_c/users/%3/Desktop").arg(NeroFS::GetPrefixesPath().path(),
@@ -201,11 +201,19 @@ QString NeroFS::GetUmU()
     } else { return ""; }
 }
 
-QString NeroFS::GetWinetricks()
+QString NeroFS::GetWinetricks(const QString &runner)
 {
-    // Each Proton version comes with a Winetricks script. Neat!
-    if(QDir(QString("%1/%2/protonfixes").arg(GetProtonsPath().path(), GetCurrentRunner())).exists("winetricks"))
-        return QString("%1/%2/protonfixes/winetricks").arg(GetProtonsPath().path(), GetCurrentRunner());
+    if(!runner.isEmpty()) {
+        if(QDir(protonsPath.path() + '/' + runner + "/protonfixes").exists("winetricks"))
+            return protonsPath.path() + '/' + runner + "/protonfixes/winetricks";
+        else {
+            // fall back to system winetricks
+            if(QDir("/usr/bin").exists("winetricks"))
+                return "/usr/bin/winetricks";
+            else return "";
+        }
+    } else if(QDir(protonsPath.path() + '/' + currentRunner + "/protonfixes").exists("winetricks"))
+        return protonsPath.path() + '/' + currentRunner + "/protonfixes/winetricks";
     else {
         // fall back to system winetricks
         if(QDir("/usr/bin").exists("winetricks"))
@@ -228,7 +236,7 @@ QSettings* NeroFS::GetCurrentPrefixCfg()
 {
     if(prefixCfg != nullptr) { delete prefixCfg; }
     if(!currentPrefix.isEmpty()) {
-        prefixCfg = new QSettings(QString("%1/%2/nero-settings.ini").arg(prefixesPath.path(), currentPrefix), QSettings::IniFormat);
+        prefixCfg = new QSettings(prefixesPath.path() + '/' + currentPrefix + "/nero-settings.ini", QSettings::IniFormat);
         return prefixCfg;
     } else {
         // if we're running into this problem, then something's gone horribly wrong.
@@ -340,7 +348,7 @@ QMap<QString, QVariant> NeroFS::GetShortcutSettings(const QString shortcutHash)
 {
     GetCurrentPrefixCfg();
     if(!prefixCfg->group().isEmpty()) prefixCfg->endGroup();
-    prefixCfg->beginGroup(QString("Shortcuts--%1").arg(shortcutHash));
+    prefixCfg->beginGroup("Shortcuts--" + shortcutHash);
     const QStringList settingKeys = prefixCfg->childKeys();
     QMap<QString, QVariant> settings;
     for(const auto &key : settingKeys) {
@@ -391,7 +399,7 @@ QMap<QString, QString> NeroFS::GetCurrentShortcutsMap()
 bool NeroFS::DeletePrefix(const QString prefix)
 {
     prefixes.removeOne(prefix);
-    if(QDir(QString("%1/%2").arg(prefixesPath.path(), prefix)).removeRecursively())
+    if(QDir(prefixesPath.path() + '/' + prefix).removeRecursively())
         return true;
     else return false;
 }
@@ -404,9 +412,9 @@ void NeroFS::DeleteShortcut(const QString shortcutHash)
     QString name = prefixCfg->value(shortcutHash).toString();
     prefixCfg->remove(shortcutHash);
     prefixCfg->endGroup();
-    prefixCfg->beginGroup(QString("Shortcuts--%1").arg(shortcutHash));
+    prefixCfg->beginGroup("Shortcuts--" + shortcutHash);
     prefixCfg->remove("");
     prefixCfg->endGroup();
-    QFile icoFile(QString("%1/%2/.icoCache/%3-%4.png").arg(prefixesPath.path(), currentPrefix, name, shortcutHash));
+    QFile icoFile(prefixesPath.path() + '/' + currentPrefix + "/.icoCache/" + name + '-' + shortcutHash + ".png");
     if(icoFile.exists()) icoFile.remove();
 }

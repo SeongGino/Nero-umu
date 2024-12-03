@@ -39,13 +39,13 @@
 QStringList NeroTricksWindow::winetricksAvailVerbs;
 QStringList NeroTricksWindow::winetricksDescriptions;
 
-NeroTricksWindow::NeroTricksWindow(QWidget *parent)
+NeroTricksWindow::NeroTricksWindow(QWidget *parent, const QString &runner)
     : QDialog(parent)
     , ui(new Ui::NeroTricksWindow)
 {
     ui->setupUi(this);
 
-    if(winetricksAvailVerbs.isEmpty()) { InitVerbs(); }
+    if(winetricksAvailVerbs.isEmpty()) { InitVerbs(runner); }
 
     for(int i = 0; i < winetricksAvailVerbs.count(); i++) {
         verbSelector << new QCheckBox(winetricksAvailVerbs.at(i), this);
@@ -74,14 +74,14 @@ NeroTricksWindow::~NeroTricksWindow()
     delete ui;
 }
 
-void NeroTricksWindow::InitVerbs()
+void NeroTricksWindow::InitVerbs(const QString &runner)
 {
     if(winetricksAvailVerbs.isEmpty()) {
-        if(!NeroFS::GetWinetricks().isEmpty()) {
+        if(!NeroFS::GetWinetricks(runner).isEmpty()) {
             QProcess winetricksList;
             QMessageBox waitBox(QMessageBox::NoIcon, "Winetricks Loading", "Please wait...");
 
-            winetricksList.start(NeroFS::GetWinetricks(), {"dlls", "list"});
+            winetricksList.start(NeroFS::GetWinetricks(runner), {"dlls", "list"});
             waitBox.open();
             waitBox.raise();
             QGuiApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
@@ -97,7 +97,7 @@ void NeroTricksWindow::InitVerbs()
                     winetricksDescriptions.clear();
                 }
 
-                if(NeroFS::GetWinetricks().contains("protontricks"))
+                if(NeroFS::GetWinetricks(runner).contains("protontricks"))
                     // read first line, which is boilerplate cd
                     winetricksList.readLine();
 

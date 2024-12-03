@@ -139,6 +139,7 @@ private:
 
     // METHODS
     void SetHeader(const QString prefix = "", const unsigned int shortcutsCount = 0);
+    void CheckWinetricks();
     void RenderPrefixes();
     void RenderPrefixList();
     void CreatePrefix(const QString newPrefix, const QString runner, QStringList tricksToInstall = {});

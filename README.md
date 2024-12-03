@@ -52,7 +52,7 @@ sudo dnf install qt6-qtbase-devel qt6-qttools-devel qt6-qt5compat-devel quazip-q
 ```
 #### Debian/Ubuntu (& derivatives)
 ```
-sudo apt install build-essential cmake qt6-base-dev qttools6-dev qt6-5compat-dev libquazip1-qt6
+sudo apt install build-essential cmake qt6-base-dev qt6-tools-dev qt6-5compat-dev libquazip1-qt6-dev
 ```
 
 Additionally, Nero uses the following external components, either implicitly or optionally:

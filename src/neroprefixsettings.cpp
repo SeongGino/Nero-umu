@@ -152,6 +152,12 @@ NeroPrefixSettingsWindow::NeroPrefixSettingsWindow(QWidget *parent, const QStrin
         // QComboboxes aren't new syntax friendly?
         if(!child->property("isFor").isNull()) connect(child, SIGNAL(activated(int)), this, SLOT(OptionSet()));
     }
+
+    // light mode styling adjustments:
+    if(this->palette().window().color().value() > this->palette().text().color().value()) {
+        ui->infoBox->setStyleSheet("QGroupBox::title { color: #909000 }");
+        ui->infoText->setStyleSheet("color: doubledarkgray");
+    }
 }
 
 bool NeroPrefixSettingsWindow::eventFilter(QObject* object, QEvent* event)

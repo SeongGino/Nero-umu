@@ -38,6 +38,8 @@ NeroManagerWindow::NeroManagerWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::NeroManagerWindow)
 {
+    QCoreApplication::setApplicationName("Nero-UMU");
+
     // rand + undefined int, bit shifted to only give the three least significant bytes (0-7)
     // THIS can be set before window setup...
     switch(((LOLRANDOM + rand()) >> 29)) {
@@ -75,7 +77,7 @@ NeroManagerWindow::NeroManagerWindow(QWidget *parent)
                               "Please install at least one Proton version at:\n\n" +
                               NeroFS::GetProtonsPath().path() +
                               "\n\nYou can install new runners either through Steam, or a Proton Manager such as ProtonUp-Qt or ProtonPlus."
-                              "\n\nNero Will now exit, umu.");
+                              "\n\nNero will now exit, umu.");
         exit(1);
     }
     managerCfg = new QSettings(NeroFS::GetManagerCfg());
@@ -106,11 +108,7 @@ NeroManagerWindow::NeroManagerWindow(QWidget *parent)
 
     ui->prefixContentsScrollArea->setVisible(false);
 
-    if(NeroFS::GetWinetricks().isEmpty()) {
-        ui->prefixTricksBtn->setEnabled(false);
-        ui->prefixTricksBtn->setText("Winetricks Not Found");
-        ui->prefixTricksBtn->setStyleSheet("color: red");
-    }
+    CheckWinetricks();
 
     blinkTimer = new QTimer();
     connect(blinkTimer, &QTimer::timeout, this, &NeroManagerWindow::blinkTimer_timeout);
@@ -376,6 +374,19 @@ void NeroManagerWindow::CreatePrefix(const QString newPrefix, const QString runn
     QGuiApplication::restoreOverrideCursor();
 }
 
+void NeroManagerWindow::CheckWinetricks()
+{
+    if(NeroFS::GetWinetricks().isEmpty()) {
+        ui->prefixTricksBtn->setEnabled(false);
+        ui->prefixTricksBtn->setText("Winetricks Not Found");
+        ui->prefixTricksBtn->setStyleSheet("color: red");
+    } else {
+        ui->prefixTricksBtn->setEnabled(true);
+        ui->prefixTricksBtn->setText("Install Winetricks Components");
+        ui->prefixTricksBtn->setStyleSheet("");
+    }
+}
+
 void NeroManagerWindow::AddTricks(QStringList verbs, const QString prefix)
 {
     QProcess umu;
@@ -571,6 +582,8 @@ void NeroManagerWindow::prefixMainButtons_clicked()
     }
 
     SetHeader(NeroFS::GetCurrentPrefix(), NeroFS::GetCurrentPrefixShortcuts().count());
+
+    CheckWinetricks();
 }
 
 void NeroManagerWindow::prefixDeleteButtons_clicked()

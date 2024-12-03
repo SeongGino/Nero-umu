@@ -35,10 +35,10 @@ class NeroTricksWindow : public QDialog
     Q_OBJECT
 
 public:
-    explicit NeroTricksWindow(QWidget *parent = nullptr);
+    explicit NeroTricksWindow(QWidget *parent = nullptr, const QString & = "");
     ~NeroTricksWindow();
 
-    void InitVerbs();
+    void InitVerbs(const QString & = "");
 
     void AddTricks(const QStringList newTricks);
     void SetPreinstalledVerbs(const QStringList installed);

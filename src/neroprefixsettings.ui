@@ -933,8 +933,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>600</width>
-               <height>454</height>
+               <width>618</width>
+               <height>359</height>
               </rect>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -1685,12 +1685,7 @@
       </font>
      </property>
      <property name="styleSheet">
-      <string notr="true">QGroupBox::title {
-color: yellow
-}</string>
-     </property>
-     <property name="title">
-      <string/>
+      <string notr="true">QGroupBox::title { color: yellow }</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <item>
@@ -1715,8 +1710,8 @@ color: yellow
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>624</width>
-           <height>68</height>
+           <width>636</width>
+           <height>229</height>
           </rect>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_6">

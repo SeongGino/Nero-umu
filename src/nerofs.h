@@ -68,7 +68,7 @@ public:
     static QString GetIcoextract();
     static QString GetIcoutils();
     static QString GetUmU();
-    static QString GetWinetricks();
+    static QString GetWinetricks(const QString & = "");
 
     static void SetCurrentPrefix(const QString);
     static bool SetCurrentPrefixCfg(const QString, const QString, const QVariant);
