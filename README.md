@@ -40,7 +40,20 @@ The backend tool that Nero relies on, *umu,* is *allegedly* based around a cooki
 ## Building
 Requirements for building Nero from source:
  - `Qt5`/ `Qt6` - the Base and Network libraries are required. Tested mainly on Qt 5, but should also be compatible up through Qt 6.8 LTS.
- - `QuaZip` - Needed for extracting zip archives (mainly the Discord RPC bridge utility).
+ - `QuaZip` - Needed for extracting zip archives (mainly the Discord RPC bridge utility). For Qt6, QuaZip additionally requires the Qt5Compat layer.
+
+#### Arch
+```
+sudo pacman -Sy qt6-base qt6-tools qt6-5compat quazip-qt6
+```
+#### Fedora
+```
+sudo dnf install qt6-qtbase-devel qt6-qttools-devel qt6-qt5compat-devel quazip-qt6-devel
+```
+#### Debian/Ubuntu (& derivatives)
+```
+sudo apt install build-essential cmake qt6-base-dev qttools6-dev qt6-5compat-dev libquazip1-qt6
+```
 
 Additionally, Nero uses the following external components, either implicitly or optionally:
  - `umu-launcher` [required] - the Proton runner backend. *duh*
