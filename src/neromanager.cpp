@@ -33,6 +33,7 @@
 #include <QFileDialog>
 #include <QProcess>
 #include <QTimer>
+#include <QWindow>
 
 NeroManagerWindow::NeroManagerWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -40,6 +41,7 @@ NeroManagerWindow::NeroManagerWindow(QWidget *parent)
 {
     QCoreApplication::setApplicationName("Nero-UMU");
 
+    /* OLD ICON CODE
     // rand + undefined int, bit shifted to only give the three least significant bytes (0-7)
     // THIS can be set before window setup...
     switch(((LOLRANDOM + rand()) >> 29)) {
@@ -52,6 +54,9 @@ NeroManagerWindow::NeroManagerWindow(QWidget *parent)
     case 6: this->setWindowIcon(QIcon(":/ico/narikiri/woodrow")); break;
     case 7: this->setWindowIcon(QIcon(":/ico/narikiri/kongman")); break;
     }
+    */
+
+    this->setWindowIcon(QIcon(":/ico/systrayPhi"));
 
     #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     // required for good hidpi icon quality because Qt < 6 didn't set this automatically.
@@ -97,7 +102,7 @@ NeroManagerWindow::NeroManagerWindow(QWidget *parent)
     if(managerCfg->value("WinSize").isValid())
         this->resize(managerCfg->value("WinSize").toSize());
 
-    sysTray = new QSystemTrayIcon(this->windowIcon(), this);
+    sysTray = new QSystemTrayIcon(QIcon(":/ico/systrayPhi"), this);
     for(auto &action : sysTrayActions)
         sysTrayMenu.addAction(&action);
     connect(&sysTrayActions[0], &QAction::triggered, this, &NeroManagerWindow::actionExit_activated);

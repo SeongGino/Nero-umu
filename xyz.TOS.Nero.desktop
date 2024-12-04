@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=Nero-UMU
+Exec=nero-umu %f
+GenericName=A fast and efficient umu manager, just as the Romans designed
+Icon=xyz.TOS.Nero
+NoDisplay=false
+StartupNotify=true
+Terminal=false
+Type=Application
+MimeType=application/x-ms-dos-executable;application/x-msi;application/x-bat
+Categories=Game;

@@ -1,12 +1,5 @@
 <RCC>
     <qresource prefix="/ico">
-        <file alias="narikiri/chelsea">narikiri/chelsea.png</file>
-        <file alias="narikiri/kongman">narikiri/kongman.png</file>
-        <file alias="narikiri/lilith">narikiri/lilith.png</file>
-        <file alias="narikiri/mary">narikiri/mary.png</file>
-        <file alias="narikiri/philia">narikiri/philia.png</file>
-        <file alias="narikiri/rutee">narikiri/rutee.png</file>
-        <file alias="narikiri/stahn">narikiri/stahn.png</file>
-        <file alias="narikiri/woodrow">narikiri/woodrow.png</file>
+        <file alias="systrayPhi">ico/systrayPhi.png</file>
     </qresource>
 </RCC>

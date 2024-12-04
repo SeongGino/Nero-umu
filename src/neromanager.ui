@@ -290,7 +290,7 @@
           </property>
          </spacer>
         </item>
-        <item alignment="Qt::AlignmentFlag::AlignRight">
+        <item alignment="Qt::AlignRight">
          <widget class="QPushButton" name="managerSettings">
           <property name="text">
            <string/>

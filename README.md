@@ -11,9 +11,9 @@ A fast and efficient Proton prefix runner and manager, using [umu](https://githu
  - **It's simple by default:** Create a prefix, add a shortcut, and done. Popups and settings are kept to a minimum to make adding new items as quick as possible.
  - **It's flexible when needed:** With comprehensive settings for both prefix and shortcut, even things that experts will use often like DLL overrides or configuring add-ons to run alongside umu like *Gamemode* and *Gamescope* can be configured graphically; all without having to type in long-winded command strings.
  - **It's streamlined:** Comprehensive descriptions of each setting and how to get the best out of them will make even a new user armed and ready with the knowledge to make full use of Proton's potential.
- - **It's integrated:*** A built-in Winetricks frontend skips the clunkiness, allowing quick and simple verbs installation either during or after creating a prefix, and per-shortcut version overrides can be set without using Winecfg.
+ - **It's integrated:*** A built-in Winetricks frontend skips (most of) the clunkiness, allowing quick and simple verbs installation either during or after creating a prefix, and per-shortcut version overrides can be set without using Winecfg.
  - **It works from the CLI:** Nero Manager is the integrated graphical frontend, made for creating, managing and running prefixes and shortcuts. But when run from the CLI, Nero's Runner component can launch an executable in a prefix, not unlike *Bottles.*
- - **It's got other stuff:** Easily install the Discord RPC bridge for each prefix, set custom shortcut icons, use pre-run and post-run scripts, and *just play your darn games already.*
+ - **It's got other stuff:** Easily install the Discord RPC bridge for each prefix, automagically apply SDL Controller layouts fix (e.g. for Nintendo controllers et al), set custom shortcut icons, use pre-run and post-run scripts, and *just play your darn games already.*
 
 ## Running
 Nero can be started without arguments, which launches the Nero Manager frontend. This is where you make and setup your prefixes, and run shortcuts.
@@ -28,6 +28,8 @@ It's highly recommend to use utilities such as *[ProtonUp-Qt](https://github.com
 Nero's been confirmed to build and work on the following:
  - Arch Linux (btw), w/ Qt 5.15.16
  - Linux Mint 22, Qt 6.4
+
+For Arch users, Nero can be installed from the AUR @ `[nero-umu](https://aur.archlinux.org/packages/nero-umu)` with your favorite helper app. For others, see building steps below (don't worry, it's not that hard!).
 
 ## Building
 Requirements for building Nero from source:
@@ -74,7 +76,7 @@ Originally, I (Seong) had no intentions of making another launcher, as I was per
 
 None of these are intended to be sleights against the developers, as they evidently do very good work *for the people these apps work for* - they just don't work for me and my use case, as someone who has limited disk space and often relies on one prefix for many applications and using Wine DLL overrides often. I'm also in the extra-unfortunate position of [being a YouTube video creator that talks about gaming on Linux](https://www.youtube.com/channel/UCKq6oQq_CnvzW4vhu-XpQ0g/), and the primary maintainer of [an open source Lightgun system](https://github.com/TeamOpenFIRE/OpenFIRE-Firmware) where a lot of the functionality and testing relies around *having an up-to-date Wine prefix* to launch and play Windows-based titles (because *fuck trying to use Windows*), so I would need to do *something.*
 
-Presenting: *something.*
+So here I am presenting to you: ***something.***
 
 ### "Why would I use your launcher over those others?"
 Well, most apparent, Nero is meant to be the Proton-running stand-in for original *Bottles,* for people who are somewhat comfortable managing prefixes, but also made to be inviting for newbies who aren't quite knowledgeable about how Wine works. So if Bottles is your jam, there's a good chance you'll be able to jump right into Nero!
@@ -82,7 +84,7 @@ Well, most apparent, Nero is meant to be the Proton-running stand-in for origina
 However, if you're looking for *deep* integration with other storefronts (i.e. GOG, EA, Uplay, etc.), you may be better served by either *Heroic* or *Lutris*. That said, actually setting up a prefix just for EA's app (or Origin) or Uplay *is actually very easy;* just running their installers is usually good enough for most people!
 
 ### "So what's the deal with the name?"
-The backend tool that Nero relies on, *umu,* is *allegedly* based around a cooking utility from Polynesian culture - however, before realizing this, [I could only think of one thing.](https://mstdn.games/@ThatOneSeong/112135472169805512)
+The backend tool that Nero relies on, *umu,* is *allegedly* based around a cooking utility from Polynesian culture - however, when I initially heard the name, [I could only think of one thing.](https://mstdn.games/@ThatOneSeong/112135472169805512)
 
 *Nero* (full name *Nero Claudius*) is the 5th Roman Emperor, known for his contributions to diplomacy, trade, and culture. Some recounts claim that his reign was tyrannical and is viewed in a negative light by these interpretations; meanwhile, certain others made Nero into a genderbent reflection of their historical selves during the *Moon Cell Holy Grail War,* and often uses *umu* as a catchphrase. Go figure.
 ###### No relation to Nero, a primary protagonist of *Devil May Cry 4/5*, featuring Dante from the *Devil May Cry* series.
@@ -95,6 +97,14 @@ The backend tool that Nero relies on, *umu,* is *allegedly* based around a cooki
  - Add integration with SteamGridDB for downloading capsule art for potential favorites menu
  - Integrate umu's extensive protonfixes support (perhaps using OWC's fixes database?)
    - This might necessitate adding a distinction between "normal" prefixes, and one-title prefixes as protonfixes are geared towards the one-prefix-per-game thing.
+
+## Things I likely WON'T do:
+ - Set custom DXVK/VKD3D versions
+   - If you really need this, make another Proton runner with these custom versions injected. Proton-GE already provides this for the most part.
+ - Integrate with non-Steam stores
+   - Other game launchers can be installed in their own prefix without too much difficulty, but specific support for this is unlikely as it doesn't fit with Nero's Prefix-first design
+ - Use Wine instead of Proton
+   - If you need Wine, Bottles would be a better fit.
 
 ## Special Thanks
  - Team OpenFIRE, for their optimism and support over the past year, and providing me the opportunity that allowed Nero to exist in the first place.
