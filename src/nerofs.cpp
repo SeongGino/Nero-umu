@@ -69,7 +69,7 @@ bool NeroFS::InitPaths() {
         printf("Steam detected, using existing compatibilitytools.d\n");
     } else {
         printf("Working Steam install not detected, using Nero data directory for Proton versions\n");
-        protonsPath.setPath(QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + "/Nero-UMU/protons");
+        protonsPath.setPath(QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + "/Nero-UMU/compatibilitytools.d");
         if(!protonsPath.exists()) {
             printf("Nero directory doesn't exist! Creating paths...\n");
             protonsPath.mkpath(".");
@@ -165,9 +165,8 @@ void NeroFS::CreateUserLinks(QString prefixName)
 
 QStringList NeroFS::GetAvailableProtons()
 {
-    if(availableProtons.isEmpty()) {
-        availableProtons << NeroFS::GetProtonsPath().entryList(QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name);
-    }
+    if(availableProtons.isEmpty())
+        availableProtons << protonsPath.entryList(QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name);
 
     return availableProtons;
 }

@@ -1,3 +1,6 @@
+###### If you enjoy or if my work's helped you in any way,
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/Z8Z5NNXWL)
+
 # Nero Manager
 A fast and efficient Proton prefix runner and manager, using [umu](https://github.com/Open-Wine-Components/umu-launcher) as its backend for Steam-like compatibility with non-Steam applications.
 
@@ -12,6 +15,53 @@ A fast and efficient Proton prefix runner and manager, using [umu](https://githu
  - **It works from the CLI:** Nero Manager is the integrated graphical frontend, made for creating, managing and running prefixes and shortcuts. But when run from the CLI, Nero's Runner component can launch an executable in a prefix, not unlike *Bottles.*
  - **It's got other stuff:** Easily install the Discord RPC bridge for each prefix, set custom shortcut icons, use pre-run and post-run scripts, and *just play your darn games already.*
 
+## Running
+Nero can be started without arguments, which launches the Nero Manager frontend. This is where you make and setup your prefixes, and run shortcuts.
+
+Nero can also be started with CLI arguments - a path to an executable will launch Nero's One-Time Runner popup, which prompts which prefix to run the executable in (using the prefix's current global settings) - else, a prefix to run in can also be specified alongside an executable for a prompt-less startup. See `nero-umu --help` for more info.
+
+Because Nero itself does NOT manage runners--only prefixes--you need at least *one* Proton runner available in any of the following directories, in order of search priority:
+ - `~/.steam/steam/compatibilitytools.d` (runners used with Steam)
+ - `~/.local/share/Nero-UMU/compatibilitytools.d` (Nero's own runners dir, in case Steam isn't installed)
+It's highly recommend to use utilities such as *[ProtonUp-Qt](https://github.com/DavidoTek/ProtonUp-Qt)* or *[ProtonPlus](https://github.com/Vysp3r/ProtonPlus)* to install new Steam runners.
+
+Nero's been confirmed to build and work on the following:
+ - Arch Linux (btw), w/ Qt 5.15.16
+ - Linux Mint 22, Qt 6.4
+
+## Building
+Requirements for building Nero from source:
+ - `Qt5` or `Qt6` - the Base and Network libraries are required. Tested mainly on Qt 5, but should also be compatible up through Qt 6.8 LTS.
+ - `QuaZip` - Needed for extracting zip archives (mainly the Discord RPC bridge utility). For Qt6, QuaZip additionally requires the Qt5Compat layer.
+
+#### Arch
+```
+sudo pacman -Sy qt6-base qt6-tools qt6-5compat quazip-qt6
+```
+#### Fedora
+```
+sudo dnf install qt6-qtbase-devel qt6-qttools-devel qt6-qt5compat-devel quazip-qt6-devel
+```
+#### Debian/Ubuntu (& derivatives)
+```
+sudo apt install build-essential cmake qt6-base-dev qt6-tools-dev qt6-5compat-dev libquazip1-qt6-dev
+```
+
+Additionally, Nero uses the following external components, either implicitly or optionally:
+ - `umu-launcher` [required] - the Proton runner backend, *duh.* Can either be installed directly from repos (currently in Arch's `multilib`), or via the package bundles in the releases page for your distro.
+ - `curl` [optional] - for grabbing certain network components, currently only used for downloading the latest release of the Discord RPC bridge. TODO: See also [#12](https://github.com/SeongGino/Nero-umu/issues/12)
+ - `winetricks` [optional] - if the current Proton runner for a prefix doesn't have a `protonfixes/winetricks` binary (normally included in the -GE fork, but not upstream), then system Winetricks will be used instead for Winetricks functionality - otherwise, all Winetricks functionality will be disabled.
+ - `icoextract` + `icoutils` [optional] - used for getting icons from selected executables for shortcut entries. If neither of these exists, icons extraction will be skipped entirely, and only raw *.PNG* files can be used as icons - a placeholder icon vector from the XDG theme will be used if no image is available.
+
+It's a very basic CMake system, so simply run:
+```
+mkdir build && cd build
+cmake ..
+make
+```
+The executable `nero-umu` will be created.
+
+## Frequently Asked FAQs
 ### "Oh c'mon, ANOTHER launcher for Linux?"
 #### Wait! There's a good reason for this!
 Originally, I (Seong) had no intentions of making another launcher, as I was perfectly content using Bottles in combination with [Wine-GE](https://github.com/GloriousEggroll/wine-ge-custom). However, [as this fork of Wine has been deprecated for nearly a year now](https://github.com/GloriousEggroll/wine-ge-custom/releases/tag/GE-Proton8-26) in favor of *umu* and *Proton-GE,* this has left non-Steam non-other-launcher users like myself in a bit of a sticky situation; Wine-GE [was missing out on more and more](https://mstdn.games/@ThatOneSeong/113360310428612780) [critical updates for games](https://mstdn.games/@ThatOneSeong/113040976370840435), and it's grown increasingly clear that the Wine userbase was being (not-so-subtly) aggressively pushed towards Proton via *umu.* So it would be fair to assume that the popular launchers have all caught up with this trend, right?
@@ -37,38 +87,6 @@ The backend tool that Nero relies on, *umu,* is *allegedly* based around a cooki
 *Nero* (full name *Nero Claudius*) is the 5th Roman Emperor, known for his contributions to diplomacy, trade, and culture. Some recounts claim that his reign was tyrannical and is viewed in a negative light by these interpretations; meanwhile, certain others made Nero into a genderbent reflection of their historical selves during the *Moon Cell Holy Grail War,* and often uses *umu* as a catchphrase. Go figure.
 ###### No relation to Nero, a primary protagonist of *Devil May Cry 4/5*, featuring Dante from the *Devil May Cry* series.
 
-## Building
-Requirements for building Nero from source:
- - `Qt5`/ `Qt6` - the Base and Network libraries are required. Tested mainly on Qt 5, but should also be compatible up through Qt 6.8 LTS.
- - `QuaZip` - Needed for extracting zip archives (mainly the Discord RPC bridge utility). For Qt6, QuaZip additionally requires the Qt5Compat layer.
-
-#### Arch
-```
-sudo pacman -Sy qt6-base qt6-tools qt6-5compat quazip-qt6
-```
-#### Fedora
-```
-sudo dnf install qt6-qtbase-devel qt6-qttools-devel qt6-qt5compat-devel quazip-qt6-devel
-```
-#### Debian/Ubuntu (& derivatives)
-```
-sudo apt install build-essential cmake qt6-base-dev qt6-tools-dev qt6-5compat-dev libquazip1-qt6-dev
-```
-
-Additionally, Nero uses the following external components, either implicitly or optionally:
- - `umu-launcher` [required] - the Proton runner backend. *duh*
- - `curl` [optional] - for grabbing certain network components, currently only used for downloading the latest release of the Discord RPC bridge. TODO: See also #12
- - `winetricks` [optional] - if the current Proton runner for a prefix doesn't have a `protonfixes/winetricks` binary (normally included in the -GE fork, but not upstream), then system Winetricks will be used instead for Winetricks functionality - otherwise, all Winetricks functionality will be disabled.
- - `icoextract` + `icoutils` (specifically *icotool* component) [optional] - used for getting icons from selected executables for shortcut entries. If neither of these exists, icons extraction will be skipped entirely, and only raw *.PNG* files can be used as icons - a placeholder icon vector from the XDG theme will be used if no image is available.
-
-It's a very basic CMake system, so simply run:
-```
-mkdir build && cd build
-cmake ..
-make
-```
-The executable `nero-umu` will be created.
-
 ## TODOs (to do):
  - Add built-in downloader without external curl use (#12)
  - Add favorites system
@@ -77,3 +95,9 @@ The executable `nero-umu` will be created.
  - Add integration with SteamGridDB for downloading capsule art for potential favorites menu
  - Integrate umu's extensive protonfixes support (perhaps using OWC's fixes database?)
    - This might necessitate adding a distinction between "normal" prefixes, and one-title prefixes as protonfixes are geared towards the one-prefix-per-game thing.
+
+## Special Thanks
+ - Team OpenFIRE, for their optimism and support over the past year, and providing me the opportunity that allowed Nero to exist in the first place.
+ - My supporters on Ko-fi, for their financial and emotional support over the past couple of years.
+ - The friends that helped keep me sane along the way.
+ - Emm, for being there when I needed them.
