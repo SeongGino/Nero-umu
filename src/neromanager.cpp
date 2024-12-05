@@ -33,7 +33,6 @@
 #include <QFileDialog>
 #include <QProcess>
 #include <QTimer>
-#include <QWindow>
 
 NeroManagerWindow::NeroManagerWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -267,7 +266,7 @@ void NeroManagerWindow::RenderPrefixList()
     }
 }
 
-void NeroManagerWindow::CreatePrefix(const QString newPrefix, const QString runner, QStringList tricksToInstall)
+void NeroManagerWindow::CreatePrefix(const QString &newPrefix, const QString &runner, QStringList tricksToInstall)
 {
     QProcess umu;
     QMessageBox waitBox(QMessageBox::NoIcon,
@@ -282,7 +281,7 @@ void NeroManagerWindow::CreatePrefix(const QString newPrefix, const QString runn
     env.insert("WINEPREFIX", NeroFS::GetPrefixesPath().path() + '/' + newPrefix);
     env.insert("GAMEID", "0");
     env.insert("PROTONPATH", NeroFS::GetProtonsPath().path() + '/' + runner);
-    env.insert("UMU_RUNTIME_UPDATE", "0");
+    //env.insert("UMU_RUNTIME_UPDATE", "0");
     umu.setProcessEnvironment(env);
     umu.setProcessChannelMode(QProcess::MergedChannels);
 
@@ -393,7 +392,7 @@ void NeroManagerWindow::CheckWinetricks()
     }
 }
 
-void NeroManagerWindow::AddTricks(QStringList verbs, const QString prefix)
+void NeroManagerWindow::AddTricks(QStringList verbs, const QString &prefix)
 {
     QProcess umu;
     QMessageBox waitBox(QMessageBox::NoIcon,
@@ -407,13 +406,12 @@ void NeroManagerWindow::AddTricks(QStringList verbs, const QString prefix)
 
     QMap<QString, QVariant> settingsMap = NeroFS::GetCurrentPrefixSettings();
 
-    env.insert("WINEPREFIX", QString("%1/%2").arg(NeroFS::GetPrefixesPath().path(), prefix));
+    env.insert("WINEPREFIX", NeroFS::GetPrefixesPath().path() + '/' + prefix);
     env.insert("GAMEID", "0");
-    env.insert("PROTONPATH", QString("%1/%2").arg(NeroFS::GetProtonsPath().path(), settingsMap["CurrentRunner"].toString()));
-    env.insert("UMU_RUNTIME_UPDATE", "0");
+    env.insert("PROTONPATH", NeroFS::GetProtonsPath().path() + '/' + settingsMap["CurrentRunner"].toString());
+    //env.insert("UMU_RUNTIME_UPDATE", "0");
     umu.setProcessEnvironment(env);
     umu.setProcessChannelMode(QProcess::MergedChannels);
-
 
     verbs.prepend("winetricks");
     umu.start(NeroFS::GetUmU(), verbs);

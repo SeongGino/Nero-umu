@@ -142,8 +142,8 @@ private:
     void CheckWinetricks();
     void RenderPrefixes();
     void RenderPrefixList();
-    void CreatePrefix(const QString newPrefix, const QString runner, QStringList tricksToInstall = {});
-    void AddTricks(QStringList verbs, const QString prefix);
+    void CreatePrefix(const QString &, const QString &, QStringList tricksToInstall = {});
+    void AddTricks(QStringList, const QString &);
     void RenderShortcuts();
     void CleanupShortcuts();
     void StartBlinkTimer();

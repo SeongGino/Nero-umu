@@ -94,7 +94,7 @@ QStringList NeroFS::GetPrefixes()
     return prefixes;
 }
 
-void NeroFS::CreateUserLinks(QString prefixName)
+void NeroFS::CreateUserLinks(const QString &prefixName)
 {
     QDir prefixDir(NeroFS::GetPrefixesPath().path() + '/' + prefixName);
     if(prefixDir.exists()) {
@@ -221,7 +221,7 @@ QString NeroFS::GetWinetricks(const QString &runner)
     }
 }
 
-void NeroFS::SetCurrentPrefix(const QString prefix)
+void NeroFS::SetCurrentPrefix(const QString &prefix)
 {
     currentPrefix = prefix;
 
@@ -243,7 +243,7 @@ QSettings* NeroFS::GetCurrentPrefixCfg()
     }
 }
 
-bool NeroFS::SetCurrentPrefixCfg(const QString group, const QString key, const QVariant value)
+bool NeroFS::SetCurrentPrefixCfg(const QString &group, const QString &key, const QVariant &value)
 {
     GetCurrentPrefixCfg();
     if(prefixCfg != nullptr) {
@@ -273,7 +273,7 @@ QMap<QString, QVariant> NeroFS::GetCurrentPrefixSettings()
     return settingsMap;
 }
 
-void NeroFS::AddNewPrefix(const QString newPrefix, const QString runner)
+void NeroFS::AddNewPrefix(const QString &newPrefix, const QString &runner)
 {
     prefixes.append(newPrefix);
     SetCurrentPrefix(newPrefix);
@@ -310,7 +310,7 @@ void NeroFS::AddNewPrefix(const QString newPrefix, const QString runner)
     currentPrefix.clear();
 }
 
-void NeroFS::AddNewShortcut(const QString newShortcutHash, const QString newShortcutName, const QString newAppPath) {
+void NeroFS::AddNewShortcut(const QString &newShortcutHash, const QString &newShortcutName, const QString &newAppPath) {
     SetCurrentPrefixCfg("Shortcuts", newShortcutHash, newShortcutName);
     SetCurrentPrefixCfg(QString("Shortcuts--%1").arg(newShortcutHash), "Name", newShortcutName);
     SetCurrentPrefixCfg(QString("Shortcuts--%1").arg(newShortcutHash), "Path", newAppPath);
@@ -343,7 +343,7 @@ void NeroFS::AddNewShortcut(const QString newShortcutHash, const QString newShor
     SetCurrentPrefixCfg(QString("Shortcuts--%1").arg(newShortcutHash), "PostRunScript", {""});
 }
 
-QMap<QString, QVariant> NeroFS::GetShortcutSettings(const QString shortcutHash)
+QMap<QString, QVariant> NeroFS::GetShortcutSettings(const QString &shortcutHash)
 {
     GetCurrentPrefixCfg();
     if(!prefixCfg->group().isEmpty()) prefixCfg->endGroup();
@@ -395,7 +395,7 @@ QMap<QString, QString> NeroFS::GetCurrentShortcutsMap()
     return shortcutsMap;
 }
 
-bool NeroFS::DeletePrefix(const QString prefix)
+bool NeroFS::DeletePrefix(const QString &prefix)
 {
     prefixes.removeOne(prefix);
     if(QDir(prefixesPath.path() + '/' + prefix).removeRecursively())
@@ -403,7 +403,7 @@ bool NeroFS::DeletePrefix(const QString prefix)
     else return false;
 }
 
-void NeroFS::DeleteShortcut(const QString shortcutHash)
+void NeroFS::DeleteShortcut(const QString &shortcutHash)
 {
     GetCurrentPrefixCfg();
     if(!prefixCfg->group().isEmpty()) prefixCfg->endGroup();

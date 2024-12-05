@@ -55,13 +55,13 @@ public:
     static QStringList GetCurrentPrefixShortcuts();
     static QMap<QString, QVariant> GetCurrentPrefixSettings();
     static QMap<QString, QString> GetCurrentShortcutsMap();
-    static QMap<QString, QVariant> GetShortcutSettings(const QString);
+    static QMap<QString, QVariant> GetShortcutSettings(const QString &);
     static QSettings GetManagerCfg() { return QSettings(QStandardPaths::writableLocation(QStandardPaths::GenericConfigLocation) + "/Nero-UMU.ini", QSettings::IniFormat); }
-    static void CreateUserLinks(const QString);
-    static void AddNewPrefix(const QString, const QString);
-    static void AddNewShortcut(const QString, const QString, const QString);
-    static bool DeletePrefix(const QString);
-    static void DeleteShortcut(const QString);
+    static void CreateUserLinks(const QString &);
+    static void AddNewPrefix(const QString &, const QString &);
+    static void AddNewShortcut(const QString &, const QString &, const QString &);
+    static bool DeletePrefix(const QString &);
+    static void DeleteShortcut(const QString &);
 
     static QSettings* GetCurrentPrefixCfg();
 
@@ -70,9 +70,9 @@ public:
     static QString GetUmU();
     static QString GetWinetricks(const QString & = "");
 
-    static void SetCurrentPrefix(const QString);
-    static bool SetCurrentPrefixCfg(const QString, const QString, const QVariant);
-    static void AddNewShortcutSetting(const QString shortcutHash, const QString key, const QVariant value) {
+    static void SetCurrentPrefix(const QString &);
+    static bool SetCurrentPrefixCfg(const QString &, const QString &, const QVariant &);
+    static void AddNewShortcutSetting(const QString &shortcutHash, const QString &key, const QVariant &value) {
         SetCurrentPrefixCfg(QString("Shortcuts--%1").arg(shortcutHash), key, value);
     }
 };
