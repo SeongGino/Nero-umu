@@ -276,6 +276,7 @@ void NeroManagerWindow::CreatePrefix(const QString newPrefix, const QString runn
                         QMessageBox::NoButton,
                         this,
                         Qt::Dialog | Qt::FramelessWindowHint | Qt::MSWindowsFixedSizeDialogHint);
+    waitBox.setStandardButtons(QMessageBox::NoButton);
     QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
 
     env.insert("WINEPREFIX", NeroFS::GetPrefixesPath().path() + '/' + newPrefix);
@@ -395,7 +396,13 @@ void NeroManagerWindow::CheckWinetricks()
 void NeroManagerWindow::AddTricks(QStringList verbs, const QString prefix)
 {
     QProcess umu;
-    QMessageBox waitBox(QMessageBox::NoIcon, "Generating Prefix", "Please wait...", QMessageBox::NoButton, this, Qt::Dialog | Qt::FramelessWindowHint | Qt::MSWindowsFixedSizeDialogHint);
+    QMessageBox waitBox(QMessageBox::NoIcon,
+                        "Generating Prefix",
+                        "Please wait...",
+                        QMessageBox::NoButton,
+                        this,
+                        Qt::Dialog | Qt::FramelessWindowHint | Qt::MSWindowsFixedSizeDialogHint);
+    waitBox.setStandardButtons(QMessageBox::NoButton);
     QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
 
     QMap<QString, QVariant> settingsMap = NeroFS::GetCurrentPrefixSettings();
@@ -633,8 +640,12 @@ void NeroManagerWindow::prefixShortcutPlayButtons_clicked()
         prefixShortcutPlayButton.at(slot)->setToolTip("Stop " + prefixShortcutLabel.at(slot)->text());
         ui->backButton->setIcon(QIcon::fromTheme("media-playback-stop"));
         ui->backButton->setToolTip("Shut down all running programs in this prefix.");
+        sysTray->setIcon(QIcon(":/ico/systrayPhiPlaying"));
         threadsCount += 1;
         currentlyRunning.append(slot);
+        if(currentlyRunning.count() > 1)
+            sysTray->setToolTip("Nero Manager (" + NeroFS::GetCurrentPrefix() + " is running " + QString::number(currentlyRunning.count()) + " apps)");
+        else sysTray->setToolTip("Nero Manager (" + NeroFS::GetCurrentPrefix() + " is running " + prefixShortcutLabel.at(slot)->text() + ')');
 
         QMap<QString, QString> settings = NeroFS::GetCurrentShortcutsMap();
 
@@ -683,8 +694,12 @@ void NeroManagerWindow::on_oneTimeRunBtn_clicked()
     if(!oneTimeApp.isEmpty()) {
         ui->backButton->setIcon(QIcon::fromTheme("media-playback-stop"));
         ui->backButton->setToolTip("Shut down all running programs in this prefix.");
+        sysTray->setIcon(QIcon(":/ico/systrayPhiPlaying"));
         threadsCount += 1;
         currentlyRunning.append(-1);
+        if(currentlyRunning.count() > 1)
+            sysTray->setToolTip("Nero Manager (" + NeroFS::GetCurrentPrefix() + " is running " + QString::number(currentlyRunning.count()) + " apps)");
+        else sysTray->setToolTip("Nero Manager (" + NeroFS::GetCurrentPrefix() + " is running " + oneTimeApp.mid(oneTimeApp.lastIndexOf('/')+1) + ')');
 
         if(runnerWindow == nullptr) {
             QIcon icon;
@@ -812,6 +827,7 @@ void NeroManagerWindow::prefixSettings_result()
                                settings.value(prefixShortcutLabel.at(slot)->text()) + ".png");
 
                 prefixShortcutLabel.at(slot)->setText(prefixSettings->appName);
+                prefixShortcutPlayButton.at(slot)->setToolTip("Start " + prefixSettings->appName);
             }
         // delete shortcut signal
         } else if(prefixSettings->result() == -1) {
@@ -952,6 +968,10 @@ void NeroManagerWindow::handleUmuResults(const int &buttonSlot, const int &resul
         umuController.clear();
         ui->backButton->setIcon(QIcon::fromTheme("go-previous"));
         ui->backButton->setToolTip("Go back to prefixes list.");
+        sysTray->setIcon(QIcon(":/ico/systrayPhi"));
+        sysTray->setToolTip("Nero Manager");
+    } else {
+        sysTray->setToolTip("Nero Manager (" + NeroFS::GetCurrentPrefix() + " is running " + QString::number(currentlyRunning.count()) + " apps)");
     }
 }
 

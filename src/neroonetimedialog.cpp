@@ -27,18 +27,7 @@ NeroOneTimeDialog::NeroOneTimeDialog(QWidget *parent)
 {
     ui->setupUi(this);
 
-    // rand + undefined int, bit shifted to only give the three least significant bytes (0-7)
-    // THIS can be set before window setup...
-    switch(((LOLRANDOM + rand()) >> 29)) {
-    case 0: this->setWindowIcon(QIcon(":/ico/narikiri/stahn")); break;
-    case 1: this->setWindowIcon(QIcon(":/ico/narikiri/rutee")); break;
-    case 2: this->setWindowIcon(QIcon(":/ico/narikiri/mary")); break;
-    case 3: this->setWindowIcon(QIcon(":/ico/narikiri/chelsea")); break;
-    case 4: this->setWindowIcon(QIcon(":/ico/narikiri/philia")); break;
-    case 5: this->setWindowIcon(QIcon(":/ico/narikiri/lilith")); break;
-    case 6: this->setWindowIcon(QIcon(":/ico/narikiri/woodrow")); break;
-    case 7: this->setWindowIcon(QIcon(":/ico/narikiri/kongman")); break;
-    }
+    this->setWindowIcon(QIcon(":/ico/systrayPhi"));
 
     #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     // required for good hidpi icon quality because Qt < 6 didn't set this automatically.

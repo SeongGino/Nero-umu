@@ -90,7 +90,8 @@ The backend tool that Nero relies on, *umu,* is *allegedly* based around a cooki
 ###### No relation to Nero, a primary protagonist of *Devil May Cry 4/5*, featuring Dante from the *Devil May Cry* series.
 
 ## TODOs (to do):
- - Add built-in downloader without external curl use (#12)
+ - Add built-in downloader without external curl use ([#12](https://github.com/SeongGino/Nero-umu/issues/12))
+ - Add `dxvk.conf` configuration dialog in shortcut settings.
  - Add favorites system
  - Add shortcuts list sorting system (currently only does ascending alphabetical)
  - Import shortcuts for newly installed applications to prefix Shortcuts list?
@@ -99,6 +100,8 @@ The backend tool that Nero relies on, *umu,* is *allegedly* based around a cooki
    - This might necessitate adding a distinction between "normal" prefixes, and one-title prefixes as protonfixes are geared towards the one-prefix-per-game thing.
 
 ## Things I likely WON'T do:
+ - Setting custom environment variables
+   - Aside from being a minor pain to parse, all possible options in Nero Manager should be something that's presented to the user - so if there is something you feel is missing, feel free to open up an issue and/or pull request. If you have a particular need for an esoteric CLI cheat code, prepend it to Nero itself in the meantime.
  - Set custom DXVK/VKD3D versions
    - If you really need this, make another Proton runner with these custom versions injected. Proton-GE already provides this for the most part.
  - Integrate with non-Steam stores
