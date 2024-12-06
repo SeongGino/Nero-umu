@@ -29,14 +29,14 @@
       <attribute name="title">
        <string>General</string>
       </attribute>
-      <layout class="QGridLayout" name="gridLayout" rowstretch="0,0,0" columnstretch="1,0">
+      <layout class="QGridLayout" name="gridLayout" rowstretch="0,0,1" columnstretch="1,0">
        <item row="2" column="1">
         <widget class="QGroupBox" name="servicesGroup">
          <property name="title">
           <string>System Services</string>
          </property>
          <property name="alignment">
-          <set>Qt::AlignCenter</set>
+          <set>Qt::AlignmentFlag::AlignCenter</set>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_3">
           <item>
@@ -96,13 +96,13 @@
           <string>Shortcut</string>
          </property>
          <property name="alignment">
-          <set>Qt::AlignCenter</set>
+          <set>Qt::AlignmentFlag::AlignCenter</set>
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,0,3,1">
           <item>
            <spacer name="horizontalSpacer_3">
             <property name="orientation">
-             <enum>Qt::Horizontal</enum>
+             <enum>Qt::Orientation::Horizontal</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
@@ -242,7 +242,7 @@
                <string>Another shortcut with this name already exists!</string>
               </property>
               <property name="alignment">
-               <set>Qt::AlignCenter</set>
+               <set>Qt::AlignmentFlag::AlignCenter</set>
               </property>
              </widget>
             </item>
@@ -270,7 +270,7 @@
           <item>
            <spacer name="horizontalSpacer_4">
             <property name="orientation">
-             <enum>Qt::Horizontal</enum>
+             <enum>Qt::Orientation::Horizontal</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
@@ -289,7 +289,7 @@
           <string>Runner Settings</string>
          </property>
          <property name="alignment">
-          <set>Qt::AlignCenter</set>
+          <set>Qt::AlignmentFlag::AlignCenter</set>
          </property>
          <layout class="QGridLayout" name="gridLayout_7" columnstretch="1,0,2,1">
           <item row="0" column="1">
@@ -312,7 +312,7 @@
             </property>
            </widget>
           </item>
-          <item row="1" column="1" colspan="2" alignment="Qt::AlignCenter">
+          <item row="1" column="1" colspan="2" alignment="Qt::AlignmentFlag::AlignHCenter|Qt::AlignmentFlag::AlignVCenter">
            <widget class="QCheckBox" name="togglePrefixRuntimeUpdates">
             <property name="whatsThis">
              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When checked, every time an application is launched in this prefix, &lt;span style=&quot; font-style:italic;&quot;&gt;umu&lt;/span&gt; will always check the internet if there's a new version of the Steam Runtime available, and automatically install it if an update is found. This ensures compatibility, at a cost to a minor hit in startup time, especially if you happen to be running in an environment without internet at the time.&lt;/p&gt;&lt;p&gt;If unsure, leave this enabled unless you're planning to run applications offline.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -331,7 +331,7 @@
           <item row="0" column="0" rowspan="2">
            <spacer name="horizontalSpacer_5">
             <property name="orientation">
-             <enum>Qt::Horizontal</enum>
+             <enum>Qt::Orientation::Horizontal</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
@@ -344,7 +344,7 @@
           <item row="0" column="3" rowspan="2">
            <spacer name="horizontalSpacer_6">
             <property name="orientation">
-             <enum>Qt::Horizontal</enum>
+             <enum>Qt::Orientation::Horizontal</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
@@ -363,9 +363,9 @@
           <string>Graphics and Image Quality</string>
          </property>
          <property name="alignment">
-          <set>Qt::AlignCenter</set>
+          <set>Qt::AlignmentFlag::AlignCenter</set>
          </property>
-         <layout class="QGridLayout" name="gridLayout_3" rowstretch="0,0,0,0,0,0">
+         <layout class="QGridLayout" name="gridLayout_3" rowstretch="0,0,0,0,0,1">
           <item row="2" column="1">
            <widget class="QComboBox" name="setScalingBox">
             <property name="whatsThis">
@@ -461,7 +461,7 @@
                 <number>8</number>
                </property>
                <property name="alignment">
-                <set>Qt::AlignCenter</set>
+                <set>Qt::AlignmentFlag::AlignCenter</set>
                </property>
                <property name="placeholderText">
                 <string>Height (px)</string>
@@ -587,7 +587,7 @@
                 <number>8</number>
                </property>
                <property name="alignment">
-                <set>Qt::AlignCenter</set>
+                <set>Qt::AlignmentFlag::AlignCenter</set>
                </property>
                <property name="placeholderText">
                 <string>Width (px)</string>
@@ -616,7 +616,7 @@
                 <number>8</number>
                </property>
                <property name="alignment">
-                <set>Qt::AlignCenter</set>
+                <set>Qt::AlignmentFlag::AlignCenter</set>
                </property>
                <property name="placeholderText">
                 <string>Width (px)</string>
@@ -641,7 +641,7 @@
                 <number>8</number>
                </property>
                <property name="alignment">
-                <set>Qt::AlignCenter</set>
+                <set>Qt::AlignmentFlag::AlignCenter</set>
                </property>
                <property name="placeholderText">
                 <string>Height (px)</string>
@@ -667,7 +667,7 @@
           <item row="5" column="0" colspan="2">
            <spacer name="verticalSpacer">
             <property name="orientation">
-             <enum>Qt::Vertical</enum>
+             <enum>Qt::Orientation::Vertical</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
@@ -699,7 +699,7 @@
                 <number>8</number>
                </property>
                <property name="alignment">
-                <set>Qt::AlignCenter</set>
+                <set>Qt::AlignmentFlag::AlignCenter</set>
                </property>
                <property name="placeholderText">
                 <string>Width (px)</string>
@@ -728,7 +728,7 @@
                 <number>8</number>
                </property>
                <property name="alignment">
-                <set>Qt::AlignCenter</set>
+                <set>Qt::AlignmentFlag::AlignCenter</set>
                </property>
                <property name="placeholderText">
                 <string>Height (px)</string>
@@ -786,7 +786,7 @@
                   <string>Limit FPS</string>
                  </property>
                  <property name="alignment">
-                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                  <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
                  </property>
                 </widget>
                </item>
@@ -799,7 +799,7 @@
                   <string>Limit FPS</string>
                  </property>
                  <property name="buttonSymbols">
-                  <enum>QAbstractSpinBox::PlusMinus</enum>
+                  <enum>QAbstractSpinBox::ButtonSymbols::PlusMinus</enum>
                  </property>
                  <property name="maximum">
                   <number>999</number>
@@ -833,7 +833,7 @@
           <string>DLL Overrides</string>
          </property>
          <property name="alignment">
-          <set>Qt::AlignCenter</set>
+          <set>Qt::AlignmentFlag::AlignCenter</set>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_5">
           <item>
@@ -841,7 +841,7 @@
             <item>
              <spacer name="horizontalSpacer">
               <property name="orientation">
-               <enum>Qt::Horizontal</enum>
+               <enum>Qt::Orientation::Horizontal</enum>
               </property>
               <property name="sizeHint" stdset="0">
                <size>
@@ -892,7 +892,7 @@
             <item>
              <spacer name="horizontalSpacer_2">
               <property name="orientation">
-               <enum>Qt::Horizontal</enum>
+               <enum>Qt::Orientation::Horizontal</enum>
               </property>
               <property name="sizeHint" stdset="0">
                <size>
@@ -923,7 +923,7 @@
           <item>
            <widget class="QScrollArea" name="scrollArea">
             <property name="horizontalScrollBarPolicy">
-             <enum>Qt::ScrollBarAlwaysOff</enum>
+             <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
             </property>
             <property name="widgetResizable">
              <bool>true</bool>
@@ -933,8 +933,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>618</width>
-               <height>359</height>
+               <width>600</width>
+               <height>454</height>
               </rect>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -943,7 +943,7 @@
                 <item row="0" column="0">
                  <spacer name="horizontalSpacer_11">
                   <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
+                   <enum>Qt::Orientation::Horizontal</enum>
                   </property>
                   <property name="sizeHint" stdset="0">
                    <size>
@@ -974,7 +974,7 @@
                 <item row="0" column="2">
                  <spacer name="horizontalSpacer_12">
                   <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
+                   <enum>Qt::Orientation::Horizontal</enum>
                   </property>
                   <property name="sizeHint" stdset="0">
                    <size>
@@ -987,7 +987,7 @@
                 <item row="1" column="1">
                  <spacer name="verticalSpacer_2">
                   <property name="orientation">
-                   <enum>Qt::Vertical</enum>
+                   <enum>Qt::Orientation::Vertical</enum>
                   </property>
                   <property name="sizeHint" stdset="0">
                    <size>
@@ -1012,13 +1012,13 @@
           <string>Windows</string>
          </property>
          <property name="alignment">
-          <set>Qt::AlignCenter</set>
+          <set>Qt::AlignmentFlag::AlignCenter</set>
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="1,0,2,1">
           <item>
            <spacer name="horizontalSpacer_9">
             <property name="orientation">
-             <enum>Qt::Horizontal</enum>
+             <enum>Qt::Orientation::Horizontal</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
@@ -1154,7 +1154,7 @@
           <item>
            <spacer name="horizontalSpacer_10">
             <property name="orientation">
-             <enum>Qt::Horizontal</enum>
+             <enum>Qt::Orientation::Horizontal</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
@@ -1183,7 +1183,7 @@
           <string>Shortcut Runner Settings</string>
          </property>
          <property name="alignment">
-          <set>Qt::AlignCenter</set>
+          <set>Qt::AlignmentFlag::AlignCenter</set>
          </property>
          <layout class="QGridLayout" name="gridLayout_8">
           <item row="0" column="0">
@@ -1286,13 +1286,13 @@
           <string>Legacy</string>
          </property>
          <property name="alignment">
-          <set>Qt::AlignCenter</set>
+          <set>Qt::AlignmentFlag::AlignCenter</set>
          </property>
          <layout class="QGridLayout" name="gridLayout_4">
           <item row="0" column="0" rowspan="2">
            <spacer name="horizontalSpacer_13">
             <property name="orientation">
-             <enum>Qt::Horizontal</enum>
+             <enum>Qt::Orientation::Horizontal</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
@@ -1305,7 +1305,7 @@
           <item row="0" column="4" rowspan="2">
            <spacer name="horizontalSpacer_14">
             <property name="orientation">
-             <enum>Qt::Horizontal</enum>
+             <enum>Qt::Orientation::Horizontal</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
@@ -1378,6 +1378,9 @@
             <property name="accessibleName">
              <string>Set File Synchronization Method</string>
             </property>
+            <property name="isFor" stdset="0">
+             <string>FileSyncMode</string>
+            </property>
             <item>
              <property name="text">
               <string>Use Fsync</string>
@@ -1404,13 +1407,13 @@
           <string>System</string>
          </property>
          <property name="alignment">
-          <set>Qt::AlignCenter</set>
+          <set>Qt::AlignmentFlag::AlignCenter</set>
          </property>
          <layout class="QGridLayout" name="gridLayout_6" columnstretch="1,0,2,1">
           <item row="1" column="3">
            <spacer name="horizontalSpacer_8">
             <property name="orientation">
-             <enum>Qt::Horizontal</enum>
+             <enum>Qt::Orientation::Horizontal</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
@@ -1423,7 +1426,7 @@
           <item row="1" column="0">
            <spacer name="horizontalSpacer_7">
             <property name="orientation">
-             <enum>Qt::Horizontal</enum>
+             <enum>Qt::Orientation::Horizontal</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
@@ -1439,7 +1442,7 @@
              <string notr="true"/>
             </property>
             <property name="alignment">
-             <set>Qt::AlignCenter</set>
+             <set>Qt::AlignmentFlag::AlignCenter</set>
             </property>
             <property name="flat">
              <bool>true</bool>
@@ -1542,7 +1545,7 @@
              <item row="1" column="3" rowspan="2">
               <spacer name="horizontalSpacer_16">
                <property name="orientation">
-                <enum>Qt::Horizontal</enum>
+                <enum>Qt::Orientation::Horizontal</enum>
                </property>
                <property name="sizeHint" stdset="0">
                 <size>
@@ -1555,7 +1558,7 @@
              <item row="1" column="0" rowspan="2">
               <spacer name="horizontalSpacer_15">
                <property name="orientation">
-                <enum>Qt::Horizontal</enum>
+                <enum>Qt::Orientation::Horizontal</enum>
                </property>
                <property name="sizeHint" stdset="0">
                 <size>
@@ -1568,7 +1571,7 @@
              <item row="0" column="0" colspan="4">
               <widget class="Line" name="line">
                <property name="orientation">
-                <enum>Qt::Horizontal</enum>
+                <enum>Qt::Orientation::Horizontal</enum>
                </property>
               </widget>
              </item>
@@ -1587,7 +1590,7 @@
              <item>
               <spacer name="horizontalSpacer_17">
                <property name="orientation">
-                <enum>Qt::Horizontal</enum>
+                <enum>Qt::Orientation::Horizontal</enum>
                </property>
                <property name="sizeHint" stdset="0">
                 <size>
@@ -1619,7 +1622,7 @@
              <item>
               <spacer name="horizontalSpacer_18">
                <property name="orientation">
-                <enum>Qt::Horizontal</enum>
+                <enum>Qt::Orientation::Horizontal</enum>
                </property>
                <property name="sizeHint" stdset="0">
                 <size>
@@ -1694,13 +1697,13 @@
          <string notr="true">background-color: transparent</string>
         </property>
         <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
+         <enum>QFrame::Shape::NoFrame</enum>
         </property>
         <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
+         <enum>QFrame::Shadow::Plain</enum>
         </property>
         <property name="horizontalScrollBarPolicy">
-         <enum>Qt::ScrollBarAlwaysOff</enum>
+         <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
         </property>
         <property name="widgetResizable">
          <bool>true</bool>
@@ -1710,8 +1713,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>636</width>
-           <height>229</height>
+           <width>624</width>
+           <height>68</height>
           </rect>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_6">
@@ -1724,10 +1727,16 @@
              <string>Hover over a setting to view info about it here.</string>
             </property>
             <property name="alignment">
-             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+             <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignTop</set>
             </property>
             <property name="wordWrap">
              <bool>true</bool>
+            </property>
+            <property name="openExternalLinks">
+             <bool>true</bool>
+            </property>
+            <property name="textInteractionFlags">
+             <set>Qt::TextInteractionFlag::TextBrowserInteraction</set>
             </property>
            </widget>
           </item>
@@ -1741,10 +1750,10 @@
    <item>
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="orientation">
-      <enum>Qt::Horizontal</enum>
+      <enum>Qt::Orientation::Horizontal</enum>
      </property>
      <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Reset|QDialogButtonBox::Save</set>
+      <set>QDialogButtonBox::StandardButton::Cancel|QDialogButtonBox::StandardButton::Reset|QDialogButtonBox::StandardButton::Save</set>
      </property>
     </widget>
    </item>

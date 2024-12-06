@@ -118,7 +118,7 @@ int NeroRunner::StartShortcut(const QString &hash, const bool &prefixAlreadyRunn
                 env.insert("PROTON_NO_ESYNC", "1");
             case NeroConstant::Esync:
                 env.insert("PROTON_NO_FSYNC", "1"); break;
-            }
+        }
 
         if(!settings->value("Shortcuts--"+hash+"/DebugOutput").toString().isEmpty()) {
             switch(settings->value("Shortcuts--"+hash+"/DebugOutput").toInt()) {
