@@ -572,17 +572,17 @@ void NeroManagerWindow::prefixMainButtons_clicked()
 {
     int slot = sender()->property("slot").toInt();
 
-    if(NeroFS::GetCurrentPrefix() != prefixMainButton.at(slot)->text()) {
+    if(NeroFS::GetCurrentPrefix() != NeroFS::GetPrefixes().at(slot)) {
         if(prefixShortcutLabel.count())
             CleanupShortcuts();
 
-        NeroFS::SetCurrentPrefix(prefixMainButton.at(slot)->text());
+        NeroFS::SetCurrentPrefix(NeroFS::GetPrefixes().at(slot));
 
         RenderPrefixList();
 
         if(!NeroFS::GetAvailableProtons().contains(NeroFS::GetCurrentRunner())) {
             NeroFS::SetCurrentPrefixCfg("PrefixSettings", "CurrentRunner", NeroFS::GetAvailableProtons().constFirst());
-            NeroFS::SetCurrentPrefix(prefixMainButton.at(slot)->text());
+            NeroFS::SetCurrentPrefix(NeroFS::GetPrefixes().at(slot));
             QMessageBox::warning(this,
                                  "Current Runner not found!",
                                  "The runner that was assigned to this prefix could not be found in the list of available Proton runners.\n"
@@ -605,11 +605,11 @@ void NeroManagerWindow::prefixDeleteButtons_clicked()
                              QString("Are you sure you wish to delete %1?\n\n"
                                      "All data inside the prefix will be deleted.\n"
                                      "This operation CAN NOT BE UNDONE.")
-                             .arg(prefixMainButton.at(slot)->text())
+                             .arg(NeroFS::GetPrefixes().at(slot))
                             ) == QMessageBox::Yes)
     {
-        if(NeroFS::DeletePrefix(prefixMainButton.at(slot)->text())) {
-            if(NeroFS::GetCurrentPrefix() == prefixMainButton.at(slot)->text())
+        if(NeroFS::DeletePrefix(NeroFS::GetPrefixes().at(slot))) {
+            if(NeroFS::GetCurrentPrefix() == NeroFS::GetPrefixes().at(slot))
                 CleanupShortcuts();
 
             delete prefixMainButton.at(slot);
@@ -878,14 +878,15 @@ void NeroManagerWindow::actionExit_activated()
 
 void NeroManagerWindow::on_actionAbout_Nero_triggered()
 {
+    // TODO: better about screen pls
     QString vInfo;
     #ifdef NERO_VERSION
-    vInfo.append(QString("v%1").arg(NERO_VERSION));
+    vInfo.append(" v" + QString(NERO_VERSION));
     #endif // NERO_VERSION
     #ifdef NERO_GITHASH
-    vInfo.append(QString("-%1").arg(NERO_GITHASH));
+    vInfo.append("-" + QString(NERO_GITHASH));
     #endif // NERO_GITHASH
-    vInfo.append("\nRunning on Qt" +
+    vInfo.append("\nRunning on Qt " +
                  QString::number(QT_VERSION_MAJOR) + '.' +
                  QString::number(QT_VERSION_MINOR) + '.' +
                  QString::number(QT_VERSION_PATCH));

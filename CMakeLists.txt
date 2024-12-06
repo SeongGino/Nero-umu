@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(Nero-UMU VERSION 0.9 LANGUAGES CXX)
+project(Nero-UMU LANGUAGES CXX)
 
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
@@ -9,8 +9,23 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets LinguistTools)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets LinguistTools)
+if(NOT NERO_QT_VERSIONS)
+    set(NERO_QT_VERSIONS Qt6)
+endif()
+
+option(NERO_VERSION "Sets Nero version number" OFF)
+option(NERO_GITHASH "Sets Nero git hash" OFF)
+
+if(NERO_VERSION)
+    add_compile_definitions(NERO_VERSION="${NERO_VERSION}")
+endif()
+
+if(NERO_GITHASH)
+    add_compile_definitions(NERO_GITHASH="${NERO_GITHASH}")
+endif()
+
+find_package(QT NAMES ${NERO_QT_VERSIONS} COMPONENTS Widgets LinguistTools REQUIRED)
+find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets LinguistTools REQUIRED)
 
 set(TS_FILES translations/Nero-Launcher_en_US.ts)
 
@@ -52,6 +67,7 @@ set(PROJECT_SOURCES
         src/neroonetimedialog.cpp
         src/neroonetimedialog.ui
         ${TS_FILES}
+        img/pics.qrc
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
@@ -65,25 +81,11 @@ else()
     find_package(QuaZip-Qt5)
     add_executable(nero-umu
         ${PROJECT_SOURCES}
-        img/pics.qrc
     )
     qt5_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
 endif()
 
 target_link_libraries(nero-umu PRIVATE Qt${QT_VERSION_MAJOR}::Widgets QuaZip::QuaZip)
-
-# Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
-# If you are developing for iOS or macOS you should consider setting an
-# explicit, fixed bundle identifier manually though.
-if(${QT_VERSION} VERSION_LESS 6.1.0)
-  set(BUNDLE_ID_OPTION MACOSX_BUNDLE_GUI_IDENTIFIER xyz.ThatOneSeong.Nero)
-endif()
-set_target_properties(nero-umu PROPERTIES
-    ${BUNDLE_ID_OPTION}
-    MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
-    MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
-    MACOSX_BUNDLE TRUE
-)
 
 include(GNUInstallDirs)
 install(TARGETS nero-umu

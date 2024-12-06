@@ -26,15 +26,17 @@ Because Nero itself does NOT manage runners--only prefixes--you need at least *o
 It's highly recommend to use utilities such as *[ProtonUp-Qt](https://github.com/DavidoTek/ProtonUp-Qt)* or *[ProtonPlus](https://github.com/Vysp3r/ProtonPlus)* to install new Steam runners.
 
 Nero's been confirmed to build and work on the following:
- - Arch Linux (btw), w/ Qt 5.15.16
+ - Arch Linux (btw), w/ Qt 5.15.16 & Qt 6.8.1
  - Linux Mint 22, Qt 6.4
 
 For Arch users, Nero can be installed from the AUR @ [`nero-umu`](https://aur.archlinux.org/packages/nero-umu) with your favorite helper app. For others, see building steps below (don't worry, it's not that hard!).
 
 ## Building
 Requirements for building Nero from source:
- - `Qt5` or `Qt6` - the Base and Network libraries are required. Tested mainly on Qt 5, but should also be compatible up through Qt 6.8 LTS.
- - `QuaZip` - Needed for extracting zip archives (mainly the Discord RPC bridge utility). For Qt6, QuaZip additionally requires the Qt5Compat layer.
+ - `Qt6` - the Base and Network libraries are required.
+   - If you're building with *Qt 5.x*, add the argument `-DNERO_QT_VERSIONS=Qt5` to the cmake command.
+ - `QuaZip` - Needed for extracting zip archives (mainly the Discord RPC bridge utility).
+   - For Qt 6.x, QuaZip additionally requires the Qt5Compat layer.
 
 #### Arch
 ```
