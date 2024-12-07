@@ -49,6 +49,8 @@ public:
     QString newAppIcon;
     QString appName;
 
+    QPushButton *deleteShortcut = nullptr;
+
 private slots:
     void on_shortcutIco_clicked();
 
@@ -121,8 +123,6 @@ private:
     QList<QAction*> dllOptions;
 
     QFont boldFont;
-
-    QPushButton *deleteShortcut;
 
     bool umuRunning = false;
 

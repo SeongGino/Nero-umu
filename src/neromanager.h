@@ -125,11 +125,11 @@ private slots:
 
     void on_prefixSettingsBtn_clicked();
 
-    void on_actionAbout_Nero_triggered();
-
     void on_oneTimeRunBtn_clicked();
 
     void on_managerSettings_clicked();
+
+    void on_aboutBtn_clicked();
 
 private:
     Ui::NeroManagerWindow *ui;
@@ -165,6 +165,7 @@ private:
     QList<NeroThreadController*> umuController;
     QList<int> currentlyRunning;
     int threadsCount = 0;
+    QStringList oneOffsRunning;
 
     // Prefixes list assets
     QList<QPushButton*> prefixMainButton;

@@ -34,7 +34,7 @@ int NeroRunner::StartShortcut(const QString &hash, const bool &prefixAlreadyRunn
         QProcess runner;
 
         if(!settings->value("Shortcuts--"+hash+"/PreRunScript").toString().isEmpty()) {
-            runner.start(settings->value("Shortcuts--"+hash+"/PreRunScript").toString(), {""});
+            runner.start(settings->value("Shortcuts--"+hash+"/PreRunScript").toString(), {});
 
             while(runner.state() != QProcess::NotRunning) {
                 runner.waitForReadyRead(-1);
@@ -380,8 +380,11 @@ int NeroRunner::StartShortcut(const QString &hash, const bool &prefixAlreadyRunn
 
         WaitLoop(runner, log);
 
+        // in case settings changed from manager
+        settings = NeroFS::GetCurrentPrefixCfg();
+
         if(!settings->value("Shortcuts--"+hash+"/PostRunScript").toString().isEmpty()) {
-            runner.start(settings->value("Shortcuts--"+hash+"/PostRunScript").toString(), {""});
+            runner.start(settings->value("Shortcuts--"+hash+"/PostRunScript").toString(), {});
 
             while(runner.state() != QProcess::NotRunning) {
                 runner.waitForReadyRead(-1);
