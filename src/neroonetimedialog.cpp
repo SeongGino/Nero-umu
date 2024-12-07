@@ -38,6 +38,7 @@ NeroOneTimeDialog::NeroOneTimeDialog(QWidget *parent)
 
     for(const QString prefix : prefixes) {
         prefixesBtns << new QPushButton(prefix);
+        prefixesBtns.last()->setProperty("slot", prefixesBtns.count()-1);
         connect(prefixesBtns.last(), &QPushButton::clicked, this, &NeroOneTimeDialog::prefixBtn_clicked);
         ui->prefixes->addWidget(prefixesBtns.last());
     }

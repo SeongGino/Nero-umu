@@ -20,6 +20,8 @@
 #ifndef NEROONETIMEDIALOG_H
 #define NEROONETIMEDIALOG_H
 
+#include "nerofs.h"
+
 #include <QDialog>
 #include <QPushButton>
 
@@ -40,7 +42,7 @@ public:
 private slots:
     void prefixBtn_clicked() {
         QPushButton *btn = qobject_cast<QPushButton*>(sender());
-        selected = btn->text();
+        selected = NeroFS::GetPrefixes().at(btn->property("slot").toInt());
         close();
     }
 
