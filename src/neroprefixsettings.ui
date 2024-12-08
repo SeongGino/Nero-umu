@@ -905,7 +905,7 @@
             <item>
              <widget class="QCheckBox" name="toggleShortcutPrefixOverride">
               <property name="whatsThis">
-               <UInt>0</UInt>
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When enabled, the list of DLL overrides specified for this shortcut will completely &lt;span style=&quot; font-style:italic;&quot;&gt;override and ignore&lt;/span&gt; any existing DLL settings for this prefix; otherwise, this overrides list will be merged with that of the prefix's current DLLs list, with the shortcut's settings taking priority.&lt;/p&gt;&lt;p&gt;If unsure, leave disabled &lt;span style=&quot; font-style:italic;&quot;&gt;unless any prefix overrides are causing issues for this specific application.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
               </property>
               <property name="accessibleName">
                <string>Exclusively Use Shortcut's DLL Overrides List</string>
