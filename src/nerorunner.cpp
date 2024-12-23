@@ -623,6 +623,11 @@ void NeroRunner::WaitLoop(QProcess &runner, QFile &log)
         }
     }
 
+    while(!runner.atEnd()) {
+        stdout = runner.readLine();
+        log.write(stdout);
+    }
+
     log.close();
 }
 
