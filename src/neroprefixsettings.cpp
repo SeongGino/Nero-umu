@@ -849,5 +849,7 @@ void NeroPrefixSettingsWindow::deleteShortcut_clicked()
 
 void NeroPrefixSettingsWindow::on_openToShortcutPath_clicked()
 {
-    QDesktopServices::openUrl(QUrl::fromLocalFile(ui->shortcutPath->text().left(ui->shortcutPath->text().lastIndexOf('/'))));
+    // in case path begins with a Windows drive letter prefix
+    QDesktopServices::openUrl(QUrl::fromLocalFile(ui->shortcutPath->text().left(ui->shortcutPath->text().lastIndexOf('/'))
+                                                                          .replace("C:/", NeroFS::GetPrefixesPath().path()+'/'+NeroFS::GetCurrentPrefix()+"/drive_c/")));
 }
