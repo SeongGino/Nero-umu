@@ -31,10 +31,12 @@ NeroShortcutWizard::NeroShortcutWizard(QWidget *parent, QString newAppPath)
     , ui(new Ui::NeroShortcutWizard)
 {
     ui->setupUi(this);
-    ui->appPath->setText(newAppPath);
     ui->nameMatchWarning->setVisible(false);
 
-    NeroIcoExtractor::CheckIcoCache(QDir(QString("%1/%2").arg(NeroFS::GetPrefixesPath().path(), NeroFS::GetCurrentPrefix())));
+    // if exe is inside of prefix, convert path to Windows path inside C:/
+    ui->appPath->setText(newAppPath.replace(NeroFS::GetPrefixesPath().path()+'/'+NeroFS::GetCurrentPrefix()+"/drive_c", "C:"));
+
+    NeroIcoExtractor::CheckIcoCache(QDir(NeroFS::GetPrefixesPath().path()+'/'+NeroFS::GetCurrentPrefix()));
 
     QGuiApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     appIcon = NeroIcoExtractor::GetIcon(newAppPath);
@@ -51,7 +53,7 @@ NeroShortcutWizard::NeroShortcutWizard(QWidget *parent, QString newAppPath)
 
 NeroShortcutWizard::~NeroShortcutWizard()
 {
-    QDir tempDir(QString("%1/nero-manager").arg(QDir::tempPath()));
+    QDir tempDir(QDir::tempPath()+"/nero-manager");
     tempDir.removeRecursively();
 
     delete ui;
@@ -79,7 +81,6 @@ void NeroShortcutWizard::on_shortcutName_textEdited(const QString &arg1)
 
 void NeroShortcutWizard::on_selectBox_clicked()
 {
-    // TODO: filemanager prompt. If path returned is empty, don't change anything.
     QString newApp = QFileDialog::getOpenFileName(this,
                                                   "Select a Windows Executable",
                                                   qEnvironmentVariable("HOME"),
@@ -88,8 +89,6 @@ void NeroShortcutWizard::on_selectBox_clicked()
                                                   QFileDialog::DontResolveSymlinks);
 
     if(!newApp.isEmpty()) {
-        ui->appPath->setText(newApp);
-
         QGuiApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
         appIcon = NeroIcoExtractor::GetIcon(newApp);
         QGuiApplication::restoreOverrideCursor();
@@ -99,6 +98,12 @@ void NeroShortcutWizard::on_selectBox_clicked()
                 ui->appIcon->setIcon(QPixmap(appIcon).scaled(48,48,Qt::KeepAspectRatio,Qt::SmoothTransformation));
             else ui->appIcon->setIcon(QPixmap(appIcon));
         } else ui->appIcon->setIcon(QIcon::fromTheme("application-x-executable"));
+
+        // if exe is inside of prefix, convert path to Windows path inside C:/
+        if(newApp.startsWith(NeroFS::GetPrefixesPath().canonicalPath()+'/'+NeroFS::GetCurrentPrefix()+"/drive_c"))
+            newApp = newApp.replace(NeroFS::GetPrefixesPath().canonicalPath()+'/'+NeroFS::GetCurrentPrefix()+"/drive_c", "C:");
+
+        ui->appPath->setText(newApp);
     }
 }
 

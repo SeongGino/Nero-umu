@@ -375,7 +375,7 @@ void NeroPrefixSettingsWindow::on_shortcutPathBtn_clicked()
                                                   nullptr,
                                                   QFileDialog::DontResolveSymlinks);
     if(!newApp.isEmpty()) {
-        ui->shortcutPath->setText(newApp);
+        ui->shortcutPath->setText(newApp.replace(NeroFS::GetPrefixesPath().path()+'/'+NeroFS::GetCurrentPrefix()+"/drive_c", "C:"));
         if(newApp != settings.value("Path").toString())
             ui->shortcutPath->setFont(boldFont);
         else ui->shortcutPath->setFont(QFont());

@@ -24,13 +24,14 @@
 #include <QApplication>
 #include <QProcess>
 #include <QDir>
+#include <QDebug>
 
 int NeroRunner::StartShortcut(const QString &hash, const bool &prefixAlreadyRunning)
 {
     QSettings *settings = NeroFS::GetCurrentPrefixCfg();
     QFileInfo fileToRun(settings->value("Shortcuts--"+hash+"/Path").toString());
 
-    if(fileToRun.exists()) {
+    if(settings->value("Shortcuts--"+hash+"/Path").toString().startsWith("C:/") || fileToRun.exists()) {
         QProcess runner;
 
         if(!settings->value("Shortcuts--"+hash+"/PreRunScript").toString().isEmpty()) {
@@ -141,19 +142,7 @@ int NeroRunner::StartShortcut(const QString &hash, const bool &prefixAlreadyRunn
         QStringList arguments;
         arguments.append("umu-run");
 
-        // set path to be relative to an existing drive, as some apps seems to rely on this behavior:
-        QString app = settings->value("Shortcuts--"+hash+"/Path").toString();
-        QDir dosdevicesPath(NeroFS::GetPrefixesPath().path() + '/' + NeroFS::GetCurrentPrefix() + "/dosdevices");
-        QFileInfoList dosdevices(dosdevicesPath.entryInfoList(QDir::NoDotAndDotDot | QDir::Dirs, QDir::Name));
-        for(auto const device : dosdevices) {
-            if(app.contains(device.symLinkTarget())) {
-                app.remove(device.symLinkTarget());
-                app.prepend(device.baseName().toUpper());
-                break;
-            }
-        }
-
-        arguments.append(app);
+        arguments.append(settings->value("Shortcuts--"+hash+"/Path").toString());
 
         if(!settings->value("Shortcuts--"+hash+"/Args").toString().isEmpty())
             arguments.append(settings->value("Shortcuts--"+hash+"/Args").toStringList());
@@ -364,7 +353,11 @@ int NeroRunner::StartShortcut(const QString &hash, const bool &prefixAlreadyRunn
         }
 
         runner.setProcessEnvironment(env);
-        runner.setWorkingDirectory(settings->value("Shortcuts--"+hash+"/Path").toString().left(settings->value("Shortcuts--"+hash+"/Path").toString().lastIndexOf("/")));
+        // some apps requires working directory to be in the right location
+        // (corrected if path starts with Windows drive letter prefix)
+        runner.setWorkingDirectory(settings->value("Shortcuts--"+hash+"/Path")
+                                            .toString().left(settings->value("Shortcuts--"+hash+"/Path").toString().lastIndexOf("/"))
+                                            .replace("C:/", NeroFS::GetPrefixesPath().path()+'/'+NeroFS::GetCurrentPrefix()+"/drive_c/"));
         QString command = arguments.takeFirst();
 
         QDir logsDir(NeroFS::GetPrefixesPath().path()+'/'+NeroFS::GetCurrentPrefix());

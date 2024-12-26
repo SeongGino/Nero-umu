@@ -145,7 +145,7 @@
                <bool>true</bool>
               </property>
               <property name="whatsThis">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The current path for this shortcut.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The current path for this shortcut.&lt;/p&gt;&lt;p&gt;If the path is within the prefix's &lt;span style=&quot; font-style:italic;&quot;&gt;drive_c&lt;/span&gt; folder (or in other words, within the virtual Windows' &lt;span style=&quot; font-style:italic;&quot;&gt;C:/&lt;/span&gt; drive), this shortcut will always be run relative to the path of this current prefix - so if the current prefix changes name or location, but not the application itself, then this shortcut will still work until the application path itself changes.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
               </property>
               <property name="accessibleName">
                <string>Executable Path</string>

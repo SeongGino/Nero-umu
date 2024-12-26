@@ -241,6 +241,7 @@ void NeroManagerWindow::RenderPrefixList()
             prefixShortcutPlayButton.at(i)->setToolTip("Start " + sortedShortcuts.at(i));
             prefixShortcutPlayButton.at(i)->setIconSize(QSize(16, 16));
             prefixShortcutPlayButton.at(i)->setProperty("slot", i);
+            prefixShortcutPlayButton.at(i)->setProperty("hash", hashMap[sortedShortcuts.at(i)]);
 
             prefixShortcutEditButton << new QPushButton(QIcon::fromTheme("document-properties"), "");
             prefixShortcutEditButton.at(i)->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
@@ -504,6 +505,7 @@ void NeroManagerWindow::on_addButton_clicked()
                 prefixShortcutPlayButton.last()->setIconSize(QSize(16, 16));
                 prefixShortcutPlayButton.last()->setToolTip("Start " + shortcutAdd.shortcutName);
                 prefixShortcutPlayButton.last()->setProperty("slot", pos);
+                prefixShortcutPlayButton.last()->setProperty("hash", hashName);
 
                 prefixShortcutEditButton << new QPushButton(QIcon::fromTheme("document-properties"), "");
                 prefixShortcutEditButton.last()->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
@@ -630,40 +632,50 @@ void NeroManagerWindow::prefixShortcutPlayButtons_clicked()
 
         umuController.at(prefixShortcutPlayButton.at(slot)->property("thread").toInt())->Stop();
     } else {
-        ui->prefixSettingsBtn->setEnabled(false);
-        ui->prefixTricksBtn->setEnabled(false);
+        QMap<QString, QVariant> shortcutSettings = NeroFS::GetShortcutSettings(sender()->property("hash").toString());
 
-        prefixShortcutPlayButton.at(slot)->setIcon(QIcon::fromTheme("media-playback-stop"));
-        prefixShortcutPlayButton.at(slot)->setToolTip("Stop " + prefixShortcutLabel.at(slot)->text());
-        ui->backButton->setIcon(QIcon::fromTheme("media-playback-stop"));
-        ui->backButton->setToolTip("Shut down all running programs in this prefix.");
-        sysTray->setIcon(QIcon(":/ico/systrayPhiPlaying"));
-        threadsCount += 1;
-        currentlyRunning.append(slot);
-        if(currentlyRunning.count() > 1)
-            sysTray->setToolTip("Nero Manager (" + NeroFS::GetCurrentPrefix() + " is running " + QString::number(currentlyRunning.count()) + " apps)");
-        else sysTray->setToolTip("Nero Manager (" + NeroFS::GetCurrentPrefix() + " is running " + prefixShortcutLabel.at(slot)->text() + ')');
+        // in case the directory has a Windows drive letter prefix,
+        // which should be harmless in the context of what Windows allows files/dirs to be named anyways.
+        if(QFileInfo::exists(shortcutSettings.value("Path").toString().replace("C:/",
+                                                                               NeroFS::GetPrefixesPath().canonicalPath()+'/'+NeroFS::GetCurrentPrefix()+"/drive_c/"))) {
+            ui->prefixSettingsBtn->setEnabled(false);
+            ui->prefixTricksBtn->setEnabled(false);
 
-        QMap<QString, QString> settings = NeroFS::GetCurrentShortcutsMap();
+            prefixShortcutPlayButton.at(slot)->setIcon(QIcon::fromTheme("media-playback-stop"));
+            prefixShortcutPlayButton.at(slot)->setToolTip("Stop " + prefixShortcutLabel.at(slot)->text());
+            ui->backButton->setIcon(QIcon::fromTheme("media-playback-stop"));
+            ui->backButton->setToolTip("Shut down all running programs in this prefix.");
+            sysTray->setIcon(QIcon(":/ico/systrayPhiPlaying"));
+            threadsCount += 1;
+            currentlyRunning.append(slot);
+            if(currentlyRunning.count() > 1)
+                sysTray->setToolTip("Nero Manager (" + NeroFS::GetCurrentPrefix() + " is running " + QString::number(currentlyRunning.count()) + " apps)");
+            else sysTray->setToolTip("Nero Manager (" + NeroFS::GetCurrentPrefix() + " is running " + prefixShortcutLabel.at(slot)->text() + ')');
 
-        if(managerCfg->value("ShortcutHidesManager").toBool())
-            this->hide();
+            if(managerCfg->value("ShortcutHidesManager").toBool())
+                this->hide();
 
-        if(runnerWindow == nullptr) {
-            runnerWindow = new NeroRunnerDialog(this);
-            runnerWindow->SetupWindow(true, prefixShortcutLabel.at(slot)->text(), prefixShortcutIco.at(slot));
-            runnerWindow->show();
+            if(runnerWindow == nullptr) {
+                runnerWindow = new NeroRunnerDialog(this);
+                runnerWindow->SetupWindow(true, prefixShortcutLabel.at(slot)->text(), prefixShortcutIco.at(slot));
+                runnerWindow->show();
+            }
+
+            if(currentlyRunning.count() > 1)
+                umuController << new NeroThreadController(slot, sender()->property("hash").toString(), true);
+            else umuController << new NeroThreadController(slot, sender()->property("hash").toString());
+
+            umuController.last()->setProperty("slot", threadsCount-1);
+            prefixShortcutPlayButton.at(slot)->setProperty("thread", threadsCount-1);
+            connect(umuController.last(),                       &NeroThreadController::passUmuResults,  this, &NeroManagerWindow::handleUmuResults);
+            connect(&umuController.last()->umuWorker->Runner,   &NeroRunner::StatusUpdate,              this, &NeroManagerWindow::handleUmuSignal);
+            emit umuController.last()->operate();
+        } else {
+            QMessageBox::critical(this,
+                                  "Executable could not be found!",
+                                  "The executable that this shortcut links to currently doesn't exist.\n"
+                                  "Check that the application path is correct, or change it in this shortcut's settings.");
         }
-
-        if(currentlyRunning.count() > 1)
-            umuController << new NeroThreadController(slot, settings.value(prefixShortcutLabel.at(slot)->text()), true);
-        else umuController << new NeroThreadController(slot, settings.value(prefixShortcutLabel.at(slot)->text()));
-
-        umuController.last()->setProperty("slot", threadsCount-1);
-        prefixShortcutPlayButton.at(slot)->setProperty("thread", threadsCount-1);
-        connect(umuController.last(),                       &NeroThreadController::passUmuResults,  this, &NeroManagerWindow::handleUmuResults);
-        connect(&umuController.last()->umuWorker->Runner,   &NeroRunner::StatusUpdate,              this, &NeroManagerWindow::handleUmuSignal);
-        emit umuController.last()->operate();
     }
 }
 
@@ -671,9 +683,7 @@ void NeroManagerWindow::prefixShortcutEditButtons_clicked()
 {
     int slot = sender()->property("slot").toInt();
 
-    QMap<QString, QString> settings = NeroFS::GetCurrentShortcutsMap();
-
-    prefixSettings = new NeroPrefixSettingsWindow(this, settings.value(prefixShortcutLabel.at(slot)->text()));
+    prefixSettings = new NeroPrefixSettingsWindow(this, prefixShortcutPlayButton.at(slot)->property("hash").toString());
     prefixSettings->setProperty("slot", slot);
     connect(prefixSettings, &NeroPrefixSettingsWindow::finished, this, &NeroManagerWindow::prefixSettings_result);
     if(currentlyRunning.count())
