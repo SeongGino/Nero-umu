@@ -483,7 +483,12 @@ void NeroPrefixSettingsWindow::dll_delete_clicked()
 {
     int slot = sender()->property("slot").toInt();
 
-    dllOverrides.remove(dllSetting.at(slot)->text().left(dllSetting.at(slot)->text().indexOf('[')-1).trimmed());
+    QString dllToRemove = dllSetting.at(slot)->text().left(dllSetting.at(slot)->text().indexOf('[')-1).trimmed();
+#if QT_VERSION >= QT_VERSION_CHECK(6, 8, 0)
+// workaround annoying as fuck anpersand being needlessly implicitly added to widget texts in Qt 6.8
+    dllToRemove.remove('&');
+#endif
+    dllOverrides.remove(dllToRemove);
     delete dllSetting.at(slot);
     delete dllDelete.at(slot);
     dllSetting[slot] = nullptr;
