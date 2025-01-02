@@ -259,6 +259,7 @@ void NeroPrefixSettingsWindow::LoadSettings()
                                                                  NeroFS::GetPrefixesPath().canonicalPath()+'/'+NeroFS::GetCurrentPrefix()+"/drive_c/")))
             ui->pathNoExistWarning->setVisible(false);
         else {
+            ui->openToShortcutPath->setEnabled(false);
             // adjust font recoloring for light mode (unused, but just in case?)
             /* if(this->palette().window().color().value() > this->palette().text().color().value())
                 ui->shortcutPath->setStyleSheet("color: darkred");
@@ -393,6 +394,7 @@ void NeroPrefixSettingsWindow::on_shortcutPathBtn_clicked()
 
         // probably assumed that in this decision path, the file is gonna be valid
         if(ui->pathNoExistWarning->isVisible()) {
+            ui->openToShortcutPath->setEnabled(true);
             ui->pathNoExistWarning->setVisible(false);
             ui->shortcutPath->setStyleSheet("color: gray");
         }
