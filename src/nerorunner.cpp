@@ -357,7 +357,7 @@ int NeroRunner::StartShortcut(const QString &hash, const bool &prefixAlreadyRunn
         // (corrected if path starts with Windows drive letter prefix)
         runner.setWorkingDirectory(settings->value("Shortcuts--"+hash+"/Path")
                                             .toString().left(settings->value("Shortcuts--"+hash+"/Path").toString().lastIndexOf("/"))
-                                            .replace("C:/", NeroFS::GetPrefixesPath().path()+'/'+NeroFS::GetCurrentPrefix()+"/drive_c/"));
+                                            .replace("C:", NeroFS::GetPrefixesPath().path()+'/'+NeroFS::GetCurrentPrefix()+"/drive_c/"));
         QString command = arguments.takeFirst();
 
         QDir logsDir(NeroFS::GetPrefixesPath().path()+'/'+NeroFS::GetCurrentPrefix());
