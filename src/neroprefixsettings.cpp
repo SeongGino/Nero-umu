@@ -255,6 +255,17 @@ void NeroPrefixSettingsWindow::LoadSettings()
         ui->shortcutPath->setText(settings["Path"].toString());
         ui->shortcutArgs->setText(settings["Args"].toStringList().join(' '));
 
+        if(QFileInfo::exists(settings["Path"].toString().replace("C:/",
+                                                                 NeroFS::GetPrefixesPath().canonicalPath()+'/'+NeroFS::GetCurrentPrefix()+"/drive_c/")))
+            ui->pathNoExistWarning->setVisible(false);
+        else {
+            // adjust font recoloring for light mode (unused, but just in case?)
+            /* if(this->palette().window().color().value() > this->palette().text().color().value())
+                ui->shortcutPath->setStyleSheet("color: darkred");
+            else */
+                ui->shortcutPath->setStyleSheet("color: red");
+        }
+
         QDir ico(QString("%1/%2/.icoCache").arg(NeroFS::GetPrefixesPath().path(),
                                                 NeroFS::GetCurrentPrefix() ));
         if(ico.exists(QString("%1-%2.png").arg(settings["Name"].toString(), currentShortcutHash))) {
@@ -379,6 +390,12 @@ void NeroPrefixSettingsWindow::on_shortcutPathBtn_clicked()
         if(newApp != settings.value("Path").toString())
             ui->shortcutPath->setFont(boldFont);
         else ui->shortcutPath->setFont(QFont());
+
+        // probably assumed that in this decision path, the file is gonna be valid
+        if(ui->pathNoExistWarning->isVisible()) {
+            ui->pathNoExistWarning->setVisible(false);
+            ui->shortcutPath->setStyleSheet("color: gray");
+        }
     }
 }
 

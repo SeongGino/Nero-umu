@@ -139,50 +139,22 @@
           </item>
           <item>
            <layout class="QGridLayout" name="shortcutFields">
-            <item row="2" column="0">
-             <widget class="QLineEdit" name="shortcutPath">
-              <property name="enabled">
-               <bool>true</bool>
-              </property>
-              <property name="whatsThis">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The current path for this shortcut.&lt;/p&gt;&lt;p&gt;If the path is within the prefix's &lt;span style=&quot; font-style:italic;&quot;&gt;drive_c&lt;/span&gt; folder (or in other words, within the virtual Windows' &lt;span style=&quot; font-style:italic;&quot;&gt;C:/&lt;/span&gt; drive), this shortcut will always be run relative to the path of this current prefix - so if the current prefix changes name or location, but not the application itself, then this shortcut will still work until the application path itself changes.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-              </property>
-              <property name="accessibleName">
-               <string>Executable Path</string>
+            <item row="1" column="0" colspan="3">
+             <widget class="QLabel" name="nameMatchWarning">
+              <property name="font">
+               <font>
+                <pointsize>9</pointsize>
+                <bold>true</bold>
+               </font>
               </property>
               <property name="styleSheet">
-               <string notr="true">color: gray</string>
-              </property>
-              <property name="readOnly">
-               <bool>true</bool>
-              </property>
-              <property name="placeholderText">
-               <string>Path</string>
-              </property>
-              <property name="isFor" stdset="0">
-               <string>Path</string>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="1">
-             <widget class="QPushButton" name="shortcutPathBtn">
-              <property name="whatsThis">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Click to select a new executable for this shortcut.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-              </property>
-              <property name="accessibleName">
-               <string>Select an Executable</string>
+               <string notr="true">color: red</string>
               </property>
               <property name="text">
-               <string/>
+               <string>Another shortcut with this name already exists!</string>
               </property>
-              <property name="icon">
-               <iconset theme="document-open"/>
-              </property>
-              <property name="iconSize">
-               <size>
-                <width>16</width>
-                <height>16</height>
-               </size>
+              <property name="alignment">
+               <set>Qt::AlignmentFlag::AlignCenter</set>
               </property>
              </widget>
             </item>
@@ -211,6 +183,50 @@
               </property>
              </widget>
             </item>
+            <item row="4" column="0" colspan="3">
+             <widget class="QLineEdit" name="shortcutArgs">
+              <property name="whatsThis">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enter any arguments that gets passed to the executable for this shortcut. These usually allow for enabling hidden or undocumented features of an app, such as borderless windowed modes or fullscreen on launch. Refer to your app's documentation for information on what arguments can be used with it.&lt;/p&gt;&lt;p&gt;If unsure, leave this field blank.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
+              <property name="accessibleName">
+               <string>Shortcut Arguments</string>
+              </property>
+              <property name="placeholderText">
+               <string>Shortcut Arguments (-fullscreen, --borderless, etc.)</string>
+              </property>
+              <property name="clearButtonEnabled">
+               <bool>true</bool>
+              </property>
+              <property name="isFor" stdset="0">
+               <string>Args</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="0">
+             <widget class="QLineEdit" name="shortcutPath">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
+              <property name="whatsThis">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The current path for this shortcut.&lt;/p&gt;&lt;p&gt;If the path is within the prefix's &lt;span style=&quot; font-style:italic;&quot;&gt;drive_c&lt;/span&gt; folder (or in other words, within the virtual Windows' &lt;span style=&quot; font-style:italic;&quot;&gt;C:/&lt;/span&gt; drive), this shortcut will always be run relative to the path of this current prefix - so if the current prefix changes name or location, but not the application itself, then this shortcut will still work until the application path itself changes.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
+              <property name="accessibleName">
+               <string>Executable Path</string>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">color: gray</string>
+              </property>
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
+              <property name="placeholderText">
+               <string>Path</string>
+              </property>
+              <property name="isFor" stdset="0">
+               <string>Path</string>
+              </property>
+             </widget>
+            </item>
             <item row="0" column="0" colspan="3">
              <widget class="QLineEdit" name="shortcutName">
               <property name="whatsThis">
@@ -227,8 +243,30 @@
               </property>
              </widget>
             </item>
-            <item row="1" column="0" colspan="3">
-             <widget class="QLabel" name="nameMatchWarning">
+            <item row="2" column="1">
+             <widget class="QPushButton" name="shortcutPathBtn">
+              <property name="whatsThis">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Click to select a new executable for this shortcut.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
+              <property name="accessibleName">
+               <string>Select an Executable</string>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset theme="document-open"/>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>16</width>
+                <height>16</height>
+               </size>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="0" colspan="3">
+             <widget class="QLabel" name="pathNoExistWarning">
               <property name="font">
                <font>
                 <pointsize>9</pointsize>
@@ -239,29 +277,10 @@
                <string notr="true">color: red</string>
               </property>
               <property name="text">
-               <string>Another shortcut with this name already exists!</string>
+               <string>File does not exist! Please update the path.</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignmentFlag::AlignCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="0" colspan="3">
-             <widget class="QLineEdit" name="shortcutArgs">
-              <property name="whatsThis">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enter any arguments that gets passed to the executable for this shortcut. These usually allow for enabling hidden or undocumented features of an app, such as borderless windowed modes or fullscreen on launch. Refer to your app's documentation for information on what arguments can be used with it.&lt;/p&gt;&lt;p&gt;If unsure, leave this field blank.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-              </property>
-              <property name="accessibleName">
-               <string>Shortcut Arguments</string>
-              </property>
-              <property name="placeholderText">
-               <string>Shortcut Arguments (-fullscreen, --borderless, etc.)</string>
-              </property>
-              <property name="clearButtonEnabled">
-               <bool>true</bool>
-              </property>
-              <property name="isFor" stdset="0">
-               <string>Args</string>
               </property>
              </widget>
             </item>
