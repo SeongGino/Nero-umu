@@ -473,7 +473,7 @@ void NeroPrefixSettingsWindow::AddDLL(const QString newDLL, const int newDLLtype
 
 void NeroPrefixSettingsWindow::dll_action_triggered(QAction* action)
 {
-    const QString name = dllSetting.at(action->property("slot").toInt())->text().left(dllSetting.at(action->property("slot").toInt())->text().indexOf('[')-1).trimmed();
+    const QString name = dllSetting.at(action->property("slot").toInt())->text().left(dllSetting.at(action->property("slot").toInt())->text().indexOf('[')-1).remove('&').trimmed();
 
     switch(action->data().toInt()) {
     case 0:
@@ -820,9 +820,9 @@ void NeroPrefixSettingsWindow::on_buttonBox_clicked(QAbstractButton *button)
                 int winVerSelected = winVersionListBackwards.indexOf(ui->winVerBox->itemText(ui->winVerBox->currentIndex()));
                 NeroFS::SetCurrentPrefixCfg("Shortcuts--"+currentShortcutHash, "WindowsVersion", winVerSelected);
 
-                QDir prefixPath(QString("%1/%2").arg(NeroFS::GetPrefixesPath().path(), NeroFS::GetCurrentPrefix()));
+                QDir prefixPath(NeroFS::GetPrefixesPath().path()+'/'+NeroFS::GetCurrentPrefix());
                 if(prefixPath.exists("user.reg")) {
-                    QFile regFile(QString("%1/user.reg").arg(prefixPath.path()));
+                    QFile regFile(prefixPath.path()+"/user.reg");
                     if(regFile.open(QFile::ReadWrite)) {
                         QString newReg;
                         QString line;
