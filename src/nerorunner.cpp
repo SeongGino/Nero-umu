@@ -123,18 +123,26 @@ int NeroRunner::StartShortcut(const QString &hash, const bool &prefixAlreadyRunn
 
         if(!settings->value("Shortcuts--"+hash+"/DebugOutput").toString().isEmpty()) {
             switch(settings->value("Shortcuts--"+hash+"/DebugOutput").toInt()) {
+            case NeroConstant::DebugDisabled:
+                break;
             case NeroConstant::DebugFull:
+                loggingEnabled = true;
                 env.insert("WINEDEBUG", "+loaddll,debugstr,mscoree,seh");
                 break;
             case NeroConstant::DebugLoadDLL:
+                loggingEnabled = true;
                 env.insert("WINEDEBUG", "+loaddll");
                 break;
             }
         } else switch(settings->value("PrefixSettings/DebugOutput").toInt()) {
+            case NeroConstant::DebugDisabled:
+                break;
             case NeroConstant::DebugFull:
+                loggingEnabled = true;
                 env.insert("WINEDEBUG", "+loaddll,debugstr,mscoree,seh");
                 break;
             case NeroConstant::DebugLoadDLL:
+                loggingEnabled = true;
                 env.insert("WINEDEBUG", "+loaddll");
                 break;
         }
@@ -364,9 +372,12 @@ int NeroRunner::StartShortcut(const QString &hash, const bool &prefixAlreadyRunn
         if(!logsDir.exists(".logs"))
             logsDir.mkdir(".logs");
         logsDir.cd(".logs");
+
         QFile log(logsDir.path()+'/'+settings->value("Shortcuts--"+hash+"/Name").toString()+'-'+hash+".txt");
-        log.open(QIODevice::WriteOnly);
-        log.resize(0);
+        if(loggingEnabled) {
+            log.open(QIODevice::WriteOnly);
+            log.resize(0);
+        }
 
         runner.start(command, arguments);
         runner.waitForStarted(-1);
@@ -441,10 +452,14 @@ int NeroRunner::StartOnetime(const QString &path, const bool &prefixAlreadyRunni
     }
 
     switch(settings->value("PrefixSettings/DebugOutput").toInt()) {
+    case NeroConstant::DebugDisabled:
+        break;
     case NeroConstant::DebugFull:
+        loggingEnabled = true;
         env.insert("WINEDEBUG", "+loaddll,debugstr,mscoree,seh");
         break;
     case NeroConstant::DebugLoadDLL:
+        loggingEnabled = true;
         env.insert("WINEDEBUG", "+loaddll");
         break;
     }
@@ -579,9 +594,12 @@ int NeroRunner::StartOnetime(const QString &path, const bool &prefixAlreadyRunni
     if(!logsDir.exists(".logs"))
         logsDir.mkdir(".logs");
     logsDir.cd(".logs");
+
     QFile log(logsDir.path()+'/'+path.mid(path.lastIndexOf('/')+1)+".txt");
-    log.open(QIODevice::WriteOnly);
-    log.resize(0);
+    if(loggingEnabled) {
+        log.open(QIODevice::WriteOnly);
+        log.resize(0);
+    }
 
     runner.start(command, arguments);
     runner.waitForStarted(-1);
@@ -600,7 +618,9 @@ void NeroRunner::WaitLoop(QProcess &runner, QFile &log)
             runner.waitForReadyRead(1000);
             if(runner.canReadLine()) {
                 stdout = runner.readLine();
-                log.write(stdout);
+                if(loggingEnabled)
+                    log.write(stdout);
+
                 if(stdout.contains("umu-launcher"))
                     emit StatusUpdate(NeroRunner::RunnerStarting);
                 else if(stdout.contains("steamrt is up to date"))
@@ -618,7 +638,8 @@ void NeroRunner::WaitLoop(QProcess &runner, QFile &log)
 
     while(!runner.atEnd()) {
         stdout = runner.readLine();
-        log.write(stdout);
+        if(loggingEnabled)
+            log.write(stdout);
     }
 
     log.close();

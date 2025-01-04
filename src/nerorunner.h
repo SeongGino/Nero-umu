@@ -37,6 +37,7 @@ public:
     void StopProcess();
 
     bool halt = false;
+    bool loggingEnabled = false;
     QProcessEnvironment env;
 
     enum {

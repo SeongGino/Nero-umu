@@ -25,6 +25,7 @@
 #include <QMap>
 #include <QCompleter>
 #include <QToolButton>
+#include <QCheckBox>
 #include <QComboBox>
 #include <QPushButton>
 #include <QStandardItemModel>
@@ -102,6 +103,8 @@ private:
         auto * item = model->item(index);
         item->setEnabled(enabled);
     }
+
+    void SetCheckboxState(const QString &, QCheckBox*);
 
     QString currentShortcutHash;
 

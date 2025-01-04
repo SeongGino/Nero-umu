@@ -204,9 +204,9 @@ void NeroPrefixSettingsWindow::LoadSettings()
     ui->gamescopeSetScalerBox->setCurrentIndex(settings.value("GamescopeScaler").toInt());
     ui->gamescopeSetUpscalingBox->setCurrentIndex(settings.value("GamescopeFilter").toInt());
     // general tab->services group
-    if(!settings.value("Gamemode").toString().isEmpty())    ui->toggleGamemode->setChecked(settings.value("Gamemode").toBool());
-    if(!settings.value("Mangohud").toString().isEmpty())    ui->toggleMangohud->setChecked(settings.value("Mangohud").toBool());
-    if(!settings.value("VKcapture").toString().isEmpty())   ui->toggleVKcap->setChecked(settings.value("VKcapture").toBool());
+    SetCheckboxState("Gamemode",  ui->toggleGamemode);
+    SetCheckboxState("Mangohud",  ui->toggleMangohud);
+    SetCheckboxState("VKcapture", ui->toggleVKcap);
 
     // compatibility tab
     if(!settings.value("DLLoverrides").toStringList().isEmpty()) {
@@ -227,9 +227,9 @@ void NeroPrefixSettingsWindow::LoadSettings()
     // advanced tab
     ui->debugBox->setCurrentIndex(settings.value("DebugOutput").toInt());
     ui->fileSyncBox->setCurrentIndex(settings.value("FileSyncMode").toInt());
-    if(!settings.value("LimitGLextensions").isValid())   ui->toggleLimitGL->setChecked(settings.value("LimitGLextensions").toBool());
-    if(!settings.value("NoD8VK").isValid())              ui->toggleNoD8VK->setChecked(settings.value("NoD8VK").toBool());
-    if(!settings.value("ForceWineD3D").isValid())        ui->toggleWineD3D->setChecked(settings.value("ForceWineD3D").toBool());
+    SetCheckboxState("LimitGLextensions",  ui->toggleLimitGL);
+    SetCheckboxState("NoD8VK",             ui->toggleNoD8VK);
+    SetCheckboxState("ForceWineD3D",       ui->toggleWineD3D);
 
     if(currentShortcutHash.isEmpty()) {
         // for prefix general settings, checkboxes are normal two-state
@@ -333,6 +333,15 @@ void NeroPrefixSettingsWindow::LoadSettings()
         child->setFont(QFont());
 
     NeroPrefixSettingsWindow::blockSignals(false);
+}
+
+
+void NeroPrefixSettingsWindow::SetCheckboxState(const QString &varName, QCheckBox* checkBox)
+{
+    if(!settings.value(varName).toString().isEmpty())
+        if(settings.value(varName).toBool())  checkBox->setCheckState(Qt::Checked);
+        else                                  checkBox->setCheckState(Qt::Unchecked);
+    else                                      checkBox->setCheckState(Qt::PartiallyChecked);
 }
 
 
