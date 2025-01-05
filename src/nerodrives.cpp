@@ -31,7 +31,7 @@ NeroVirtualDriveDialog::NeroVirtualDriveDialog(QWidget *parent)
     letterFont.setPointSize(11), letterFont.setBold(true);
     mainLabelFont.setPointSize(11), mainLabelFont.setItalic(true);
 
-    prefixDir.setPath(QString("%1/%2/dosdevices").arg(NeroFS::GetPrefixesPath().path(), NeroFS::GetCurrentPrefix()));
+    prefixDir.setPath(NeroFS::GetPrefixesPath().path()+'/'+NeroFS::GetCurrentPrefix()+"/dosdevices");
 
     RenderList();
 }
@@ -41,13 +41,13 @@ NeroVirtualDriveDialog::~NeroVirtualDriveDialog()
     for(int i = 0; i < dirWinLabel.count(); i++) {
         // skip empty/dummied entries that were deleted previously
         if(dirLetter.at(i)->currentIndex() != -1)
-            if(!dirWinLabel.at(i)->text().trimmed().isEmpty()) {
-                QDir labelDir = prefixDir.absoluteFilePath(QString("%1/%2").arg(prefixDir.path(), dirLetter.at(i)->currentText().toLower()));
+            if(!dirWinLabel.at(i)->text().remove('&').trimmed().isEmpty()) {
+                QDir labelDir = prefixDir.absoluteFilePath(prefixDir.path()+'/'+dirLetter.at(i)->currentText().toLower());
                 if(labelDir.exists()) {
                     labelDir.remove(".windows-label");
-                    QFile labelFile(QString("%1/.windows-label").arg(labelDir.canonicalPath()));
+                    QFile labelFile(labelDir.canonicalPath()+"/.windows-label");
                     if(labelFile.open(QFile::ReadWrite)) {
-                        labelFile.write(dirWinLabel.at(i)->text().trimmed().toLocal8Bit());
+                        labelFile.write(dirWinLabel.at(i)->text().remove('&').trimmed().toLocal8Bit());
                     }
                 }
             }
@@ -73,7 +73,7 @@ void NeroVirtualDriveDialog::RenderList()
     QStringList currentLinks = prefixDir.entryList(QDir::NoDotAndDotDot | QDir::Dirs, QDir::Name);
 
     for(const QString &dir : currentLinks) {
-        QFileInfo parser(QString("%1/%2").arg(prefixDir.path(), dir));
+        QFileInfo parser(prefixDir.path()+'/'+dir);
         if(parser.isDir())
             AddDir(parser.canonicalFilePath(), parser.fileName());
     }
@@ -89,13 +89,13 @@ void NeroVirtualDriveDialog::AddDir(const QString newPath, const QString letter)
     dirLetter.last()->setFont(letterFont);
     dirLetter.last()->setProperty("slot", dirLetter.size()-1);
     dirLetter.last()->setFrame(false);
-    connect(dirLetter.last(), SIGNAL(activated(QString)), this, SLOT(letterBox_activated(QString)));
+    connect(dirLetter.last(), SIGNAL(activated(int)), this, SLOT(letterBox_activated(int)));
 
     dirPath << new QLabel(newPath);
     dirPath.last()->setFont(mainLabelFont);
     dirPath.last()->setProperty("letter", letter);
 
-    QFile windowsLabel(QString("%1/.windows-label").arg(newPath));
+    QFile windowsLabel(newPath+"/.windows-label");
     if(windowsLabel.exists()) {
         windowsLabel.open(QIODevice::ReadWrite);
         dirWinLabel << new QLineEdit(windowsLabel.readLine().trimmed());
@@ -106,20 +106,20 @@ void NeroVirtualDriveDialog::AddDir(const QString newPath, const QString letter)
     dirWinLabel.last()->setMaxLength(16);
     dirWinLabel.last()->setStyleSheet("background-color: transparent");
     dirWinLabel.last()->setProperty("slot", dirWinLabel.size()-1);
-    connect(dirWinLabel.last(), SIGNAL(textEdited(QString)), this, SLOT(winLabel_textEdited(QString)));
+    connect(dirWinLabel.last(), &QLineEdit::textEdited, this, &NeroVirtualDriveDialog::winLabel_textEdited);
 
     dirChange << new QPushButton(QIcon::fromTheme("document-open"), "");
     dirChange.last()->setIconSize(QSize(24,24));
     dirChange.last()->setProperty("slot", dirChange.size()-1);
     dirChange.last()->setToolTip("Change symlink to new directory.");
-    connect(dirChange.last(), SIGNAL(clicked()), this, SLOT(changeBtn_clicked()));
+    connect(dirChange.last(), &QPushButton::clicked, this, &NeroVirtualDriveDialog::changeBtn_clicked);
 
     dirDelete << new QPushButton(QIcon::fromTheme("edit-delete"),"");
     dirDelete.last()->setIconSize(QSize(24,24));
     dirDelete.last()->setFlat(true);
     dirDelete.last()->setProperty("slot", dirDelete.size()-1);
     dirDelete.last()->setToolTip("Delete this symlink.");
-    connect(dirDelete.last(), SIGNAL(clicked()), this, SLOT(deleteBtn_clicked()));
+    connect(dirDelete.last(), &QPushButton::clicked, this, &NeroVirtualDriveDialog::deleteBtn_clicked);
 
     dirLetterPathLayout << new QHBoxLayout;
     dirLetterPathLayout.last()->addWidget(dirLetter.last());
@@ -177,9 +177,8 @@ void NeroVirtualDriveDialog::on_addDirBtn_clicked()
         char letter[] = {'a', ':'};
         for(int i = 0; i < 26; i++) {
             letter[0] = 'a'+i;
-            if(!newLink.exists(QString("%1/%2").arg(prefixDir.path(), letter))) {
-                if(newLink.link(externalDir.canonicalPath(), QString("%1/%2").arg(prefixDir.path(), letter))) {
-                    letter[0] += i;
+            if(!newLink.exists(prefixDir.path()+'/'+letter)) {
+                if(newLink.link(externalDir.canonicalPath(), prefixDir.path()+'/'+letter)) {
                     AddDir(externalDir.canonicalPath(), letter);
                     UpdateUsedLetters();
                     // in case this is the last possible letter used, disable for safety.
@@ -192,18 +191,18 @@ void NeroVirtualDriveDialog::on_addDirBtn_clicked()
     }
 }
 
-void NeroVirtualDriveDialog::letterBox_activated(const QString arg)
+void NeroVirtualDriveDialog::letterBox_activated(const int &arg)
 {
     int slot = sender()->property("slot").toInt();
 
     usedLetters.removeOne(dirPath.at(slot)->property("letter").toString().toUpper());
 
     QFile renamer;
-    renamer.rename(QString("%1/%2").arg(prefixDir.path(), dirPath.at(slot)->property("letter").toString()),
-                   QString("%1/%2").arg(prefixDir.path(), arg.toLower()));
-    dirPath.at(slot)->setProperty("letter", arg.toLower());
+    renamer.rename(prefixDir.path()+'/'+dirPath.at(slot)->property("letter").toString(),
+                   prefixDir.path()+'/'+letters.at(arg).toLower());
+    dirPath.at(slot)->setProperty("letter", letters.at(arg).toLower());
 
-    usedLetters.append(arg);
+    usedLetters.append(letters.at(arg));
 
     UpdateUsedLetters();
 }
@@ -242,7 +241,7 @@ void NeroVirtualDriveDialog::changeBtn_clicked()
                                                           qEnvironmentVariable("HOME")));
     if(!externalDir.path().isEmpty()) {
         QFile newLink;
-        if(newLink.remove(QString("%1/%2").arg(prefixDir.path(), dirPath.at(slot)->property("letter").toString()))) {
+        if(newLink.remove(prefixDir.path()+'/'+dirPath.at(slot)->property("letter").toString())) {
             if(newLink.link(externalDir.canonicalPath(), dirPath.at(slot)->property("letter").toString()))
                 dirPath.at(slot)->setText(QString("<b>%1/</b> <i>[%2]</i>").arg(dirPath.at(slot)->property("letter").toString().toUpper(), externalDir.canonicalPath()));
         }

@@ -43,7 +43,7 @@ public:
 private slots:
     void on_addDirBtn_clicked();
 
-    void letterBox_activated(const QString);
+    void letterBox_activated(const int &);
 
     void changeBtn_clicked();
 
