@@ -618,6 +618,7 @@ void NeroRunner::WaitLoop(QProcess &runner, QFile &log)
             runner.waitForReadyRead(1000);
             if(runner.canReadLine()) {
                 stdout = runner.readLine();
+                printf("%s", stdout.constData());
                 if(loggingEnabled)
                     log.write(stdout);
 
@@ -638,11 +639,13 @@ void NeroRunner::WaitLoop(QProcess &runner, QFile &log)
 
     while(!runner.atEnd()) {
         stdout = runner.readLine();
+        printf("%s", stdout.constData());
         if(loggingEnabled)
             log.write(stdout);
     }
 
-    log.close();
+    if(loggingEnabled)
+        log.close();
 }
 
 void NeroRunner::StopProcess()
