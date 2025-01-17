@@ -470,13 +470,15 @@ int NeroRunner::StartOnetime(const QString &path, const bool &prefixAlreadyRunni
     QString app = path;
     QDir dosdevicesPath(NeroFS::GetPrefixesPath().path() + '/' + NeroFS::GetCurrentPrefix() + "/dosdevices");
     QFileInfoList dosdevices(dosdevicesPath.entryInfoList(QDir::NoDotAndDotDot | QDir::Dirs, QDir::Name));
-    for(auto const device : dosdevices) {
-        if(app.contains(device.symLinkTarget())) {
-            app.remove(device.symLinkTarget());
-            app.prepend(device.baseName().toUpper());
-            break;
+    // .dots/relative paths don't really need a path fixup.
+    if(!app.startsWith('.'))
+        for(auto const device : dosdevices) {
+            if(app.contains(device.symLinkTarget())) {
+                app.remove(device.symLinkTarget());
+                app.prepend(device.baseName().toUpper());
+                break;
+            }
         }
-    }
 
     arguments.append(app);
 
