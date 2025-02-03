@@ -216,10 +216,10 @@ void NeroPrefixSettingsWindow::LoadSettings()
         for(const QString &dll : dllsToAdd) {
             const QString dllName = dllsToAdd.at(dllsToAdd.indexOf(dll)).left(dllsToAdd.at(dllsToAdd.indexOf(dll)).indexOf('='));
             const QString dllType = dllsToAdd.at(dllsToAdd.indexOf(dll)).mid(dllsToAdd.at(dllsToAdd.indexOf(dll)).indexOf('=')+1);
-            if(dllType == "n,b") AddDLL(dllName, NeroConstant::DLLNativeThenBuiltin);
-            else if(dllType == "builtin") AddDLL(dllName, NeroConstant::DLLBuiltinOnly);
-            else if(dllType == "b,n") AddDLL(dllName, NeroConstant::DLLBuiltinThenNative);
-            else if(dllType == "native") AddDLL(dllName, NeroConstant::DLLNativeOnly);
+            if(dllType == "n,b")           AddDLL(dllName, NeroConstant::DLLNativeThenBuiltin);
+            else if(dllType == "builtin")  AddDLL(dllName, NeroConstant::DLLBuiltinOnly);
+            else if(dllType == "b,n")      AddDLL(dllName, NeroConstant::DLLBuiltinThenNative);
+            else if(dllType == "native")   AddDLL(dllName, NeroConstant::DLLNativeOnly);
             else if(dllType == "disabled") AddDLL(dllName, NeroConstant::DLLDisabled);
         }
     }
@@ -254,6 +254,8 @@ void NeroPrefixSettingsWindow::LoadSettings()
         ui->shortcutArgs->setText(settings["Args"].toStringList().join(' '));
         ui->preRunScriptPath->setText(settings.value("PreRunScript").toString());
         ui->postRunScriptPath->setText(settings.value("PostRunScript").toString());
+        if(ui->preRunScriptPath->text().isEmpty())  ui->preRunClearBtn->setVisible(false);
+        if(ui->postRunScriptPath->text().isEmpty()) ui->postRunClearBtn->setVisible(false);
 
         if(QFileInfo::exists(settings["Path"].toString().replace("C:/",
                                                                  NeroFS::GetPrefixesPath().canonicalPath()+'/'+NeroFS::GetCurrentPrefix()+"/drive_c/")))
@@ -529,7 +531,13 @@ void NeroPrefixSettingsWindow::on_preRunButton_clicked()
                                      "Select a Pre-run Script",
                                      qEnvironmentVariable("HOME"),
                                      "Unix Bash Script (.sh)");
-    if(!scriptPath.isEmpty()) ui->preRunScriptPath->setText(scriptPath);
+    if(!scriptPath.isEmpty()) {
+        ui->preRunScriptPath->setText(scriptPath);
+        ui->preRunClearBtn->setVisible(true);
+        if(scriptPath != settings.value("PreRunScript").toString())
+            ui->preRunScriptPath->setFont(boldFont);
+        else ui->preRunScriptPath->setFont(QFont());
+    }
 }
 
 
@@ -539,7 +547,33 @@ void NeroPrefixSettingsWindow::on_postRunButton_clicked()
                                                       "Select a Post-run Script",
                                                       qEnvironmentVariable("HOME"),
                                                       "Unix Bash Script (.sh)");
-    if(!scriptPath.isEmpty()) ui->postRunScriptPath->setText(scriptPath);
+    if(!scriptPath.isEmpty()) {
+        ui->postRunScriptPath->setText(scriptPath);
+        ui->postRunClearBtn->setVisible(true);
+        if(scriptPath != settings.value("PostRunScript").toString())
+            ui->postRunScriptPath->setFont(boldFont);
+        else ui->postRunScriptPath->setFont(QFont());
+    }
+}
+
+
+void NeroPrefixSettingsWindow::on_preRunClearBtn_clicked()
+{
+    ui->preRunScriptPath->clear();
+    if(ui->preRunScriptPath->text() != settings.value("PreRunScript").toString())
+        ui->preRunScriptPath->setFont(boldFont);
+    else ui->preRunScriptPath->setFont(QFont());
+    ui->preRunClearBtn->setVisible(false);
+}
+
+
+void NeroPrefixSettingsWindow::on_postRunClearBtn_clicked()
+{
+    ui->postRunScriptPath->clear();
+    if(ui->postRunScriptPath->text() != settings.value("PostRunScript").toString())
+        ui->postRunScriptPath->setFont(boldFont);
+    else ui->postRunScriptPath->setFont(QFont());
+    ui->postRunClearBtn->setVisible(false);
 }
 
 

@@ -953,7 +953,7 @@
                <x>0</x>
                <y>0</y>
                <width>600</width>
-               <height>454</height>
+               <height>436</height>
               </rect>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -1204,52 +1204,8 @@
          <property name="alignment">
           <set>Qt::AlignmentFlag::AlignCenter</set>
          </property>
-         <layout class="QGridLayout" name="gridLayout_8">
-          <item row="0" column="0">
-           <widget class="QLineEdit" name="preRunScriptPath">
-            <property name="whatsThis">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Path to a designated Pre-run Script for this Shortcut.&lt;/p&gt;&lt;p&gt;When set, this script will be run whenever this shortcut is started &lt;span style=&quot; font-style:italic;&quot;&gt;before&lt;/span&gt; the Proton runner process. This can be used for setting up other services before the application starts.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-            </property>
-            <property name="accessibleName">
-             <string>Pre-Run Script</string>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">color: gray</string>
-            </property>
-            <property name="placeholderText">
-             <string>Path to a Pre-run Script</string>
-            </property>
-            <property name="clearButtonEnabled">
-             <bool>true</bool>
-            </property>
-            <property name="isFor" stdset="0">
-             <string>PreRunScript</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLineEdit" name="postRunScriptPath">
-            <property name="whatsThis">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Path to a designated Post-run Script for this Shortcut.&lt;/p&gt;&lt;p&gt;When set, this script will be run whenever this shortcut is started &lt;span style=&quot; font-style:italic;&quot;&gt;after&lt;/span&gt; the Proton runner process. This can be used for cleaning up or closing other process that may have been started for the application, but don't need to be run in perpetuity.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-            </property>
-            <property name="accessibleName">
-             <string>Post-Run Script</string>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">color: gray</string>
-            </property>
-            <property name="placeholderText">
-             <string>Path to a Post-run Script</string>
-            </property>
-            <property name="clearButtonEnabled">
-             <bool>true</bool>
-            </property>
-            <property name="isFor" stdset="0">
-             <string>PostRunScript</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
+         <layout class="QGridLayout" name="gridLayout_8" columnstretch="1,0,0">
+          <item row="0" column="2">
            <widget class="QPushButton" name="preRunButton">
             <property name="whatsThis">
              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select a Pre-run Script to run for this Shortcut.&lt;/p&gt;&lt;p&gt;When set, this script will be run whenever this shortcut is started &lt;span style=&quot; font-style:italic;&quot;&gt;before&lt;/span&gt; the Proton runner process. This can be used for setting up other services before the application starts.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -1274,7 +1230,51 @@
             </property>
            </widget>
           </item>
-          <item row="1" column="1">
+          <item row="0" column="0">
+           <widget class="QLineEdit" name="preRunScriptPath">
+            <property name="whatsThis">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Path to a designated Pre-run Script for this Shortcut.&lt;/p&gt;&lt;p&gt;When set, this script will be run whenever this shortcut is started &lt;span style=&quot; font-style:italic;&quot;&gt;before&lt;/span&gt; the Proton runner process. This can be used for setting up other services before the application starts.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="accessibleName">
+             <string>Pre-Run Script</string>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">color: gray</string>
+            </property>
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+            <property name="placeholderText">
+             <string>Path to a Pre-run Script</string>
+            </property>
+            <property name="isFor" stdset="0">
+             <string>PreRunScript</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLineEdit" name="postRunScriptPath">
+            <property name="whatsThis">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Path to a designated Post-run Script for this Shortcut.&lt;/p&gt;&lt;p&gt;When set, this script will be run whenever this shortcut is started &lt;span style=&quot; font-style:italic;&quot;&gt;after&lt;/span&gt; the Proton runner process. This can be used for cleaning up or closing other process that may have been started for the application, but don't need to be run in perpetuity.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="accessibleName">
+             <string>Post-Run Script</string>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">color: gray</string>
+            </property>
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+            <property name="placeholderText">
+             <string>Path to a Post-run Script</string>
+            </property>
+            <property name="isFor" stdset="0">
+             <string>PostRunScript</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="2">
            <widget class="QPushButton" name="postRunButton">
             <property name="whatsThis">
              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select a Post-run Script to run for this Shortcut.&lt;/p&gt;&lt;p&gt;When set, this script will be run whenever this shortcut is started &lt;span style=&quot; font-style:italic;&quot;&gt;after&lt;/span&gt; the Proton runner process. This can be used for cleaning up or closing other process that may have been started for the application, but don't need to be run in perpetuity.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -1293,6 +1293,32 @@
               <width>16</width>
               <height>16</height>
              </size>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QPushButton" name="preRunClearBtn">
+            <property name="text">
+             <string/>
+            </property>
+            <property name="icon">
+             <iconset theme="edit-clear"/>
+            </property>
+            <property name="flat">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QPushButton" name="postRunClearBtn">
+            <property name="text">
+             <string/>
+            </property>
+            <property name="icon">
+             <iconset theme="edit-clear"/>
+            </property>
+            <property name="flat">
+             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -1733,7 +1759,7 @@
            <x>0</x>
            <y>0</y>
            <width>624</width>
-           <height>68</height>
+           <height>101</height>
           </rect>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_6">

@@ -73,6 +73,10 @@ private slots:
 
     void on_postRunButton_clicked();
 
+    void on_preRunClearBtn_clicked();
+
+    void on_postRunClearBtn_clicked();
+
     void on_prefixInstallDiscordRPC_clicked();
 
     void OptionSet();

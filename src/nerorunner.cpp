@@ -41,6 +41,8 @@ int NeroRunner::StartShortcut(const QString &hash, const bool &prefixAlreadyRunn
                 runner.waitForReadyRead(-1);
                 printf("%s", runner.readAll().constData());
             }
+
+            printf("%s", runner.readAll().constData());
         }
 
         runner.setProcessChannelMode(QProcess::ForwardedOutputChannel);
@@ -394,6 +396,8 @@ int NeroRunner::StartShortcut(const QString &hash, const bool &prefixAlreadyRunn
                 runner.waitForReadyRead(-1);
                 printf("%s", runner.readAll().constData());
             }
+
+            printf("%s", runner.readAll().constData());
         }
 
         return runner.exitCode();
@@ -471,7 +475,7 @@ int NeroRunner::StartOnetime(const QString &path, const bool &prefixAlreadyRunni
     QDir dosdevicesPath(NeroFS::GetPrefixesPath().path() + '/' + NeroFS::GetCurrentPrefix() + "/dosdevices");
     QFileInfoList dosdevices(dosdevicesPath.entryInfoList(QDir::NoDotAndDotDot | QDir::Dirs, QDir::Name));
     // .dots/relative paths don't really need a path fixup.
-    if(!app.startsWith('.'))
+    if(!app.startsWith("./") && !app.startsWith("~/") && !app.startsWith("C:/"))
         for(auto const device : dosdevices) {
             if(app.contains(device.symLinkTarget())) {
                 app.remove(device.symLinkTarget());
@@ -480,7 +484,7 @@ int NeroRunner::StartOnetime(const QString &path, const bool &prefixAlreadyRunni
             }
         }
 
-    arguments.append(app);
+    arguments.append(app.replace("C:/", NeroFS::GetPrefixesPath().canonicalPath()+'/'+NeroFS::GetCurrentPrefix()+"/drive_c/"));
 
     if(!args.isEmpty())
         arguments.append(args);
@@ -589,7 +593,9 @@ int NeroRunner::StartOnetime(const QString &path, const bool &prefixAlreadyRunni
     }
 
     runner.setProcessEnvironment(env);
-    runner.setWorkingDirectory(path.left(path.lastIndexOf("/")));
+    if(path.startsWith('/') || path.startsWith("~/") || path.startsWith("./"))
+        runner.setWorkingDirectory(path.left(path.lastIndexOf("/")).replace("C:", NeroFS::GetPrefixesPath().canonicalPath()+'/'+NeroFS::GetCurrentPrefix()+"/drive_c/"));
+
     QString command = arguments.takeFirst();
 
     QDir logsDir(NeroFS::GetPrefixesPath().path()+'/'+NeroFS::GetCurrentPrefix());
