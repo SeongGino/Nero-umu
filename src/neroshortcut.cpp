@@ -26,7 +26,7 @@
 #include <QFileDialog>
 #include <QProcess>
 
-NeroShortcutWizard::NeroShortcutWizard(QWidget *parent, QString newAppPath)
+NeroShortcutWizard::NeroShortcutWizard(QWidget *parent, const QString &newAppPath)
     : QDialog(parent)
     , ui(new Ui::NeroShortcutWizard)
 {
@@ -34,7 +34,8 @@ NeroShortcutWizard::NeroShortcutWizard(QWidget *parent, QString newAppPath)
     ui->nameMatchWarning->setVisible(false);
 
     // if exe is inside of prefix, convert path to Windows path inside C:/
-    ui->appPath->setText(newAppPath.replace(NeroFS::GetPrefixesPath().path()+'/'+NeroFS::GetCurrentPrefix()+"/drive_c", "C:"));
+    QString newAppPathConv = newAppPath;
+    ui->appPath->setText(newAppPathConv.replace(NeroFS::GetPrefixesPath().path()+'/'+NeroFS::GetCurrentPrefix()+"/drive_c", "C:"));
 
     NeroIcoExtractor::CheckIcoCache(QDir(NeroFS::GetPrefixesPath().path()+'/'+NeroFS::GetCurrentPrefix()));
 

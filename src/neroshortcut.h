@@ -31,7 +31,7 @@ class NeroShortcutWizard : public QDialog
     Q_OBJECT
 
 public:
-    explicit NeroShortcutWizard(QWidget *parent = nullptr, QString newAppPath = "");
+    explicit NeroShortcutWizard(QWidget *parent = nullptr, const QString &newAppPath = "");
     ~NeroShortcutWizard();
 
     QString appPath;
