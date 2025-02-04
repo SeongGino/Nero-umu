@@ -379,6 +379,9 @@ int NeroRunner::StartShortcut(const QString &hash, const bool &prefixAlreadyRunn
         if(loggingEnabled) {
             log.open(QIODevice::WriteOnly);
             log.resize(0);
+            log.write("Current running environment:\n");
+            log.write(runner.environment().join('\n').toLocal8Bit());
+            log.write("==============================================\n");
         }
 
         runner.start(command, arguments);

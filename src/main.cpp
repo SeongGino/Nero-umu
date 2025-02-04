@@ -80,7 +80,10 @@ int main(int argc, char *argv[])
                 return 1;
             }
         // One-time runner with provided prefix name
-        } else if(argc > 3 && arguments.contains("--prefix") && (arguments.last().endsWith(".exe") || arguments.last().endsWith(".msi") || arguments.last().endsWith(".bat"))) {
+        } else if(argc > 3 && arguments.contains("--prefix") &&
+                  (arguments.at(arguments.indexOf("--prefix")+2).endsWith(".exe") ||
+                   arguments.at(arguments.indexOf("--prefix")+2).endsWith(".msi") ||
+                   arguments.at(arguments.indexOf("--prefix")+2).endsWith(".bat"))) {
             if(NeroFS::InitPaths()) {
                 NeroFS::SetCurrentPrefix(arguments.takeAt(arguments.indexOf("--prefix")+1));
                 arguments.removeAt(arguments.indexOf("--prefix"));
