@@ -28,13 +28,9 @@
 #include <QProcess>
 #include <QSpinBox>
 
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-#include <QuaZip-Qt5-1.4/quazip/quazip.h>
-#include <QuaZip-Qt5-1.4/quazip/quazipfile.h>
-#else
-#include <QuaZip-Qt6-1.4/quazip/quazip.h>
-#include <QuaZip-Qt6-1.4/quazip/quazipfile.h>
-#endif
+#include "../lib/quazip/quazip/quazip.h"
+#include "../lib/quazip/quazip/quazipfile.h"
+
 
 NeroPrefixSettingsWindow::NeroPrefixSettingsWindow(QWidget *parent, const QString shortcutHash)
     : QDialog(parent)

@@ -15,6 +15,8 @@ endif()
 
 option(NERO_VERSION "Sets Nero version number" OFF)
 option(NERO_GITHASH "Sets Nero git hash" OFF)
+# for statically linking QuaZip specifically
+set(BUILD_SHARED_LIBS OFF)
 
 if(NERO_VERSION)
     add_compile_definitions(NERO_VERSION="${NERO_VERSION}")
@@ -70,21 +72,23 @@ set(PROJECT_SOURCES
         img/pics.qrc
 )
 
+include(FindPkgConfig)
+
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
-    find_package(QuaZip-Qt6)
+    find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core5Compat)
     qt_add_executable(nero-umu
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
     )
     qt_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
 else()
-    find_package(QuaZip-Qt5)
     add_executable(nero-umu
         ${PROJECT_SOURCES}
     )
     qt5_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
 endif()
 
+add_subdirectory(lib/quazip)
 target_link_libraries(nero-umu PRIVATE Qt${QT_VERSION_MAJOR}::Widgets QuaZip::QuaZip)
 
 include(GNUInstallDirs)
