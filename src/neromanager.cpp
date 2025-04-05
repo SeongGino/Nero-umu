@@ -327,9 +327,8 @@ void NeroManagerWindow::CreatePrefix(const QString &newPrefix, const QString &ru
     if(umu.exitCode() >= 0) {
         NeroFS::AddNewPrefix(newPrefix, runner);
 
-        if(!NeroFS::GetPrefixes().isEmpty()) {
+        if(!NeroFS::GetPrefixes().isEmpty())
             StopBlinkTimer();
-        }
 
         // Add fixes to system.reg
         QDir prefixPath(NeroFS::GetPrefixesPath().path() + '/' + newPrefix);
@@ -446,7 +445,19 @@ void NeroManagerWindow::AddTricks(QStringList verbs, const QString &prefix)
         }
     }
 
-    if(umu.exitCode() >= 0) { QApplication::alert(this); }
+    if(umu.exitCode() >= 0) {
+        QApplication::alert(this);
+        if(sysTray->supportsMessages())
+            sysTray->showMessage("Winetricks Installation Returned An Error",
+                                 "Winetricks process in prefix \"" + NeroFS::GetCurrentPrefix() + "\" has exited with error code " + QString::number(umu.exitCode()) + ". "
+                                 "Not all queued verbs may have finished installing. "
+                                 "Confirm which verbs have been successfully installed by checking for grayed-out entries in the \"Install Winetricks Components\" window for this prefix.",
+                                 QSystemTrayIcon::Warning);
+    } else {
+        if(sysTray->supportsMessages())
+            sysTray->showMessage("Finished Installing Winetricks",
+                                 "Queued Winetricks verbs has finished installing to prefix \"" + NeroFS::GetCurrentPrefix() + "\".");
+    }
     QGuiApplication::restoreOverrideCursor();
 }
 
