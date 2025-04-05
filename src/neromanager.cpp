@@ -445,8 +445,8 @@ void NeroManagerWindow::AddTricks(QStringList verbs, const QString &prefix)
         }
     }
 
-    if(umu.exitCode() >= 0) {
-        QApplication::alert(this);
+    QApplication::alert(this);
+    if(umu.exitCode() != 0) {
         if(sysTray->supportsMessages())
             sysTray->showMessage("Winetricks Installation Returned An Error",
                                  "Winetricks process in prefix \"" + NeroFS::GetCurrentPrefix() + "\" has exited with error code " + QString::number(umu.exitCode()) + ". "
