@@ -347,7 +347,8 @@ void NeroPrefixSettingsWindow::on_shortcutIco_clicked()
 {
     QString newIcon = QFileDialog::getOpenFileName(this,
                                                    "Select a Windows Executable",
-                                                   qEnvironmentVariable("HOME"),
+                                                   ui->shortcutPath->text().replace("C:/",
+                                                                                    NeroFS::GetPrefixesPath().canonicalPath()+'/'+NeroFS::GetCurrentPrefix()+"/drive_c/"),
         "Windows Executable, Dynamic Link Library, Icon Resource File, or Portable Network Graphics File (*.dll *.exe *.ico *.png);;Windows Dynamic Link Library (*.dll);;Windows Executable (*.exe);;Windows Icon Resource (*.ico);;Portable Network Graphics File (*.png)");
 
     if(!newIcon.isEmpty()) {
@@ -388,7 +389,8 @@ void NeroPrefixSettingsWindow::on_shortcutPathBtn_clicked()
 {
     QString newApp = QFileDialog::getOpenFileName(this,
                                                   "Select a Windows Executable",
-                                                  qEnvironmentVariable("HOME"),
+                                                  ui->shortcutPath->text().replace("C:/",
+                                                                                   NeroFS::GetPrefixesPath().canonicalPath()+'/'+NeroFS::GetCurrentPrefix()+"/drive_c/"),
     "Compatible Windows Executables (*.bat *.exe *.msi);;Windows Batch Script Files (*.bat);;Windows Portable Executable (*.exe);;Windows Installer Package (*.msi)",
                                                   nullptr,
                                                   QFileDialog::DontResolveSymlinks);

@@ -84,7 +84,8 @@ void NeroShortcutWizard::on_selectBox_clicked()
 {
     QString newApp = QFileDialog::getOpenFileName(this,
                                                   "Select a Windows Executable",
-                                                  qEnvironmentVariable("HOME"),
+                                                  ui->appPath->text().replace("C:/",
+                                                                              NeroFS::GetPrefixesPath().canonicalPath()+'/'+NeroFS::GetCurrentPrefix()+"/drive_c/"),
     "Compatible Windows Executables (*.bat *.exe *.msi);;Windows Batch Script Files (*.bat);;Windows Portable Executable (*.exe);;Windows Installer Package (*.msi)",
                                                   nullptr,
                                                   QFileDialog::DontResolveSymlinks);

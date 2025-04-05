@@ -61,9 +61,11 @@ private:
     void UpdateUsedLetters();
 
     void SetComboBoxItemEnabled(QComboBox * comboBox, const int index, const bool enabled) {
-        auto * model = qobject_cast<QStandardItemModel*>(comboBox->model());
-        auto * item = model->item(index);
-        item->setEnabled(enabled);
+        if(index > -1) {
+            auto * model = qobject_cast<QStandardItemModel*>(comboBox->model());
+            auto * item = model->item(index);
+            item->setEnabled(enabled);
+        }
     }
 
     QDir prefixDir;

@@ -174,7 +174,7 @@ void NeroVirtualDriveDialog::on_addDirBtn_clicked()
                                                           qEnvironmentVariable("HOME")));
     if(!externalDir.path().isEmpty()) {
         QFile newLink;
-        char letter[] = {'a', ':'};
+        char letter[] = {'a', ':', '\0'};
         for(int i = 0; i < 26; i++) {
             letter[0] = 'a'+i;
             if(!newLink.exists(prefixDir.path()+'/'+letter)) {

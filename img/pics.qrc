@@ -2,5 +2,6 @@
     <qresource prefix="/ico">
         <file alias="systrayPhi">ico/systrayPhi.png</file>
         <file alias="systrayPhiPlaying">ico/systrayPhiPlaying.png</file>
+        <file alias="systrayPhiBusy">ico/systrayPhiBusy.png</file>
     </qresource>
 </RCC>
