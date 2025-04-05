@@ -105,6 +105,7 @@ NeroManagerWindow::NeroManagerWindow(QWidget *parent)
     sysTray->show();
     sysTray->setToolTip("Nero Manager");
     connect(sysTray, &QSystemTrayIcon::activated, this, &NeroManagerWindow::sysTray_activated);
+    connect(sysTray, &QSystemTrayIcon::messageClicked, this, &NeroManagerWindow::sysTray_messageClicked);
 
     ui->prefixContentsScrollArea->setVisible(false);
 
@@ -179,6 +180,14 @@ void NeroManagerWindow::RenderPrefixes()
         StartBlinkTimer();
     } else {
         StopBlinkTimer();
+
+        if(!prefixMainButton.isEmpty()) {
+            for(auto btn : prefixMainButton)
+                delete btn;
+            for(auto btn : prefixDeleteButton)
+                delete btn;
+            prefixMainButton.clear(), prefixDeleteButton.clear();
+        }
 
         for(int i = 0; i < NeroFS::GetPrefixes().count(); i++) {
             prefixMainButton << new QPushButton(NeroFS::GetPrefixes().at(i));
@@ -539,6 +548,9 @@ void NeroManagerWindow::on_addButton_clicked()
 
             if(wizard.userSymlinks) NeroFS::CreateUserLinks(wizard.prefixName);
             sysTray->setIcon(QIcon(":/ico/systrayPhi"));
+            if(sysTray->supportsMessages())
+                sysTray->showMessage("Finished Making Prefix \"" + wizard.prefixName + "\"",
+                                     "New Proton prefix \"" + wizard.prefixName + "\" has been created successfully.");
         } else {
             if(NeroFS::GetPrefixes().isEmpty()) { StartBlinkTimer(); }
         }
@@ -611,10 +623,7 @@ void NeroManagerWindow::prefixDeleteButtons_clicked()
             if(NeroFS::GetCurrentPrefix() == prefixMainButton.at(slot)->text())
                 CleanupShortcuts();
 
-            delete prefixMainButton.at(slot);
-            delete prefixDeleteButton.at(slot);
-            prefixMainButton.remove(slot);
-            prefixDeleteButton.remove(slot);
+            RenderPrefixes();
         }
     }
 }
@@ -891,6 +900,13 @@ void NeroManagerWindow::sysTray_activated(QSystemTrayIcon::ActivationReason reas
     default:
         break;
     }
+}
+
+void NeroManagerWindow::sysTray_messageClicked()
+{
+    if(this->isHidden()) this->show();
+
+    this->raise();
 }
 
 void NeroManagerWindow::actionExit_activated()

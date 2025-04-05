@@ -220,6 +220,13 @@ int NeroRunner::StartShortcut(const QString &hash, const bool &prefixAlreadyRunn
                     }
                     arguments.prepend("-F");
                 }
+                if(settings->value("Shortcuts--"+hash+"/LimitFPS").toInt()) {
+                    arguments.prepend(QByteArray::number(settings->value("Shortcuts--"+hash+"/LimitFPS").toInt()));
+                    arguments.prepend("-r");
+                    arguments.prepend(QByteArray::number(settings->value("Shortcuts--"+hash+"/LimitFPS").toInt()));
+                    arguments.prepend("-o");
+                }
+                //arguments.prepend("--adaptive-sync");
                 arguments.prepend("gamescope");
                 break;
             case NeroConstant::ScalingGamescopeBorderless:
@@ -254,6 +261,13 @@ int NeroRunner::StartShortcut(const QString &hash, const bool &prefixAlreadyRunn
                     }
                     arguments.prepend("-F");
                 }
+                if(settings->value("Shortcuts--"+hash+"/LimitFPS").toInt()) {
+                    arguments.prepend(QByteArray::number(settings->value("Shortcuts--"+hash+"/LimitFPS").toInt()));
+                    arguments.prepend("-r");
+                    arguments.prepend(QByteArray::number(settings->value("Shortcuts--"+hash+"/LimitFPS").toInt()));
+                    arguments.prepend("-o");
+                }
+                //arguments.prepend("--adaptive-sync");
                 arguments.prepend("gamescope");
                 break;
             }
@@ -312,6 +326,13 @@ int NeroRunner::StartShortcut(const QString &hash, const bool &prefixAlreadyRunn
                     }
                     arguments.prepend("-F");
                 }
+                if(settings->value("PrefixSettings/LimitFPS").toInt()) {
+                    arguments.prepend(QByteArray::number(settings->value("PrefixSettings/LimitFPS").toInt()));
+                    arguments.prepend("-r");
+                    arguments.prepend(QByteArray::number(settings->value("PrefixSettings/LimitFPS").toInt()));
+                    arguments.prepend("-o");
+                }
+                //arguments.prepend("--adaptive-sync");
                 arguments.prepend("gamescope");
                 break;
             case NeroConstant::ScalingGamescopeBorderless:
@@ -346,6 +367,13 @@ int NeroRunner::StartShortcut(const QString &hash, const bool &prefixAlreadyRunn
                     }
                     arguments.prepend("-F");
                 }
+                if(settings->value("PrefixSettings/LimitFPS").toInt()) {
+                    arguments.prepend(QByteArray::number(settings->value("PrefixSettings/LimitFPS").toInt()));
+                    arguments.prepend("-r");
+                    arguments.prepend(QByteArray::number(settings->value("PrefixSettings/LimitFPS").toInt()));
+                    arguments.prepend("-o");
+                }
+                //arguments.prepend("--adaptive-sync");
                 arguments.prepend("gamescope");
                 break;
         }
@@ -551,6 +579,11 @@ int NeroRunner::StartOnetime(const QString &path, const bool &prefixAlreadyRunni
             }
             arguments.prepend("-F");
         }
+        if(settings->value("PrefixSettings/LimitFPS").toInt()) {
+            arguments.prepend(QByteArray::number(settings->value("PrefixSettings/LimitFPS").toInt()));
+            arguments.prepend("--framerate-limit");
+        }
+        arguments.prepend("--adaptive-sync");
         arguments.prepend("gamescope");
         break;
     case NeroConstant::ScalingGamescopeBorderless:
@@ -585,6 +618,11 @@ int NeroRunner::StartOnetime(const QString &path, const bool &prefixAlreadyRunni
             }
             arguments.prepend("-F");
         }
+        if(settings->value("PrefixSettings/LimitFPS").toInt()) {
+            arguments.prepend(QByteArray::number(settings->value("PrefixSettings/LimitFPS").toInt()));
+            arguments.prepend("--framerate-limit");
+        }
+        arguments.prepend("--adaptive-sync");
         arguments.prepend("gamescope");
         break;
     }

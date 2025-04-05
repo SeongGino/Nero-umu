@@ -117,6 +117,8 @@ private slots:
 
     void sysTray_activated(QSystemTrayIcon::ActivationReason reason);
 
+    void sysTray_messageClicked();
+
     void on_addButton_clicked();
 
     void on_backButton_clicked();
