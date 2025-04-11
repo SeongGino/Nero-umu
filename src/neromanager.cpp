@@ -717,12 +717,13 @@ void NeroManagerWindow::on_oneTimeRunBtn_clicked()
 {
     QString oneTimeApp(QFileDialog::getOpenFileName(this,
                                                     "Select an Executable to Start in Prefix",
-                                                    NeroFS::GetPrefixesPath().absoluteFilePath(NeroFS::GetCurrentPrefix()+"/drive_c"),
+                                                    oneTimeLastPath.isEmpty() ? NeroFS::GetPrefixesPath().absoluteFilePath(NeroFS::GetCurrentPrefix()+"/drive_c") : oneTimeLastPath,
     "Compatible Windows Executables (*.bat *.exe *.msi);;Windows Batch Script Files (*.bat);;Windows Portable Executable (*.exe);;Windows Installer Package (*.msi)",
                                                     nullptr,
                                                     QFileDialog::DontResolveSymlinks));
 
     if(!oneTimeApp.isEmpty()) {
+        oneTimeLastPath = oneTimeApp;
         ui->prefixSettingsBtn->setEnabled(false);
         ui->prefixTricksBtn->setEnabled(false);
 
@@ -845,7 +846,8 @@ void NeroManagerWindow::prefixSettings_result()
         if(prefixSettings->result() == QDialog::Accepted) {
             // update app icon if changed
             if(!prefixSettings->newAppIcon.isEmpty()) {
-                prefixShortcutIco.at(slot)->addFile(prefixSettings->newAppIcon);
+                delete prefixShortcutIco.at(slot);
+                prefixShortcutIco[slot] = new QIcon(prefixSettings->newAppIcon);
                 if(prefixShortcutIco.at(slot)->actualSize(QSize(24,24)).height() < 24)
                     prefixShortcutIcon.at(slot)->setPixmap(prefixShortcutIco.at(slot)->pixmap(prefixShortcutIco.at(slot)->actualSize(QSize(24,24))).scaled(24,24,Qt::KeepAspectRatio,Qt::SmoothTransformation));
                 else prefixShortcutIcon.at(slot)->setPixmap(prefixShortcutIco.at(slot)->pixmap(24,24));

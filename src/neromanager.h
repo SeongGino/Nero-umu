@@ -162,6 +162,7 @@ private:
     QTimer *blinkTimer;
     int blinkingState = 1;
     bool prefixIsSelected = false;
+    QString oneTimeLastPath;
 
     // umu threads
     QList<NeroThreadController*> umuController;

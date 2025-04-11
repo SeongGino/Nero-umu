@@ -198,6 +198,7 @@ int NeroRunner::StartShortcut(const QString &hash, const bool &prefixAlreadyRunn
                            settings->value("Shortcuts--"+hash+"/FSRcustomResH").toString());
                 break;
             case NeroConstant::ScalingGamescopeFullscreen:
+                arguments.prepend("--");
                 arguments.prepend("-f");
                 if(settings->value("Shortcuts--"+hash+"/GamescopeOutResH").toInt()) {
                     arguments.prepend(settings->value("Shortcuts--"+hash+"/GamescopeOutResH").toString());
@@ -230,8 +231,10 @@ int NeroRunner::StartShortcut(const QString &hash, const bool &prefixAlreadyRunn
                 arguments.prepend("gamescope");
                 break;
             case NeroConstant::ScalingGamescopeBorderless:
+                arguments.prepend("--");
                 arguments.prepend("-b");
             case NeroConstant::ScalingGamescopeWindowed:
+                if(!arguments.contains("--")) arguments.prepend("--");
                 if(settings->value("Shortcuts--"+hash+"/GamescopeWinResH").toInt()) {
                     arguments.prepend(settings->value("Shortcuts--"+hash+"/GamescopeWinResH").toString());
                     arguments.prepend("-H");
