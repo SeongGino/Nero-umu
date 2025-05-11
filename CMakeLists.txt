@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(Nero-UMU LANGUAGES CXX)
+project(Nero-UMU VERSION 0.9.10 LANGUAGES CXX)
 
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
@@ -8,10 +8,6 @@ set(CMAKE_AUTORCC ON)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-if(NOT NERO_QT_VERSIONS)
-    set(NERO_QT_VERSIONS Qt6)
-endif()
 
 option(NERO_VERSION "Sets Nero version number" OFF)
 option(NERO_GITHASH "Sets Nero git hash" OFF)
@@ -26,8 +22,13 @@ if(NERO_GITHASH)
     add_compile_definitions(NERO_GITHASH="${NERO_GITHASH}")
 endif()
 
-find_package(QT NAMES ${NERO_QT_VERSIONS} COMPONENTS Widgets LinguistTools REQUIRED)
-find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets LinguistTools REQUIRED)
+if(NOT NERO_QT_VERSION)
+    find_package(QT NAMES Qt6 Qt5 REQUIRED)
+else()
+    find_package(QT NAMES ${NERO_QT_VERSION} REQUIRED)
+endif()
+
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets LinguistTools)
 
 set(TS_FILES translations/Nero-Launcher_en_US.ts)
 

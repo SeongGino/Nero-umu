@@ -33,8 +33,8 @@ For Arch users, Nero can be installed from the AUR @ [`nero-umu`](https://aur.ar
 
 ## Building
 Requirements for building Nero from source:
- - `Qt6` - the Base and Network libraries are required.
-   - If you're building with *Qt 5.x*, add the argument `-DNERO_QT_VERSIONS=Qt5` to the cmake command.
+ - `Qt6/Qt5` - the Base and Network libraries are required.
+   - If you'd like to build with *Qt 5.x* on a system with Qt6 installed, add the argument `-DNERO_QT_VERSION=Qt5` to the cmake command.
  - `QuaZip` - Needed for extracting zip archives (mainly the Discord RPC bridge utility).
    - For Qt 6.x, QuaZip additionally requires the Qt5Compat layer.
 
