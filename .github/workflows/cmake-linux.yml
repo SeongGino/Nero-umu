@@ -29,7 +29,7 @@ jobs:
       with:
         version: '6.8.3'
         modules: 'qt5compat'
-        archives: 'qtbase qtwayland qttools qttranslations icu'
+        archives: 'qtbase qtwayland qttools qttranslations qtsvg icu'
 
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
