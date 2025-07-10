@@ -32,7 +32,7 @@
       <enum>QFrame::Shape::NoFrame</enum>
      </property>
      <property name="text">
-      <string>WInetricks Verbs Available:</string>
+      <string>Winetricks Verbs Available:</string>
      </property>
     </widget>
    </item>
