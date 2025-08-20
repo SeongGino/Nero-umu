@@ -21,11 +21,17 @@
 #include "ui_nerodrives.h"
 #include "nerofs.h"
 
+#include <QShortcut>
+
 NeroVirtualDriveDialog::NeroVirtualDriveDialog(QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::NeroVirtualDriveDialog)
 {
     ui->setupUi(this);
+
+    // shortcut ctrl/cmd + W to close the popup window
+	QShortcut *shortcutClose = new QShortcut(QKeySequence::Close, this);
+	connect(shortcutClose, &QShortcut::activated, this,&NeroVirtualDriveDialog::close);
 
     lineEditFont.setPointSize(9);
     letterFont.setPointSize(11), letterFont.setBold(true);

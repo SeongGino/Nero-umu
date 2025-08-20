@@ -32,6 +32,7 @@
 #include <QFileDialog>
 #include <QProcess>
 #include <QTimer>
+#include <QShortcut>
 
 NeroManagerWindow::NeroManagerWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -96,6 +97,13 @@ NeroManagerWindow::NeroManagerWindow(QWidget *parent)
     if(managerCfg->value("WinSize").isValid())
         this->resize(managerCfg->value("WinSize").toSize());
 
+    // shortcut ctrl/cmd + Q to close the main window
+	QShortcut *shortcutQuit = new QShortcut(QKeySequence::Quit, this);
+	connect(shortcutQuit, &QShortcut::activated, this, &NeroManagerWindow::actionExit_activated);
+    // shortcut ctrl/cmd + W to hide the main window
+	QShortcut *shortcutClose = new QShortcut(QKeySequence::Close, this);
+	connect(shortcutClose, &QShortcut::activated, this, &NeroManagerWindow::hide);
+    
     sysTray = new QSystemTrayIcon(QIcon(":/ico/systrayPhi"), this);
     for(auto &action : sysTrayActions)
         sysTrayMenu.addAction(&action);
@@ -153,6 +161,7 @@ void NeroManagerWindow::SetHeader(const QString prefix, const unsigned int short
         ui->backButton->setEnabled(true);
         ui->backButton->setIcon(QIcon::fromTheme("go-previous"));
         ui->backButton->setToolTip("Go back to prefixes list.");
+        ui->backButton->setShortcut(QKeySequence::Back);
         ui->backButton->clearFocus();
         ui->addButton->clearFocus();
         ui->addButton->setIcon(QIcon::fromTheme("list-add"));

@@ -20,11 +20,17 @@
 #include "neropreferences.h"
 #include "ui_neropreferences.h"
 
+#include <QShortcut>
+
 NeroManagerPreferences::NeroManagerPreferences(QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::NeroManagerPreferences)
 {
     ui->setupUi(this);
+
+    // shortcut ctrl/cmd + W to close the popup window
+	QShortcut *shortcutClose = new QShortcut(QKeySequence::Close, this);
+	connect(shortcutClose, &QShortcut::activated, this,&NeroManagerPreferences::close);
 }
 
 NeroManagerPreferences::~NeroManagerPreferences()

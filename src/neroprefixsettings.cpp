@@ -27,6 +27,7 @@
 #include <QAction>
 #include <QProcess>
 #include <QSpinBox>
+#include <QShortcut>
 
 #include "../lib/quazip/quazip/quazip.h"
 #include "../lib/quazip/quazip/quazipfile.h"
@@ -37,6 +38,10 @@ NeroPrefixSettingsWindow::NeroPrefixSettingsWindow(QWidget *parent, const QStrin
     , ui(new Ui::NeroPrefixSettingsWindow)
 {
     ui->setupUi(this);
+
+    // shortcut ctrl/cmd + W to close the popup window
+	QShortcut *shortcutClose = new QShortcut(QKeySequence::Close, this);
+	connect(shortcutClose, &QShortcut::activated, this,&NeroPrefixSettingsWindow::close);
 
     boldFont.setBold(true);
 

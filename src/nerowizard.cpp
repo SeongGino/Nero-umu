@@ -24,6 +24,7 @@
 #include <QMessageBox>
 #include <QPushButton>
 #include <QAction>
+#include <QShortcut>
 
 NeroPrefixWizard::NeroPrefixWizard(QWidget *parent)
     : QDialog(parent)
@@ -33,6 +34,10 @@ NeroPrefixWizard::NeroPrefixWizard(QWidget *parent)
     ui->nameMatchingWarning->setVisible(false);
     ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
     ui->symlinkDisclaimer->setVisible(false);
+
+    // shortcut ctrl/cmd + W to close the popup window
+	QShortcut *shortcutClose = new QShortcut(QKeySequence::Close, this);
+	connect(shortcutClose, &QShortcut::activated, this,&NeroPrefixWizard::close);
 
     currentPrefixes = NeroFS::GetPrefixes();
     ui->protonRunnerBox->addItems(NeroFS::GetAvailableProtons());

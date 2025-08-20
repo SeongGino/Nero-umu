@@ -35,12 +35,17 @@
 #include <QMessageBox>
 #include <QPushButton>
 #include <QThread>
+#include <QShortcut>
 
 NeroTricksWindow::NeroTricksWindow(QWidget *parent, const QString &runner)
     : QDialog(parent)
     , ui(new Ui::NeroTricksWindow)
 {
     ui->setupUi(this);
+
+    // shortcut ctrl/cmd + W to close the popup window
+	QShortcut *shortcutClose = new QShortcut(QKeySequence::Close, this);
+	connect(shortcutClose, &QShortcut::activated, this,&NeroTricksWindow::close);
 
     if(winetricksAvailVerbs.isEmpty())
         InitVerbs(runner);

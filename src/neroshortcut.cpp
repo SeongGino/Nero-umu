@@ -25,6 +25,7 @@
 #include <QDir>
 #include <QFileDialog>
 #include <QProcess>
+#include <QShortcut>
 
 NeroShortcutWizard::NeroShortcutWizard(QWidget *parent, const QString &newAppPath)
     : QDialog(parent)
@@ -32,6 +33,10 @@ NeroShortcutWizard::NeroShortcutWizard(QWidget *parent, const QString &newAppPat
 {
     ui->setupUi(this);
     ui->nameMatchWarning->setVisible(false);
+
+    // shortcut ctrl/cmd + W to close the popup window
+	QShortcut *shortcutClose = new QShortcut(QKeySequence::Close, this);
+	connect(shortcutClose, &QShortcut::activated, this,&NeroShortcutWizard::close);
 
     // if exe is inside of prefix, convert path to Windows path inside C:/
     QString newAppPathConv = newAppPath;
