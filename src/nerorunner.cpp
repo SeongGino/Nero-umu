@@ -104,12 +104,12 @@ int NeroRunner::StartShortcut(const QString &hash, const bool &prefixAlreadyRunn
             env.insert("PROTON_ENABLE_NVAPI", "1");
 
         if(!settings->value("Shortcuts--"+hash+"/LimitGLextensions").toString().isEmpty()) {
-            if(settings->value("Shortcuts--"+hash+"LimitGLextensions").toBool()) env.insert("PROTON_OLD_GL_STRING", "1");
+            if(settings->value("Shortcuts--"+hash+"/LimitGLextensions").toBool()) env.insert("PROTON_OLD_GL_STRING", "1");
         } else if(settings->value("PrefixSettings/LimitGLextensions").toBool())
             env.insert("PROTON_OLD_GL_STRING", "1");
 
         if(!settings->value("Shortcuts--"+hash+"/VKcapture").toString().isEmpty()) {
-            if(settings->value("Shortcuts--"+hash+"VKcapture").toBool()) env.insert("OBS_VKCAPTURE", "1");
+            if(settings->value("Shortcuts--"+hash+"/VKcapture").toBool()) env.insert("OBS_VKCAPTURE", "1");
         } else if(settings->value("PrefixSettings/VKcapture").toBool())
             env.insert("OBS_VKCAPTURE", "1");
 
