@@ -290,6 +290,7 @@ void NeroFS::AddNewPrefix(const QString &newPrefix, const QString &runner)
     prefixCfg->setValue("GamescopeFilter", NeroConstant::GSfilterLinear);
     //prefixCfg->setValue("GamescopeFilterStrength", 0);
     prefixCfg->setValue("DLLoverrides", {""});
+    prefixCfg->setValue("UseiGPU", false);
     prefixCfg->setValue("LimitGLextensions", false);
     prefixCfg->setValue("DebugOutput", NeroConstant::DebugDisabled);
     prefixCfg->setValue("FileSyncMode", NeroConstant::Fsync);

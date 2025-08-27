@@ -1591,6 +1591,22 @@
             </item>
            </widget>
           </item>
+          <item row="2" column="1"  colspan="2" alignment="Qt::AlignmentFlag::AlignCenter">
+           <widget class="QCheckBox" name="toggleiGPU">
+            <property name="whatsThis">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When enabled, forces programs to run via the integrated graphics card by fully hiding any other graphics cards you may have in your system. This is done before running the main program, therefore any other programs you might start afterwards within the main program &lt;span style=&quot; font-weight:700;&quot;&gt;will also be forced to use the integrated graphics card.&lt;/p&gt;&lt;p&gt; This option is mainly intended for usage with laptops where battery life and heat management is important.&lt;/p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;If unsure, keep disabled&lt;/span&gt;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="accessibleName">
+             <string>Force Usage of Integrated Graphics Card</string>
+            </property>
+            <property name="text">
+             <string>Force Integrated GPU</string>
+            </property>
+            <property name="isFor" stdset="0">
+             <string>UseiGPU</string>
+            </property>
+           </widget>
+          </item>
          </layout>
         </widget>
        </item>
@@ -1948,6 +1964,7 @@
   <tabstop>postRunButton</tabstop>
   <tabstop>prefixEnvVars</tabstop>
   <tabstop>debugBox</tabstop>
+  <tabstop>toggleiGPU</tabstop>
   <tabstop>prefixInstallDiscordRPC</tabstop>
   <tabstop>prefixDrivesBtn</tabstop>
   <tabstop>prefixRegeditBtn</tabstop>
