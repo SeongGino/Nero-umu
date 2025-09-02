@@ -1603,7 +1603,7 @@
              <string>Force Integrated GPU</string>
             </property>
             <property name="isFor" stdset="0">
-             <string>UseiGPU</string>
+             <string>ForceiGPU</string>
             </property>
            </widget>
           </item>

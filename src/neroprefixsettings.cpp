@@ -236,7 +236,7 @@ void NeroPrefixSettingsWindow::LoadSettings()
     // advanced tab
     ui->debugBox->setCurrentIndex(settings.value("DebugOutput").toInt());
     ui->fileSyncBox->setCurrentIndex(settings.value("FileSyncMode").toInt());
-    SetCheckboxState("UseiGPU",            ui->toggleiGPU);
+    SetCheckboxState("ForceiGPU",            ui->toggleiGPU);
     SetCheckboxState("LimitGLextensions",  ui->toggleLimitGL);
     SetCheckboxState("NoD8VK",             ui->toggleNoD8VK);
     SetCheckboxState("ForceWineD3D",       ui->toggleWineD3D);

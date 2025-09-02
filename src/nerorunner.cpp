@@ -113,9 +113,9 @@ int NeroRunner::StartShortcut(const QString &hash, const bool &prefixAlreadyRunn
         } else if(settings->value("PrefixSettings/VKcapture").toBool())
             env.insert("OBS_VKCAPTURE", "1");
 
-        if(!settings->value("Shortcuts--"+hash+"/UseiGPU").toString().isEmpty()) {
-            if(settings->value("Shortcuts--"+hash+"/UseiGPU").toBool()) env.insert("MESA_VK_DEVICE_SELECT_FORCE_DEFAULT_DEVICE", "1");
-        } else if(settings->value("PrefixSettings/UseiGPU").toBool())
+        if(!settings->value("Shortcuts--"+hash+"/ForceiGPU").toString().isEmpty()) {
+            if(settings->value("Shortcuts--"+hash+"/ForceiGPU").toBool()) env.insert("MESA_VK_DEVICE_SELECT_FORCE_DEFAULT_DEVICE", "1");
+        } else if(settings->value("PrefixSettings/ForceiGPU").toBool())
             env.insert("MESA_VK_DEVICE_SELECT_FORCE_DEFAULT_DEVICE", "1");
 
         if(settings->value("Shortcuts--"+hash+"/LimitFPS").toInt())
@@ -596,7 +596,7 @@ int NeroRunner::StartOnetime(const QString &path, const bool &prefixAlreadyRunni
         env.insert("PROTON_OLD_GL_STRING", "1");
     if(settings->value("PrefixSettings/VKcapture").toBool())
         env.insert("OBS_VKCAPTURE", "1");
-    if(settings->value("PrefixSettings/UseiGPU").toBool())
+    if(settings->value("PrefixSettings/ForceiGPU").toBool())
         env.insert("MESA_VK_DEVICE_SELECT_FORCE_DEFAULT_DEVICE", "1");
 
     switch(settings->value("PrefixSettings/FileSyncMode").toInt()) {
