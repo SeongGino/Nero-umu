@@ -147,8 +147,11 @@ void NeroManagerWindow::SetHeader(const QString prefix, const unsigned int short
         ui->addButton->setIcon(QIcon::fromTheme("folder-new"));
         ui->addButton->setToolTip("Create a new prefix.");
         ui->addButton->clearFocus();
-        ui->oneTimeRunBtn->setVisible(false);
-        ui->oneTimeRunArgs->setVisible(false);
+        ui->oneTimeRunBtn->setText("Run Executable in Default Prefix...");
+        ui->oneTimeRunBtn->setVisible(true);
+        ui->oneTimeRunArgs->setVisible(true);
+        ui->oneTimeRunBtn->setEnabled(!managerCfg->value("DefaultPrefix").toString().isEmpty());
+        ui->oneTimeRunArgs->setEnabled(!managerCfg->value("DefaultPrefix").toString().isEmpty());
 
         if(NeroFS::GetPrefixes().isEmpty()) { StartBlinkTimer(); }
         else { StopBlinkTimer(); }
@@ -166,9 +169,12 @@ void NeroManagerWindow::SetHeader(const QString prefix, const unsigned int short
         ui->addButton->clearFocus();
         ui->addButton->setIcon(QIcon::fromTheme("list-add"));
         ui->addButton->setToolTip("Add a new shortcut to this prefix.");
+        ui->oneTimeRunBtn->setText("Run Executable in Prefix...");
         ui->oneTimeRunBtn->setVisible(true);
         ui->oneTimeRunArgs->setVisible(true);
         ui->oneTimeRunArgs->clear();
+        ui->oneTimeRunBtn->setEnabled(true);
+        ui->oneTimeRunArgs->setEnabled(true);
 
         if(shortcutsCount) {
             ui->topSubtitle->setText(QString("%1 Apps").arg(shortcutsCount));
@@ -559,9 +565,10 @@ void NeroManagerWindow::on_addButton_clicked()
 
 void NeroManagerWindow::on_backButton_clicked()
 {
-    // this also handles the page toggling
-    if(prefixIsSelected) {
-        if(currentlyRunning.count() > 0) {
+    if (currentlyRunning.count() > 0) {
+
+        // kill apps only if apps were started in the same page
+        if (!(prefixIsSelected && runnerPrefixIsDefault)) {
             if(runnerWindow == nullptr) {
                 runnerWindow = new NeroRunnerDialog(this);
                 runnerWindow->SetupWindow(false, "all running apps in current prefix");
@@ -574,9 +581,22 @@ void NeroManagerWindow::on_backButton_clicked()
                     break;
                 }
             }
-        } else SetHeader();
+            return;
+        }
+
     } else {
+        if (!prefixIsSelected) {
         // TODO: implement favorites
+            return;
+        }
+    }
+    
+    // this handles the page toggling
+    SetHeader();
+    if (currentlyRunning.count() > 0) {
+        ui->backButton->setEnabled(true);
+        ui->backButton->setIcon(QIcon::fromTheme("media-playback-stop"));
+        ui->backButton->setToolTip("Shut down all running programs in this prefix.");
     }
 }
 
@@ -606,6 +626,16 @@ void NeroManagerWindow::prefixMainButtons_clicked()
     SetHeader(NeroFS::GetCurrentPrefix(), NeroFS::GetCurrentPrefixShortcuts().count());
 
     CheckWinetricks();
+
+    // very hacky but works for now
+    // disable prefixtricks and prefixsettings buttons only when it is the default prefix
+    if (currentlyRunning.count() > 0 && NeroFS::GetCurrentPrefix() == managerCfg->value("DefaultPrefix").toString()) {
+        ui->prefixTricksBtn->setEnabled(false);
+        ui->prefixSettingsBtn->setEnabled(false);
+    } else {
+        ui->prefixTricksBtn->setEnabled(true);
+        ui->prefixSettingsBtn->setEnabled(true);
+    }
 }
 
 void NeroManagerWindow::prefixDefaultButtons_clicked()
@@ -619,11 +649,15 @@ void NeroManagerWindow::prefixDefaultButtons_clicked()
     if(pos == oldPos) {
         prefixDefaultButton.at(pos)->setToolTip("Make Default");
         prefixDefaultButton.at(pos)->setIcon(QIcon::fromTheme("checkmark"));
+        ui->oneTimeRunBtn->setEnabled(false);
+        ui->oneTimeRunArgs->setEnabled(false);
 
         managerCfg->remove("DefaultPrefix");
     } else {
         prefixDefaultButton.at(pos)->setToolTip("Remove Default");
         prefixDefaultButton.at(pos)->setIcon(QIcon::fromTheme("gtk-cancel"));
+        ui->oneTimeRunBtn->setEnabled(true);
+        ui->oneTimeRunArgs->setEnabled(true);
 
         if(oldPos != -1) {
             prefixDefaultButton.at(oldPos)->setToolTip("Make Default");
@@ -730,6 +764,11 @@ void NeroManagerWindow::prefixShortcutEditButtons_clicked()
 
 void NeroManagerWindow::on_oneTimeRunBtn_clicked()
 {
+    if (!prefixIsSelected) {
+        NeroFS::SetCurrentPrefix(managerCfg->value("DefaultPrefix").toString());
+        runnerPrefixIsDefault = true;
+    }
+
     QString oneTimeApp(QFileDialog::getOpenFileName(this,
                                                     "Select an Executable to Start in Prefix",
                                                     oneTimeLastPath.isEmpty() ? NeroFS::GetPrefixesPath().absoluteFilePath(NeroFS::GetCurrentPrefix()+"/drive_c") : oneTimeLastPath,
@@ -742,6 +781,7 @@ void NeroManagerWindow::on_oneTimeRunBtn_clicked()
         ui->prefixSettingsBtn->setEnabled(false);
         ui->prefixTricksBtn->setEnabled(false);
 
+        ui->backButton->setEnabled(true);
         ui->backButton->setIcon(QIcon::fromTheme("media-playback-stop"));
         ui->backButton->setToolTip("Shut down all running programs in this prefix.");
         sysTray->setIcon(QIcon(":/ico/systrayPhiPlaying"));
@@ -1136,8 +1176,11 @@ void NeroManagerWindow::handleUmuResults(const int &buttonSlot, const int &resul
         currentlyRunning.clear();
         threadsCount = 0;
         umuController.clear();
-        ui->backButton->setIcon(QIcon::fromTheme("go-previous"));
-        ui->backButton->setToolTip("Go back to prefixes list.");
+        runnerPrefixIsDefault = false;
+        if (prefixIsSelected) {
+            ui->backButton->setIcon(QIcon::fromTheme("go-previous"));
+            ui->backButton->setToolTip("Go back to prefixes list.");
+        } else SetHeader();
         sysTray->setIcon(QIcon(":/ico/systrayPhi"));
         sysTray->setToolTip("Nero Manager");
         ui->prefixSettingsBtn->setEnabled(true);

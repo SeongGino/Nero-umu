@@ -168,6 +168,7 @@ private:
     QTimer *blinkTimer;
     int blinkingState = 1;
     bool prefixIsSelected = false;
+    bool runnerPrefixIsDefault = false;
     QString oneTimeLastPath;
 
     // umu threads
