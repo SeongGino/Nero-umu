@@ -168,7 +168,7 @@
         </sizepolicy>
        </property>
        <property name="text">
-        <string>Set Prefix Default</string>
+        <string>Set Prefix as Default</string>
        </property>
       </widget>
      </item>
