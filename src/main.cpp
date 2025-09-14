@@ -60,7 +60,7 @@ int main(int argc, char *argv[])
             arguments.append(argv[i]);
 
         // One-time runner (executable only) - prompt user for prefix
-        if(argc < 3 && (arguments.last().endsWith(".exe") || arguments.last().endsWith(".msi") || arguments.last().endsWith(".bat"))) {
+        if(argc < 3 && (arguments.last().endsWith(".exe") || arguments.last().endsWith(".msi") || arguments.last().endsWith(".bat") || arguments.last().endsWith(".cmd"))) {
             printf("Requested to open file!\n");
 
             if(NeroFS::InitPaths()) {

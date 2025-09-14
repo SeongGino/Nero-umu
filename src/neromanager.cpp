@@ -446,7 +446,7 @@ void NeroManagerWindow::on_addButton_clicked()
         QString newApp(QFileDialog::getOpenFileName(this,
                                                     "Select a Windows Executable",
                                                     NeroFS::GetPrefixesPath().absoluteFilePath(NeroFS::GetCurrentPrefix()+"/drive_c"),
-        "Compatible Windows Files (*.bat *.exe *.msi);;Windows Batch Script Files (*.bat);;Windows Executable (*.exe);;Windows Installer Package (*.msi)",
+        "Compatible Windows Files (*.bat *.cmd *.exe *.msi);;Windows Batch Script Files (*.bat *.cmd);;Windows Executable (*.exe);;Windows Installer Package (*.msi)",
                                                     nullptr,
                                                     QFileDialog::DontResolveSymlinks));
 
@@ -681,7 +681,7 @@ void NeroManagerWindow::on_oneTimeRunBtn_clicked()
     QString oneTimeApp(QFileDialog::getOpenFileName(this,
                                                     "Select an Executable to Start in Prefix",
                                                     oneTimeLastPath.isEmpty() ? NeroFS::GetPrefixesPath().absoluteFilePath(NeroFS::GetCurrentPrefix()+"/drive_c") : oneTimeLastPath,
-    "Compatible Windows Executables (*.bat *.exe *.msi);;Windows Batch Script Files (*.bat);;Windows Portable Executable (*.exe);;Windows Installer Package (*.msi)",
+    "Compatible Windows Executables (*.bat *.cmd *.exe *.msi);;Windows Batch Script Files (*.bat *.cmd);;Windows Portable Executable (*.exe);;Windows Installer Package (*.msi)",
                                                     nullptr,
                                                     QFileDialog::DontResolveSymlinks));
 

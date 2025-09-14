@@ -91,7 +91,7 @@ void NeroShortcutWizard::on_selectBox_clicked()
                                                   "Select a Windows Executable",
                                                   ui->appPath->text().replace("C:/",
                                                                               NeroFS::GetPrefixesPath().canonicalPath()+'/'+NeroFS::GetCurrentPrefix()+"/drive_c/"),
-    "Compatible Windows Executables (*.bat *.exe *.msi);;Windows Batch Script Files (*.bat);;Windows Portable Executable (*.exe);;Windows Installer Package (*.msi)",
+    "Compatible Windows Executables (*.bat *.cmd *.exe *.msi);;Windows Batch Script Files (*.bat *.cmd);;Windows Portable Executable (*.exe);;Windows Installer Package (*.msi)",
                                                   nullptr,
                                                   QFileDialog::DontResolveSymlinks);
 
