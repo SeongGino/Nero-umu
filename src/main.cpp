@@ -59,11 +59,21 @@ int main(int argc, char *argv[])
         for(int i = 1; i < argc; ++i)
             arguments.append(argv[i]);
 
-        // One-time runner (executable only) - prompt user for prefix
-        if(argc < 3 && (arguments.last().endsWith(".exe") || arguments.last().endsWith(".msi") || arguments.last().endsWith(".bat"))) {
-            printf("Requested to open file!\n");
+        if(NeroFS::InitPaths()) {
+            QSettings* managerCfg = new QSettings(NeroFS::GetManagerCfg());
+            managerCfg->beginGroup("NeroSettings");
 
-            if(NeroFS::InitPaths()) {
+            // One-time runner (executable only) when DefaultPrefix set 
+            if(argc < 3 && (arguments.last().endsWith(".exe") || arguments.last().endsWith(".msi") || arguments.last().endsWith(".bat")) && 
+                !managerCfg->value("DefaultPrefix").isNull()) {
+
+                printf("Requested to open file!\n");
+
+                NeroFS::SetCurrentPrefix(managerCfg->value("DefaultPrefix").toString());
+                NeroRunner runner;
+                return runner.StartOnetime(arguments.last(), {});
+            // One-time runner (executable only) - prompt user for prefix
+            } else if(managerCfg->value("DefaultPrefix").isNull()) {
                 NeroOneTimeDialog oneTimeDiag;
                 oneTimeDiag.exec();
 
@@ -75,29 +85,20 @@ int main(int argc, char *argv[])
                     printf("No prefix selected! Aborting...\n");
                     return 1;
                 }
-            } else {
-                printf("Nero cannot run without a home directory set! Aborting...\n");
-                return 1;
-            }
-        // One-time runner with provided prefix name
-        } else if(argc > 3 && arguments.contains("--prefix") &&
-                  (arguments.at(arguments.indexOf("--prefix")+2).endsWith(".exe") ||
-                   arguments.at(arguments.indexOf("--prefix")+2).endsWith(".msi") ||
-                   arguments.at(arguments.indexOf("--prefix")+2).endsWith(".bat"))) {
-            if(NeroFS::InitPaths()) {
+            // One-time runner with provided prefix name
+            } else if(argc > 3 && arguments.contains("--prefix") &&
+                (arguments.at(arguments.indexOf("--prefix")+2).endsWith(".exe") ||
+                arguments.at(arguments.indexOf("--prefix")+2).endsWith(".msi") ||
+                arguments.at(arguments.indexOf("--prefix")+2).endsWith(".bat"))) {
+
                 NeroFS::SetCurrentPrefix(arguments.takeAt(arguments.indexOf("--prefix")+1));
                 arguments.removeAt(arguments.indexOf("--prefix"));
 
                 NeroRunner runner;
                 QString executable = arguments.takeFirst();
                 return runner.StartOnetime(executable, false, arguments);
-            } else {
-                printf("Nero cannot run without a home directory set! Aborting...\n");
-                return 1;
-            }
-        // One-time runner using prefix with provided preset shortcut
-        } else if(argc > 4 && arguments.contains("--prefix") && arguments.contains("--shortcut")) {
-            if(NeroFS::InitPaths()) {
+            // One-time runner using prefix with provided preset shortcut
+            } else if(argc > 4 && arguments.contains("--prefix") && arguments.contains("--shortcut")) {
                 NeroFS::SetCurrentPrefix(arguments.takeAt(arguments.indexOf("--prefix")+1));
                 arguments.removeAt(arguments.indexOf("--prefix"));
 
@@ -109,13 +110,8 @@ int main(int argc, char *argv[])
                     NeroRunner runner;
                     return runner.StartShortcut(shortcutHash);
                 }
-            } else {
-                printf("Nero cannot run without a home directory set! Aborting...\n");
-                return 1;
-            }
-        // List available shortcuts in defined prefix
-        } else if(argc > 3 && arguments.contains("--prefix") && arguments.last() == "--list") {
-            if(NeroFS::InitPaths()) {
+            // List available shortcuts in defined prefix
+            } else if(argc > 3 && arguments.contains("--prefix") && arguments.last() == "--list") {
                 NeroFS::SetCurrentPrefix(arguments.takeAt(arguments.indexOf("--prefix")+1));
                 arguments.removeAt(arguments.indexOf("--prefix"));
 
@@ -131,17 +127,17 @@ int main(int argc, char *argv[])
                         printf("%s\n", shortcut.toLocal8Bit().constData());
                     return 0;
                 }
+            // Help printout
+            } else if(argc < 3 && (arguments.last() == "-h" || arguments.last() == "--help")) {
+                PrintHelp();
+                return 0;
+            // For unknown args, default to help printout
             } else {
-                printf("Nero cannot run without a home directory set! Aborting...\n");
+                PrintHelp();
                 return 1;
             }
-        // Help printout
-        } else if(argc < 3 && (arguments.last() == "-h" || arguments.last() == "--help")) {
-            PrintHelp();
-            return 0;
-        // For unknown args, default to help printout
         } else {
-            PrintHelp();
+            printf("Nero cannot run without a home directory set! Aborting...\n");
             return 1;
         }
     // Start graphical manager when run with no arguments

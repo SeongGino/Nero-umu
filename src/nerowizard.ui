@@ -160,6 +160,19 @@
       </widget>
      </item>
      <item>
+      <widget class="QCheckBox" name="defaultPrefixCheckbox">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>Set Prefix as Default</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QLabel" name="symlinkDisclaimer">
        <property name="enabled">
         <bool>true</bool>

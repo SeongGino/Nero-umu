@@ -37,6 +37,7 @@ public:
     ~NeroPrefixWizard();
 
     bool userSymlinks = false;
+    bool defaultPrefix = false;
     int protonRunner;
     QString prefixName;
     QStringList verbsToInstall;
@@ -45,6 +46,8 @@ public:
 
 private slots:
     void on_symlinksCheckbox_stateChanged(int arg1);
+
+    void on_defaultPrefixCheckbox_stateChanged(int arg1);
 
     void on_protonRunnerBox_currentIndexChanged(int index) { protonRunner = index; }
 

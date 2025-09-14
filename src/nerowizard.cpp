@@ -259,3 +259,8 @@ void NeroPrefixWizard::on_symlinksCheckbox_stateChanged(int arg1)
     userSymlinks = arg1;
     ui->symlinkDisclaimer->setVisible(arg1);
 }
+
+void NeroPrefixWizard::on_defaultPrefixCheckbox_stateChanged(int arg1)
+{
+    defaultPrefix = arg1;
+}

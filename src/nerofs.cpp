@@ -382,6 +382,13 @@ QMap<QString, QString> NeroFS::GetCurrentShortcutsMap()
 
 bool NeroFS::DeletePrefix(const QString &prefix)
 {
+    // I don't know why this doesn't work without it.
+    QSettings managerCfg(QStandardPaths::writableLocation(QStandardPaths::GenericConfigLocation) + "/Nero-UMU.ini", QSettings::IniFormat);
+    managerCfg.beginGroup("NeroSettings");
+
+    if(managerCfg.value("DefaultPrefix").toString() == prefix)
+        managerCfg.remove("DefaultPrefix");
+
     prefixes.removeOne(prefix);
     if(QDir(prefixesPath.path() + '/' + prefix).removeRecursively())
         return true;
