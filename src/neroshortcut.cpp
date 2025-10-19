@@ -44,6 +44,11 @@ NeroShortcutWizard::NeroShortcutWizard(QWidget *parent, const QString &newAppPat
 
     NeroIcoExtractor::CheckIcoCache(QDir(NeroFS::GetPrefixesPath().path()+'/'+NeroFS::GetCurrentPrefix()));
 
+    // set the shortcut name field to the exe name
+    QString newAppNameWithExtension = newAppPath.right((newAppPath.length() - 1) - newAppPath.lastIndexOf("/"));
+    QString newAppName = newAppNameWithExtension.left(newAppNameWithExtension.lastIndexOf("."));
+    ui->shortcutName->setText(newAppName);
+
     QGuiApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     appIcon = NeroIcoExtractor::GetIcon(newAppPath);
     QGuiApplication::restoreOverrideCursor();
