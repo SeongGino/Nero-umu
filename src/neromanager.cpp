@@ -114,7 +114,7 @@ NeroManagerWindow::NeroManagerWindow(QWidget *parent)
     connect(sysTray, &QSystemTrayIcon::activated, this, &NeroManagerWindow::sysTray_activated);
     connect(sysTray, &QSystemTrayIcon::messageClicked, this, &NeroManagerWindow::sysTray_messageClicked);
 
-    ui->prefixContentsScrollArea->setVisible(false);
+    ui->prefixContentsArea->setVisible(false);
 
     CheckWinetricks();
 
@@ -139,8 +139,8 @@ void NeroManagerWindow::SetHeader(const QString prefix, const unsigned int short
         prefixIsSelected = false;
         ui->topTitle->setText("Select a Prefix");
         ui->topSubtitle->setVisible(false);
-        ui->prefixContentsScrollArea->setVisible(false);
-        ui->prefixesScrollArea->setVisible(true);
+        ui->prefixContentsArea->setVisible(false);
+        ui->prefixesArea->setVisible(true);
         ui->backButton->setEnabled(false);
         ui->backButton->setToolTip("");
         ui->backButton->setIcon(QIcon::fromTheme("user-bookmarks"));
@@ -156,8 +156,8 @@ void NeroManagerWindow::SetHeader(const QString prefix, const unsigned int short
         prefixIsSelected = true;
         ui->topTitle->setText(prefix);
         ui->topSubtitle->setVisible(true);
-        ui->prefixesScrollArea->setVisible(false);
-        ui->prefixContentsScrollArea->setVisible(true);
+        ui->prefixesArea->setVisible(false);
+        ui->prefixContentsArea->setVisible(true);
         ui->backButton->setEnabled(true);
         ui->backButton->setIcon(QIcon::fromTheme("go-previous"));
         ui->backButton->setToolTip("Go back to prefixes list.");
@@ -1037,7 +1037,7 @@ void NeroManagerWindow::blinkTimer_timeout()
 void NeroManagerWindow::StartBlinkTimer()
 {
     blinkTimer->start(800);
-    if(!prefixIsSelected) { ui->missingPrefixesLabel->setVisible(true); }
+    if(!prefixIsSelected) { ui->missingPrefixesLabelArea->setVisible(true); ui->prefixesScrollArea->setVisible(false); }
 }
 
 void NeroManagerWindow::StopBlinkTimer()
@@ -1045,7 +1045,7 @@ void NeroManagerWindow::StopBlinkTimer()
     ui->addButton->setStyleSheet("");
     ui->addButton->setFlat(true);
     blinkTimer->stop();
-    if(!prefixIsSelected) { ui->missingPrefixesLabel->setVisible(false); }
+    if(!prefixIsSelected) { ui->missingPrefixesLabelArea->setVisible(false); ui->prefixesScrollArea->setVisible(true); }
 }
 
 // umu runner stuff here!
