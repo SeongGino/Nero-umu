@@ -60,6 +60,8 @@ NeroManagerWindow::NeroManagerWindow(QWidget *parent)
 
     // load initial data
     if(!NeroFS::InitPaths()) { exit(1); }
+    managerCfg = NeroFS::GetManagerCfg();
+
     if(NeroFS::GetUmU().isEmpty()) {
         QMessageBox::critical(this,
                               "UMU!?",
@@ -68,7 +70,7 @@ NeroManagerWindow::NeroManagerWindow(QWidget *parent)
                               "Please install umu from your package manager, or try using a custom install.\n\n"
                               "Nero will now exit, umu.");
         exit(1);
-    }
+    } else if(NeroFS::GetUmU() != managerCfg->value("UMUpath").toString()) managerCfg->setValue("UMUpath", NeroFS::GetUmU());
     if(NeroFS::GetAvailableProtons().isEmpty()) {
         QMessageBox::critical(this,
                               "No Runners Available!",
@@ -79,7 +81,6 @@ NeroManagerWindow::NeroManagerWindow(QWidget *parent)
                               "\n\nNero will now exit, umu.");
         exit(1);
     }
-    managerCfg = NeroFS::GetManagerCfg();
 
     listFont.setPointSize(12);
 
@@ -127,6 +128,9 @@ NeroManagerWindow::~NeroManagerWindow()
 {
     managerCfg->setValue("WinSize", this->size());
     managerCfg->sync();
+    for(const auto &key : managerCfg->allKeys()) {
+        printf("Key: %s | Value: %s\n", key.toLocal8Bit().constData(), managerCfg->value(key).toString().toLocal8Bit().constData());
+    }
     delete ui;
 }
 
