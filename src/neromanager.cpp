@@ -58,18 +58,17 @@ NeroManagerWindow::NeroManagerWindow(QWidget *parent)
     QGuiApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
     #endif
 
+    // load initial data
+    if(!NeroFS::InitPaths()) { exit(1); }
     if(NeroFS::GetUmU().isEmpty()) {
         QMessageBox::critical(this,
                               "UMU!?",
                               "It seems like umu isn't detected as installed on your system!\n"
                               "Nero and Proton runners will not function without umu.\n"
-                              "Please install umu from your package manager.\n\n"
+                              "Please install umu from your package manager, or try using a custom install.\n\n"
                               "Nero will now exit, umu.");
         exit(1);
     }
-
-    // load initial data
-    if(!NeroFS::InitPaths()) { exit(1); }
     if(NeroFS::GetAvailableProtons().isEmpty()) {
         QMessageBox::critical(this,
                               "No Runners Available!",
@@ -80,8 +79,7 @@ NeroManagerWindow::NeroManagerWindow(QWidget *parent)
                               "\n\nNero will now exit, umu.");
         exit(1);
     }
-    managerCfg = new QSettings(NeroFS::GetManagerCfg());
-    managerCfg->beginGroup("NeroSettings");
+    managerCfg = NeroFS::GetManagerCfg();
 
     listFont.setPointSize(12);
 
@@ -974,7 +972,6 @@ void NeroManagerWindow::prefixSettings_result()
 void NeroManagerWindow::on_managerSettings_clicked()
 {
     prefs = new NeroManagerPreferences(this);
-    prefs->BindSettings(managerCfg);
     prefs->setAttribute(Qt::WA_DeleteOnClose);
     prefs->show();
 }

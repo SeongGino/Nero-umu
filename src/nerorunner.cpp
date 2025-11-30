@@ -28,6 +28,9 @@
 
 int NeroRunner::StartShortcut(const QString &hash, const bool &prefixAlreadyRunning)
 {
+    // failsafe for cli runs
+    if(NeroFS::GetUmU().isEmpty()) return -1;
+
     QSettings *settings = NeroFS::GetCurrentPrefixCfg();
     QFileInfo fileToRun(settings->value("Shortcuts--"+hash+"/Path").toString());
 
@@ -228,7 +231,7 @@ int NeroRunner::StartShortcut(const QString &hash, const bool &prefixAlreadyRunn
         }
 
         QStringList arguments;
-        arguments.append("umu-run");
+        arguments.append(NeroFS::GetUmU());
 
         arguments.append(settings->value("Shortcuts--"+hash+"/Path").toString());
 
@@ -552,13 +555,14 @@ int NeroRunner::StartShortcut(const QString &hash, const bool &prefixAlreadyRunn
         }
 
         return runner.exitCode();
-    } else {
-        return -1;
-    }
+    } else return -1;
 }
 
 int NeroRunner::StartOnetime(const QString &path, const bool &prefixAlreadyRunning, const QStringList &args)
 {
+    // failsafe for cli runs
+    if(NeroFS::GetUmU().isEmpty()) return -1;
+
     QSettings *settings = NeroFS::GetCurrentPrefixCfg();
 
     QProcess runner;
@@ -657,7 +661,7 @@ int NeroRunner::StartOnetime(const QString &path, const bool &prefixAlreadyRunni
     }
 
     QStringList arguments;
-    arguments.append("umu-run");
+    arguments.append(NeroFS::GetUmU());
 
     // Proton/umu should be able to translate Windows-type paths on its own, no conversion needed
     arguments.append(path);
@@ -860,7 +864,7 @@ void NeroRunner::StopProcess()
     env.remove("UMU_RUNTIME_UPDATE");
     env.insert("UMU_RUNTIME_UPDATE", "0");
     wineStopper.setProcessEnvironment(env);
-    wineStopper.start("umu-run", { NeroFS::GetProtonsPath().path()+'/'+NeroFS::GetCurrentRunner()+'/'+"proton", "runinprefix", "wineboot", "-e" });
+    wineStopper.start(NeroFS::GetUmU(), { NeroFS::GetProtonsPath().path()+'/'+NeroFS::GetCurrentRunner()+'/'+"proton", "runinprefix", "wineboot", "-e" });
     wineStopper.waitForFinished();
 }
 

@@ -19,8 +19,12 @@
 
 #include "neropreferences.h"
 #include "ui_neropreferences.h"
+#include "nerofs.h"
 
 #include <QShortcut>
+#include <QFileDialog>
+#include <QProcess>
+#include <QStandardPaths>
 
 NeroManagerPreferences::NeroManagerPreferences(QWidget *parent)
     : QDialog(parent)
@@ -31,6 +35,14 @@ NeroManagerPreferences::NeroManagerPreferences(QWidget *parent)
     // shortcut ctrl/cmd + W to close the popup window
 	QShortcut *shortcutClose = new QShortcut(QKeySequence::Close, this);
 	connect(shortcutClose, &QShortcut::activated, this,&NeroManagerPreferences::close);
+
+    // load settings from current prefs file
+    managerCfg = NeroFS::GetManagerCfg();
+    //ui->runnerNotifs->setChecked(managerCfg->value("UseNotifier").toBool());
+    ui->shortcutHide->setChecked(managerCfg->value("ShortcutHidesManager").toBool());
+    ui->umuPath->setText(managerCfg->value("UMUpath").toString());
+    if(ui->umuPath->text().isEmpty()) ui->umuPath->setPlaceholderText(ui->umuPath->placeholderText() + " (" +
+                                                                      QStandardPaths::findExecutable("umu-run") + ")");
 }
 
 NeroManagerPreferences::~NeroManagerPreferences()
@@ -38,13 +50,41 @@ NeroManagerPreferences::~NeroManagerPreferences()
     if(accepted) {
         //managerCfg->setValue("UseNotifier", ui->runnerNotifs->isChecked());
         managerCfg->setValue("ShortcutHidesManager", ui->shortcutHide->isChecked());
+
+        if(ui->umuPath->text().isEmpty() && !managerCfg->value("UMUpath").toString().isEmpty()) {
+            if(NeroFS::SetUmU(QStandardPaths::findExecutable("umu-run"))) managerCfg->setValue("UMUpath", "");
+            else QMessageBox::warning(NULL,
+                                      "No working system UMU!",
+                                      "System paths do not contain a working UMU instance!\n"
+                                      "Reverting to previous working path.");
+        } else if(NeroFS::SetUmU(ui->umuPath->text())) managerCfg->setValue("UMUpath", ui->umuPath->text());
+        else QMessageBox::warning(NULL,
+                                  "No working UMU found!",
+                                  "Selected path did not point to a working UMU instance!\n"
+                                  "Reverting to previous working path.");
     }
     delete ui;
 }
 
-void NeroManagerPreferences::BindSettings(QSettings *cfg)
+void NeroManagerPreferences::on_umuChangeBtn_clicked()
 {
-    managerCfg = cfg;
-    //ui->runnerNotifs->setChecked(managerCfg->value("UseNotifier").toBool());
-    ui->shortcutHide->setChecked(managerCfg->value("ShortcutHidesManager").toBool());
+    QString newUmuPath = QFileDialog::getOpenFileName(NULL,
+                                                      "Select custom UMU executable",
+                                                      qEnvironmentVariable("HOME"));
+
+    if(!newUmuPath.isEmpty()) ui->umuPath->setText(newUmuPath);
 }
+
+
+void NeroManagerPreferences::on_umuPathClearBtn_clicked()
+{
+    ui->umuPath->clear();
+}
+
+
+void NeroManagerPreferences::on_umuPath_textChanged(const QString &arg1)
+{
+    if(arg1.isEmpty()) ui->umuPathClearBtn->setVisible(false);
+    else ui->umuPathClearBtn->setVisible(true);
+}
+

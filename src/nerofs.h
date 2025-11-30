@@ -34,6 +34,7 @@ private:
     static QDir protonsPath;
     static QString currentPrefix;
     static QString currentRunner;
+    static QString currentUMU;
     static QSettings managerCfg;
     static QStringList currentPrefixOverrides;
     static QStringList prefixes;
@@ -56,7 +57,7 @@ public:
     static QMap<QString, QVariant> GetCurrentPrefixSettings();
     static QMap<QString, QString> GetCurrentShortcutsMap();
     static QMap<QString, QVariant> GetShortcutSettings(const QString &);
-    static QSettings GetManagerCfg() { return QSettings(QStandardPaths::writableLocation(QStandardPaths::GenericConfigLocation) + "/Nero-UMU.ini", QSettings::IniFormat); }
+    static QSettings* GetManagerCfg() { return &managerCfg; }
     static void CreateUserLinks(const QString &);
     static void AddNewPrefix(const QString &, const QString &);
     static void AddNewShortcut(const QString &, const QString &, const QString &);
@@ -69,6 +70,7 @@ public:
     static QString GetIcoutils();
     static QString GetUmU();
     static QString GetWinetricks(const QString & = "");
+    static bool SetUmU(const QString & = "");
 
     static void SetCurrentPrefix(const QString &);
     static bool SetCurrentPrefixCfg(const QString &, const QString &, const QVariant &);

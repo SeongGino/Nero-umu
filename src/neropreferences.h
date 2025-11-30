@@ -34,10 +34,15 @@ class NeroManagerPreferences : public QDialog
 public:
     explicit NeroManagerPreferences(QWidget *parent = nullptr);
     ~NeroManagerPreferences();
-    void BindSettings(QSettings *);
 
 private slots:
     void on_buttonBox_accepted() { accepted = true; }
+
+    void on_umuChangeBtn_clicked();
+
+    void on_umuPathClearBtn_clicked();
+
+    void on_umuPath_textChanged(const QString &arg1);
 
 private:
     Ui::NeroManagerPreferences *ui;

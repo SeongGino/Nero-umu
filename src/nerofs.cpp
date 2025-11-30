@@ -23,8 +23,7 @@
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QStandardPaths>
-
-NeroFS::NeroFS() {}
+#include <QProcess>
 
 // this needs to be re-generated each time the caller needs to reference current prefixCfg.
 QSettings *prefixCfg;
@@ -33,6 +32,7 @@ QDir NeroFS::prefixesPath;
 QDir NeroFS::protonsPath;
 QString NeroFS::currentPrefix;
 QString NeroFS::currentRunner;
+QString NeroFS::currentUMU;
 QSettings NeroFS::managerCfg;
 QStringList NeroFS::currentPrefixOverrides;
 QStringList NeroFS::prefixes;
@@ -185,7 +185,64 @@ QString NeroFS::GetIcoutils()
 
 QString NeroFS::GetUmU()
 {
-    return QStandardPaths::findExecutable("umu-run");
+    // if empty, assume first time checking so that UMU is tested
+    if(currentUMU.isEmpty()) {
+        // default to last used path, if any
+        currentUMU = managerCfg.value("UMUpath").toString();
+        if(!QFile::exists(currentUMU)) {
+            // fallback to system path first
+            currentUMU = QStandardPaths::findExecutable("umu-run");
+            if(currentUMU.isEmpty()) {
+                // UMU not installed, prompt user for custom path
+                QMessageBox umuPrompt(QMessageBox::Information,
+                                      "Where be UMU?",
+                                      "<p>UMU does not seem to be installed on this machine.</p>"
+                                      "<p>Nero can make use of a user-provided instance of UMU in lieu of a system-wide install.<br>"
+                                      "The latest version can be installed from "
+                                      "<a href='https://github.com/Open-Wine-Components/umu-launcher/releases/latest'><span style=' text-decoration: underline; color:#8ab4f8;'>its GitHub releases.</span></a></p>"
+                                      "<p>Would you like to select a custom UMU path?</p>",
+                                      QMessageBox::Yes | QMessageBox::No);
+
+                while(umuPrompt.result() == QMessageBox::NoButton) switch(umuPrompt.exec()) {
+                case QMessageBox::Yes:
+                    currentUMU = QFileDialog::getOpenFileName(NULL,
+                                                              "Select custom UMU executable",
+                                                              qEnvironmentVariable("HOME"));
+                    if(currentUMU.isEmpty()) umuPrompt.setResult(QMessageBox::NoButton);
+                    else if(!SetUmU(currentUMU)) currentUMU.clear();
+
+                    break;
+                case QMessageBox::Cancel:
+                    break;
+                }
+            } else if(!SetUmU(currentUMU)) currentUMU.clear();
+        } else if(!SetUmU(currentUMU)) currentUMU.clear();
+
+        return currentUMU;
+    } else return currentUMU;
+}
+
+bool NeroFS::SetUmU(const QString &umuPath)
+{
+    if(!umuPath.isEmpty()) {
+        QProcess umuTester;
+        umuTester.setProcessEnvironment(QProcessEnvironment::systemEnvironment());
+        umuTester.start(umuPath, {"-v"});
+        if(umuTester.waitForFinished()) {
+            if(umuTester.exitCode() != 0) {
+                printf("ERROR: UMU test ended with exit code %d - not usable!", umuTester.exitCode());
+                return false;
+            } else {
+                printf("Successfully initialized %s from %s\n", umuTester.readAllStandardOutput().removeLast().constData(), umuPath.toLocal8Bit().constData());
+                currentUMU = umuPath;
+                return true;
+            }
+        } else {
+            printf("ERROR: UMU test timed out - not usable!");
+            umuTester.kill();
+            return false;
+        }
+    } else return false;
 }
 
 QString NeroFS::GetWinetricks(const QString &runner)
