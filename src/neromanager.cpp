@@ -71,12 +71,12 @@ NeroManagerWindow::NeroManagerWindow(QWidget *parent)
                               "Nero will now exit, umu.");
         exit(1);
     } else if(NeroFS::GetUmU() != managerCfg->value("UMUpath").toString()) managerCfg->setValue("UMUpath", NeroFS::GetUmU());
-    if(NeroFS::GetAvailableProtons().isEmpty()) {
+    if(NeroFS::GetAvailableProtons()->isEmpty()) {
         QMessageBox::critical(this,
                               "No Runners Available!",
                               "No usable Proton versions could be found, so umu has no runners to use!\n"
                               "Please install at least one Proton version at:\n\n" +
-                              NeroFS::GetProtonsPath().path() +
+                              NeroFS::GetProtonsPath()->path() +
                               "\n\nYou can install new runners either through Steam, or a Proton Manager such as ProtonUp-Qt or ProtonPlus."
                               "\n\nNero will now exit, umu.");
         exit(1);
@@ -128,9 +128,7 @@ NeroManagerWindow::~NeroManagerWindow()
 {
     managerCfg->setValue("WinSize", this->size());
     managerCfg->sync();
-    for(const auto &key : managerCfg->allKeys()) {
-        printf("Key: %s | Value: %s\n", key.toLocal8Bit().constData(), managerCfg->value(key).toString().toLocal8Bit().constData());
-    }
+
     delete ui;
 }
 
@@ -236,10 +234,10 @@ void NeroManagerWindow::RenderPrefixList()
 
         // now start adding things
         for(int i = 0; i < sortedShortcuts.count(); i++) {
-            if(QFile::exists(QString("%1/%2/.icoCache/%3").arg(NeroFS::GetPrefixesPath().path(),
+            if(QFile::exists(QString("%1/%2/.icoCache/%3").arg(NeroFS::GetPrefixesPath()->path(),
                                                                NeroFS::GetCurrentPrefix(),
                                                                QString("%1-%2.png").arg(sortedShortcuts.at(i), hashMap[sortedShortcuts.at(i)])))) {
-                prefixShortcutIco << new QIcon(QPixmap(QString("%1/%2/.icoCache/%3").arg(NeroFS::GetPrefixesPath().path(),
+                prefixShortcutIco << new QIcon(QPixmap(QString("%1/%2/.icoCache/%3").arg(NeroFS::GetPrefixesPath()->path(),
                                                                                          NeroFS::GetCurrentPrefix(),
                                                                                          QString("%1-%2.png").arg(sortedShortcuts.at(i), hashMap[sortedShortcuts.at(i)]))));
             } else prefixShortcutIco << new QIcon(QIcon::fromTheme("application-x-executable"));
@@ -294,14 +292,14 @@ void NeroManagerWindow::CreatePrefix(const QString &newPrefix, const QString &ru
     waitBox.setStandardButtons(QMessageBox::NoButton);
     QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
 
-    env.insert("WINEPREFIX", NeroFS::GetPrefixesPath().path() + '/' + newPrefix);
+    env.insert("WINEPREFIX", NeroFS::GetPrefixesPath()->path() + '/' + newPrefix);
 
     // Only explicit set GAMEID when not already declared by user for (their) testing purposes
     // (may or may not cause issues if user also selects tricks verbs, but since it needs to be expressly set by user, they assume all responsibility)
     // See SeongGino/Nero-umu#66 for more info
     if(!env.contains("GAMEID")) env.insert("GAMEID", "0");
 
-    env.insert("PROTONPATH", NeroFS::GetProtonsPath().path() + '/' + runner);
+    env.insert("PROTONPATH", NeroFS::GetProtonsPath()->path() + '/' + runner);
     // for Proton 10+. this shit gets real annoying
     env.insert("PROTON_USE_XALIA", "0");
     //env.insert("UMU_RUNTIME_UPDATE", "0");
@@ -368,7 +366,7 @@ void NeroManagerWindow::CreatePrefix(const QString &newPrefix, const QString &ru
                                  "Confirm that the desired verbs have installed in the prefix's \"Install Winetricks Components\" window.");
     }
 
-    QDir prefixPath(NeroFS::GetPrefixesPath().path() + '/' + newPrefix);
+    QDir prefixPath(NeroFS::GetPrefixesPath()->path() + '/' + newPrefix);
     if(prefixPath.exists("system.reg")) {
         // Add fixes to system.reg
         QFile regFile(prefixPath.path() + "/system.reg");
@@ -452,7 +450,7 @@ void NeroManagerWindow::on_addButton_clicked()
     if(prefixIsSelected) {
         QString newApp(QFileDialog::getOpenFileName(this,
                                                     "Select a Windows Executable",
-                                                    NeroFS::GetPrefixesPath().absoluteFilePath(NeroFS::GetCurrentPrefix()+"/drive_c"),
+                                                    NeroFS::GetPrefixesPath()->absoluteFilePath(NeroFS::GetCurrentPrefix()+"/drive_c"),
         "Compatible Windows Files (*.bat *.cmd *.exe *.msi);;Windows Batch Script Files (*.bat *.cmd);;Windows Executable (*.exe);;Windows Installer Package (*.msi)",
                                                     nullptr,
                                                     QFileDialog::DontResolveSymlinks));
@@ -483,10 +481,10 @@ void NeroManagerWindow::on_addButton_clicked()
                 if(shortcutAdd.appIcon.isEmpty()) {
                     prefixShortcutIco << new QIcon(QIcon::fromTheme("application-x-executable"));
                 } else {
-                    QFile::copy(shortcutAdd.appIcon, QString("%1/%2/.icoCache/%3").arg( NeroFS::GetPrefixesPath().path(),
+                    QFile::copy(shortcutAdd.appIcon, QString("%1/%2/.icoCache/%3").arg( NeroFS::GetPrefixesPath()->path(),
                                                                                         NeroFS::GetCurrentPrefix(),
                                                                                         shortcutAdd.shortcutName + '-' + hashName + ".png"));
-                    prefixShortcutIco << new QIcon(QPixmap(QString("%1/%2/.icoCache/%3").arg(   NeroFS::GetPrefixesPath().path(),
+                    prefixShortcutIco << new QIcon(QPixmap(QString("%1/%2/.icoCache/%3").arg(   NeroFS::GetPrefixesPath()->path(),
                                                                                                 NeroFS::GetCurrentPrefix(),
                                                                                                 shortcutAdd.shortcutName + '-' + hashName + ".png")));
                 }
@@ -573,8 +571,8 @@ void NeroManagerWindow::prefixMainButtons_clicked()
 
         RenderPrefixList();
 
-        if(!NeroFS::GetAvailableProtons().contains(NeroFS::GetCurrentRunner())) {
-            NeroFS::SetCurrentPrefixCfg("PrefixSettings", "CurrentRunner", NeroFS::GetAvailableProtons().constFirst());
+        if(!NeroFS::GetAvailableProtons()->contains(NeroFS::GetCurrentRunner())) {
+            NeroFS::SetCurrentPrefixCfg("PrefixSettings", "CurrentRunner", NeroFS::GetAvailableProtons()->constFirst());
             NeroFS::SetCurrentPrefix(obj->text());
             QMessageBox::warning(this,
                                  "Current Runner not found!",
@@ -628,7 +626,7 @@ void NeroManagerWindow::prefixShortcutPlayButtons_clicked()
         // in case the directory has a Windows drive letter prefix,
         // which should be harmless in the context of what Windows allows files/dirs to be named anyways.
         if(QFileInfo::exists(shortcutSettings.value("Path").toString().replace("C:/",
-                                                                               NeroFS::GetPrefixesPath().canonicalPath()+'/'+NeroFS::GetCurrentPrefix()+"/drive_c/"))) {
+                                                                               NeroFS::GetPrefixesPath()->canonicalPath()+'/'+NeroFS::GetCurrentPrefix()+"/drive_c/"))) {
             ui->prefixSettingsBtn->setEnabled(false);
             ui->prefixTricksBtn->setEnabled(false);
 
@@ -687,7 +685,7 @@ void NeroManagerWindow::on_oneTimeRunBtn_clicked()
 {
     QString oneTimeApp(QFileDialog::getOpenFileName(this,
                                                     "Select an Executable to Start in Prefix",
-                                                    oneTimeLastPath.isEmpty() ? NeroFS::GetPrefixesPath().absoluteFilePath(NeroFS::GetCurrentPrefix()+"/drive_c") : oneTimeLastPath,
+                                                    oneTimeLastPath.isEmpty() ? NeroFS::GetPrefixesPath()->absoluteFilePath(NeroFS::GetCurrentPrefix()+"/drive_c") : oneTimeLastPath,
     "Compatible Windows Executables (*.bat *.cmd *.exe *.msi);;Windows Batch Script Files (*.bat *.cmd);;Windows Portable Executable (*.exe);;Windows Installer Package (*.msi)",
                                                     nullptr,
                                                     QFileDialog::DontResolveSymlinks));
@@ -787,7 +785,7 @@ void NeroManagerWindow::on_prefixSettingsBtn_clicked()
 void NeroManagerWindow::on_prefixTricksBtn_clicked()
 {
     // use winetricks.log as a basis.
-    QFile winetricksLog(NeroFS::GetPrefixesPath().path() + '/' +
+    QFile winetricksLog(NeroFS::GetPrefixesPath()->path() + '/' +
                         NeroFS::GetCurrentPrefix() + "/winetricks.log");
     QStringList verbsInstalled;
 
@@ -832,9 +830,9 @@ void NeroManagerWindow::tricksWindow_result()
             QMap<QString, QVariant> settingsMap = NeroFS::GetCurrentPrefixSettings();
             QString prefix = NeroFS::GetCurrentPrefix();
 
-            env.insert("WINEPREFIX", NeroFS::GetPrefixesPath().path() + '/' + prefix);
+            env.insert("WINEPREFIX", NeroFS::GetPrefixesPath()->path() + '/' + prefix);
             env.insert("GAMEID", "0"); // force gameid here since tricks installation wouldn't benefit from having a forced profile
-            env.insert("PROTONPATH", NeroFS::GetProtonsPath().path() + '/' + settingsMap["CurrentRunner"].toString());
+            env.insert("PROTONPATH", NeroFS::GetProtonsPath()->path() + '/' + settingsMap["CurrentRunner"].toString());
             // for Proton 10+. this shit gets real annoying
             env.insert("PROTON_USE_XALIA", "0");
             //env.insert("UMU_RUNTIME_UPDATE", "0");
@@ -910,7 +908,7 @@ void NeroManagerWindow::prefixWizard_result()
 {
     if(wizard->result() == QDialog::Accepted) {
         sysTray->setIcon(QIcon(":/ico/systrayPhiBusy"));
-        CreatePrefix(wizard->prefixName, NeroFS::GetAvailableProtons().at(wizard->protonRunner), wizard->verbsToInstall);
+        CreatePrefix(wizard->prefixName, NeroFS::GetAvailableProtons()->at(wizard->protonRunner), wizard->verbsToInstall);
 
         if(wizard->userSymlinks) NeroFS::CreateUserLinks(wizard->prefixName);
     } else if(NeroFS::GetPrefixes().isEmpty()) StartBlinkTimer();
@@ -938,12 +936,12 @@ void NeroManagerWindow::prefixSettings_result()
                 QMap<QString, QString> settings = NeroFS::GetCurrentShortcutsMap();
                 NeroFS::SetCurrentPrefixCfg("Shortcuts", settings.value(prefixShortcutLabel.at(slot)->text()), prefixSettings->appName);
                 // move existing ico (if any) to new name
-                QFile ico(NeroFS::GetPrefixesPath().path() + '/' +
+                QFile ico(NeroFS::GetPrefixesPath()->path() + '/' +
                           NeroFS::GetCurrentPrefix()+ "/.icoCache/" +
                           prefixShortcutLabel.at(slot)->text() + '-' +
                           settings.value(prefixShortcutLabel.at(slot)->text()) + ".png");
                 if(ico.exists())
-                    ico.rename(NeroFS::GetPrefixesPath().path() + '/' +
+                    ico.rename(NeroFS::GetPrefixesPath()->path() + '/' +
                                NeroFS::GetCurrentPrefix() + "/.icoCache/" +
                                prefixSettings->appName + '-' +
                                settings.value(prefixShortcutLabel.at(slot)->text()) + ".png");

@@ -96,79 +96,79 @@ QStringList NeroFS::GetPrefixes()
 
 void NeroFS::CreateUserLinks(const QString &prefixName)
 {
-    QDir prefixDir(NeroFS::GetPrefixesPath().path() + '/' + prefixName);
+    QDir prefixDir(prefixesPath.path() + '/' + prefixName);
     if(prefixDir.exists()) {
         // TODO: should we allow the user to selectively link certain directories?
-        prefixDir.setPath(QString("%1/%2/drive_c/users/%3/Desktop").arg(NeroFS::GetPrefixesPath().path(),
+        prefixDir.setPath(QString("%1/%2/drive_c/users/%3/Desktop").arg(prefixesPath.path(),
                                                                         prefixName,
                                                                         qEnvironmentVariable("USER")));
         prefixDir.removeRecursively();
-        prefixDir.setPath(QString("%1/%2/drive_c/users/%3/Documents").arg(NeroFS::GetPrefixesPath().path(),
+        prefixDir.setPath(QString("%1/%2/drive_c/users/%3/Documents").arg(prefixesPath.path(),
                                                                           prefixName,
                                                                           qEnvironmentVariable("USER")));
         prefixDir.removeRecursively();
-        prefixDir.setPath(QString("%1/%2/drive_c/users/%3/Downloads").arg(NeroFS::GetPrefixesPath().path(),
+        prefixDir.setPath(QString("%1/%2/drive_c/users/%3/Downloads").arg(prefixesPath.path(),
                                                                           prefixName,
                                                                           qEnvironmentVariable("USER")));
         prefixDir.removeRecursively();
-        prefixDir.setPath(QString("%1/%2/drive_c/users/%3/Music").arg(NeroFS::GetPrefixesPath().path(),
+        prefixDir.setPath(QString("%1/%2/drive_c/users/%3/Music").arg(prefixesPath.path(),
                                                                       prefixName,
                                                                       qEnvironmentVariable("USER")));
         prefixDir.removeRecursively();
-        prefixDir.setPath(QString("%1/%2/drive_c/users/%3/Pictures").arg(NeroFS::GetPrefixesPath().path(),
+        prefixDir.setPath(QString("%1/%2/drive_c/users/%3/Pictures").arg(prefixesPath.path(),
                                                                          prefixName,
                                                                          qEnvironmentVariable("USER")));
         prefixDir.removeRecursively();
-        prefixDir.setPath(QString("%1/%2/drive_c/users/%3/Videos").arg(NeroFS::GetPrefixesPath().path(),
+        prefixDir.setPath(QString("%1/%2/drive_c/users/%3/Videos").arg(prefixesPath.path(),
                                                                        prefixName,
                                                                        qEnvironmentVariable("USER")));
         prefixDir.removeRecursively();
 
         if(QDir(qEnvironmentVariable("HOME")).exists("Desktop")) {
             QFile::link(QString("%1/Desktop").arg(qEnvironmentVariable("HOME")),
-                        QString("%1/%2/drive_c/users/%3/Desktop").arg(NeroFS::GetPrefixesPath().path(),
+                        QString("%1/%2/drive_c/users/%3/Desktop").arg(prefixesPath.path(),
                                                                       prefixName,
                                                                       qEnvironmentVariable("USER")));
         }
         if(QDir(qEnvironmentVariable("HOME")).exists("Documents")) {
             QFile::link(QString("%1/Documents").arg(qEnvironmentVariable("HOME")),
-                        QString("%1/%2/drive_c/users/%3/Documents").arg(NeroFS::GetPrefixesPath().path(),
+                        QString("%1/%2/drive_c/users/%3/Documents").arg(prefixesPath.path(),
                                                                         prefixName,
                                                                         qEnvironmentVariable("USER")));
         }
         if(QDir(qEnvironmentVariable("HOME")).exists("Downloads")) {
             QFile::link(QString("%1/Downloads").arg(qEnvironmentVariable("HOME")),
-                        QString("%1/%2/drive_c/users/%3/Downloads").arg(NeroFS::GetPrefixesPath().path(),
+                        QString("%1/%2/drive_c/users/%3/Downloads").arg(prefixesPath.path(),
                                                                         prefixName,
                                                                         qEnvironmentVariable("USER")));
         }
         if(QDir(qEnvironmentVariable("HOME")).exists("Music")) {
             QFile::link(QString("%1/Music").arg(qEnvironmentVariable("HOME")),
-                        QString("%1/%2/drive_c/users/%3/Music").arg(NeroFS::GetPrefixesPath().path(),
+                        QString("%1/%2/drive_c/users/%3/Music").arg(prefixesPath.path(),
                                                                     prefixName,
                                                                     qEnvironmentVariable("USER")));
         }
         if(QDir(qEnvironmentVariable("HOME")).exists("Pictures")) {
             QFile::link(QString("%1/Pictures").arg(qEnvironmentVariable("HOME")),
-                        QString("%1/%2/drive_c/users/%3/Pictures").arg(NeroFS::GetPrefixesPath().path(),
+                        QString("%1/%2/drive_c/users/%3/Pictures").arg(prefixesPath.path(),
                                                                        prefixName,
                                                                        qEnvironmentVariable("USER")));
         }
         if(QDir(qEnvironmentVariable("HOME")).exists("Videos")) {
             QFile::link(QString("%1/Videos").arg(qEnvironmentVariable("HOME")),
-                        QString("%1/%2/drive_c/users/%3/Videos").arg(NeroFS::GetPrefixesPath().path(),
+                        QString("%1/%2/drive_c/users/%3/Videos").arg(prefixesPath.path(),
                                                                      prefixName,
                                                                      qEnvironmentVariable("USER")));
         }
     }
 }
 
-QStringList NeroFS::GetAvailableProtons()
+QStringList* NeroFS::GetAvailableProtons()
 {
     if(availableProtons.isEmpty())
         availableProtons << protonsPath.entryList(QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name);
 
-    return availableProtons;
+    return &availableProtons;
 }
 
 QString NeroFS::GetIcoextract()

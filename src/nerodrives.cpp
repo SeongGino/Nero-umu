@@ -37,7 +37,7 @@ NeroVirtualDriveDialog::NeroVirtualDriveDialog(QWidget *parent)
     letterFont.setPointSize(11), letterFont.setBold(true);
     mainLabelFont.setPointSize(11), mainLabelFont.setItalic(true);
 
-    prefixDir.setPath(NeroFS::GetPrefixesPath().path()+'/'+NeroFS::GetCurrentPrefix()+"/dosdevices");
+    prefixDir.setPath(NeroFS::GetPrefixesPath()->path()+'/'+NeroFS::GetCurrentPrefix()+"/dosdevices");
 
     RenderList();
 }

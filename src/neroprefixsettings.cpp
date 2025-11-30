@@ -49,7 +49,7 @@ NeroPrefixSettingsWindow::NeroPrefixSettingsWindow(QWidget *parent, const QStrin
     ui->envBox->setVisible(false);
 
     // prefix runner box is used to govern availability of scaling options in both prefix and shortcut settings
-    ui->prefixRunner->addItems(NeroFS::GetAvailableProtons());
+    ui->prefixRunner->addItems(*NeroFS::GetAvailableProtons());
     ui->prefixRunner->setCurrentText(NeroFS::GetCurrentRunner());
 
     if(shortcutHash.isEmpty()) {
@@ -250,7 +250,7 @@ void NeroPrefixSettingsWindow::LoadSettings()
 
         // general tab->prefix global settings group
         // if prefix runner doesn't exist, just set to whatever's the first entry.
-        if(NeroFS::GetAvailableProtons().contains(settings.value("CurrentRunner").toString()))
+        if(NeroFS::GetAvailableProtons()->contains(settings.value("CurrentRunner").toString()))
             ui->prefixRunner->setCurrentText(settings.value("CurrentRunner").toString());
         else ui->prefixRunner->setCurrentIndex(0),
              ui->prefixRunner->setFont(boldFont);
@@ -272,7 +272,7 @@ void NeroPrefixSettingsWindow::LoadSettings()
         if(ui->postRunScriptPath->text().isEmpty()) ui->postRunClearBtn->setVisible(false);
 
         if(QFileInfo::exists(settings["Path"].toString().replace("C:/",
-                                                                 NeroFS::GetPrefixesPath().canonicalPath()+'/'+NeroFS::GetCurrentPrefix()+"/drive_c/")))
+                                                                 NeroFS::GetPrefixesPath()->canonicalPath()+'/'+NeroFS::GetCurrentPrefix()+"/drive_c/")))
             ui->pathNoExistWarning->setVisible(false);
         else {
             ui->openToShortcutPath->setEnabled(false);
@@ -283,7 +283,7 @@ void NeroPrefixSettingsWindow::LoadSettings()
                 ui->shortcutPath->setStyleSheet("color: red");
         }
 
-        QDir ico(NeroFS::GetPrefixesPath().path()+'/'+NeroFS::GetCurrentPrefix()+"/.icoCache");
+        QDir ico(NeroFS::GetPrefixesPath()->path()+'/'+NeroFS::GetCurrentPrefix()+"/.icoCache");
         if(ico.exists(settings["Name"].toString()+'-'+currentShortcutHash+".png")) {
             if(QPixmap(ico.path()+'/'+settings["Name"].toString()+'-'+currentShortcutHash+".png").height() < 64)
                 ui->shortcutIco->setIcon(QPixmap(ico.path()+'/'+
@@ -367,7 +367,7 @@ void NeroPrefixSettingsWindow::on_shortcutIco_clicked()
     QString newIcon = QFileDialog::getOpenFileName(this,
                                                    "Select a Windows Executable",
                                                    ui->shortcutPath->text().replace("C:/",
-                                                                                    NeroFS::GetPrefixesPath().canonicalPath()+'/'+NeroFS::GetCurrentPrefix()+"/drive_c/"),
+                                                                                    NeroFS::GetPrefixesPath()->canonicalPath()+'/'+NeroFS::GetCurrentPrefix()+"/drive_c/"),
         "Windows Executable, Dynamic Link Library, Icon Resource File, or Portable Network Graphics File (*.dll *.exe *.ico *.png);;Windows Dynamic Link Library (*.dll);;Windows Executable (*.exe);;Windows Icon Resource (*.ico);;Portable Network Graphics File (*.png)");
 
     if(!newIcon.isEmpty()) {
@@ -409,12 +409,12 @@ void NeroPrefixSettingsWindow::on_shortcutPathBtn_clicked()
     QString newApp = QFileDialog::getOpenFileName(this,
                                                   "Select a Windows Executable",
                                                   ui->shortcutPath->text().replace("C:/",
-                                                                                   NeroFS::GetPrefixesPath().canonicalPath()+'/'+NeroFS::GetCurrentPrefix()+"/drive_c/"),
+                                                                                   NeroFS::GetPrefixesPath()->canonicalPath()+'/'+NeroFS::GetCurrentPrefix()+"/drive_c/"),
     "Compatible Windows Executables (*.bat *.cmd *.exe *.msi);;Windows Batch Script Files (*.bat *.cmd);;Windows Portable Executable (*.exe);;Windows Installer Package (*.msi)",
                                                   nullptr,
                                                   QFileDialog::DontResolveSymlinks);
     if(!newApp.isEmpty()) {
-        ui->shortcutPath->setText(newApp.replace(NeroFS::GetPrefixesPath().path()+'/'+NeroFS::GetCurrentPrefix()+"/drive_c", "C:"));
+        ui->shortcutPath->setText(newApp.replace(NeroFS::GetPrefixesPath()->path()+'/'+NeroFS::GetCurrentPrefix()+"/drive_c", "C:"));
         if(newApp != settings.value("Path").toString())
             ui->shortcutPath->setFont(boldFont);
         else ui->shortcutPath->setFont(QFont());
@@ -700,9 +700,9 @@ void NeroPrefixSettingsWindow::StartUmu(const QString command, QStringList args)
         QProcess umu(this);
         QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
 
-        env.insert("WINEPREFIX", QString("%1/%2").arg(NeroFS::GetPrefixesPath().path(), NeroFS::GetCurrentPrefix()));
+        env.insert("WINEPREFIX", QString("%1/%2").arg(NeroFS::GetPrefixesPath()->path(), NeroFS::GetCurrentPrefix()));
         env.insert("GAMEID", "0");
-        env.insert("PROTONPATH", QString("%1/%2").arg(NeroFS::GetProtonsPath().path(), NeroFS::GetCurrentRunner()));
+        env.insert("PROTONPATH", QString("%1/%2").arg(NeroFS::GetProtonsPath()->path(), NeroFS::GetCurrentRunner()));
         env.insert("PROTON_USE_XALIA", "0");
         env.insert("UMU_RUNTIME_UPDATE", "0");
         umu.setProcessEnvironment(env);
@@ -857,7 +857,7 @@ void NeroPrefixSettingsWindow::on_buttonBox_clicked(QAbstractButton *button)
 
             // check if new ico was set.
             if(!newAppIcon.isEmpty())
-                QFile::copy(newAppIcon, QString("%1/%2/.icoCache/%3").arg(NeroFS::GetPrefixesPath().path(),
+                QFile::copy(newAppIcon, QString("%1/%2/.icoCache/%3").arg(NeroFS::GetPrefixesPath()->path(),
                                                                           NeroFS::GetCurrentPrefix(),
                                                                           QString("%1-%2.png").arg(settings.value("Name").toString(), currentShortcutHash)));
 
@@ -889,7 +889,7 @@ void NeroPrefixSettingsWindow::on_buttonBox_clicked(QAbstractButton *button)
                 int winVerSelected = winVersionListBackwards.indexOf(ui->winVerBox->itemText(ui->winVerBox->currentIndex()));
                 NeroFS::SetCurrentPrefixCfg("Shortcuts--"+currentShortcutHash, "WindowsVersion", winVerSelected);
 
-                QDir prefixPath(NeroFS::GetPrefixesPath().path()+'/'+NeroFS::GetCurrentPrefix());
+                QDir prefixPath(NeroFS::GetPrefixesPath()->path()+'/'+NeroFS::GetCurrentPrefix());
                 if(prefixPath.exists("user.reg")) {
                     QFile regFile(prefixPath.path()+"/user.reg");
                     if(regFile.open(QFile::ReadWrite)) {
@@ -950,5 +950,5 @@ void NeroPrefixSettingsWindow::on_openToShortcutPath_clicked()
 {
     // in case path begins with a Windows drive letter prefix
     QDesktopServices::openUrl(QUrl::fromLocalFile(ui->shortcutPath->text().left(ui->shortcutPath->text().lastIndexOf('/'))
-                                                                          .replace("C:", NeroFS::GetPrefixesPath().path()+'/'+NeroFS::GetCurrentPrefix()+"/drive_c")));
+                                                                          .replace("C:", NeroFS::GetPrefixesPath()->path()+'/'+NeroFS::GetCurrentPrefix()+"/drive_c")));
 }

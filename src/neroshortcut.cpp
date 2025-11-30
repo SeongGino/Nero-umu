@@ -40,9 +40,9 @@ NeroShortcutWizard::NeroShortcutWizard(QWidget *parent, const QString &newAppPat
 
     // if exe is inside of prefix, convert path to Windows path inside C:/
     QString newAppPathConv = newAppPath;
-    ui->appPath->setText(newAppPathConv.replace(NeroFS::GetPrefixesPath().path()+'/'+NeroFS::GetCurrentPrefix()+"/drive_c", "C:"));
+    ui->appPath->setText(newAppPathConv.replace(NeroFS::GetPrefixesPath()->path()+'/'+NeroFS::GetCurrentPrefix()+"/drive_c", "C:"));
 
-    NeroIcoExtractor::CheckIcoCache(QDir(NeroFS::GetPrefixesPath().path()+'/'+NeroFS::GetCurrentPrefix()));
+    NeroIcoExtractor::CheckIcoCache(QDir(NeroFS::GetPrefixesPath()->path()+'/'+NeroFS::GetCurrentPrefix()));
 
     QGuiApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     appIcon = NeroIcoExtractor::GetIcon(newAppPath);
@@ -96,7 +96,7 @@ void NeroShortcutWizard::on_selectBox_clicked()
     QString newApp = QFileDialog::getOpenFileName(this,
                                                   "Select a Windows Executable",
                                                   ui->appPath->text().replace("C:/",
-                                                                              NeroFS::GetPrefixesPath().canonicalPath()+'/'+NeroFS::GetCurrentPrefix()+"/drive_c/"),
+                                                                              NeroFS::GetPrefixesPath()->canonicalPath()+'/'+NeroFS::GetCurrentPrefix()+"/drive_c/"),
     "Compatible Windows Executables (*.bat *.cmd *.exe *.msi);;Windows Batch Script Files (*.bat *.cmd);;Windows Portable Executable (*.exe);;Windows Installer Package (*.msi)",
                                                   nullptr,
                                                   QFileDialog::DontResolveSymlinks);
@@ -113,8 +113,8 @@ void NeroShortcutWizard::on_selectBox_clicked()
         } else ui->appIcon->setIcon(QIcon::fromTheme("application-x-executable"));
 
         // if exe is inside of prefix, convert path to Windows path inside C:/
-        if(newApp.startsWith(NeroFS::GetPrefixesPath().canonicalPath()+'/'+NeroFS::GetCurrentPrefix()+"/drive_c"))
-            newApp = newApp.replace(NeroFS::GetPrefixesPath().canonicalPath()+'/'+NeroFS::GetCurrentPrefix()+"/drive_c", "C:");
+        if(newApp.startsWith(NeroFS::GetPrefixesPath()->canonicalPath()+'/'+NeroFS::GetCurrentPrefix()+"/drive_c"))
+            newApp = newApp.replace(NeroFS::GetPrefixesPath()->canonicalPath()+'/'+NeroFS::GetCurrentPrefix()+"/drive_c", "C:");
 
         ui->appPath->setText(newApp);
     }

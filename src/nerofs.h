@@ -46,12 +46,12 @@ public:
     // METHODS
     static bool InitPaths();
 
-    static QDir GetPrefixesPath() { return prefixesPath; }
-    static QDir GetProtonsPath() { return protonsPath; }
+    static QDir* GetPrefixesPath() { return &prefixesPath; }
+    static QDir* GetProtonsPath() { return &protonsPath; }
     static QString GetCurrentPrefix() { return currentPrefix; }
     static QString GetCurrentRunner() { return currentRunner; }
     static QStringList GetCurrentOverrides() { return currentPrefixOverrides; }
-    static QStringList GetAvailableProtons();
+    static QStringList* GetAvailableProtons();
     static QStringList GetPrefixes();
     static QStringList GetCurrentPrefixShortcuts();
     static QMap<QString, QVariant> GetCurrentPrefixSettings();

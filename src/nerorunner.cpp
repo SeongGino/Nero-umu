@@ -53,14 +53,19 @@ int NeroRunner::StartShortcut(const QString &hash, const bool &prefixAlreadyRunn
         runner.setReadChannel(QProcess::StandardError);
 
         env = QProcessEnvironment::systemEnvironment();
-        env.insert("WINEPREFIX", NeroFS::GetPrefixesPath().path()+'/'+NeroFS::GetCurrentPrefix());
+        env.insert("WINEPREFIX", NeroFS::GetPrefixesPath()->path()+'/'+NeroFS::GetCurrentPrefix());
 
         // Only explicit set GAMEID when not already declared by user
         // See SeongGino/Nero-umu#66 for more info
         if(!env.contains("GAMEID")) env.insert("GAMEID", "0");
-
-        const QString protonRunner = settings->value("PrefixSettings/CurrentRunner").toString();
-        env.insert("PROTONPATH", NeroFS::GetProtonsPath().path()+'/'+protonRunner);
+        
+        QString protonRunner = settings->value("PrefixSettings/CurrentRunner").toString();
+        if(!QFile::exists(NeroFS::GetProtonsPath()->path()+'/'+protonRunner)) {
+            printf("Could not find %s in '%s', ", protonRunner.toLocal8Bit().constData(), NeroFS::GetProtonsPath()->absolutePath().toLocal8Bit().constData());
+            if(!NeroFS::GetAvailableProtons()->isEmpty()) protonRunner = NeroFS::GetAvailableProtons()->first();
+            printf("using %s instead\n", protonRunner.toLocal8Bit().constData());
+        }
+        env.insert("PROTONPATH", NeroFS::GetProtonsPath()->path()+'/'+protonRunner);
 
         if(settings->value("PrefixSettings/RuntimeUpdateOnLaunch").toBool())
             if(!env.contains("UMU_RUNTIME_UPDATE")) env.insert("UMU_RUNTIME_UPDATE", "1");
@@ -517,10 +522,10 @@ int NeroRunner::StartShortcut(const QString &hash, const bool &prefixAlreadyRunn
         // (corrected if path starts with Windows drive letter prefix)
         runner.setWorkingDirectory(settings->value("Shortcuts--"+hash+"/Path")
                                             .toString().left(settings->value("Shortcuts--"+hash+"/Path").toString().lastIndexOf("/"))
-                                            .replace("C:", NeroFS::GetPrefixesPath().path()+'/'+NeroFS::GetCurrentPrefix()+"/drive_c/"));
+                                            .replace("C:", NeroFS::GetPrefixesPath()->path()+'/'+NeroFS::GetCurrentPrefix()+"/drive_c/"));
         QString command = arguments.takeFirst();
 
-        QDir logsDir(NeroFS::GetPrefixesPath().path()+'/'+NeroFS::GetCurrentPrefix());
+        QDir logsDir(NeroFS::GetPrefixesPath()->path()+'/'+NeroFS::GetCurrentPrefix());
         if(!logsDir.exists(".logs"))
             logsDir.mkdir(".logs");
         logsDir.cd(".logs");
@@ -572,14 +577,19 @@ int NeroRunner::StartOnetime(const QString &path, const bool &prefixAlreadyRunni
     runner.setReadChannel(QProcess::StandardError);
 
     env = QProcessEnvironment::systemEnvironment();
-    env.insert("WINEPREFIX", NeroFS::GetPrefixesPath().path()+'/'+NeroFS::GetCurrentPrefix());
+    env.insert("WINEPREFIX", NeroFS::GetPrefixesPath()->path()+'/'+NeroFS::GetCurrentPrefix());
 
     // Only explicit set GAMEID when not already declared by user
     // See SeongGino/Nero-umu#66 for more info
     if(!env.contains("GAMEID")) env.insert("GAMEID", "0");
 
-    const QString protonRunner = settings->value("PrefixSettings/CurrentRunner").toString();
-    env.insert("PROTONPATH", NeroFS::GetProtonsPath().path()+'/'+protonRunner);
+    QString protonRunner = settings->value("PrefixSettings/CurrentRunner").toString();
+    if(!QFile::exists(NeroFS::GetProtonsPath()->path()+'/'+protonRunner)) {
+        printf("Could not find %s in '%s', ", protonRunner.toLocal8Bit().constData(), NeroFS::GetProtonsPath()->absolutePath().toLocal8Bit().constData());
+        if(!NeroFS::GetAvailableProtons()->isEmpty()) protonRunner = NeroFS::GetAvailableProtons()->first();
+        printf("using %s instead\n", protonRunner.toLocal8Bit().constData());
+    }
+    env.insert("PROTONPATH", NeroFS::GetProtonsPath()->path()+'/'+protonRunner);
 
     if(prefixAlreadyRunning)
         env.insert("PROTON_VERB", "run");
@@ -787,11 +797,11 @@ int NeroRunner::StartOnetime(const QString &path, const bool &prefixAlreadyRunni
 
     runner.setProcessEnvironment(env);
     if(path.startsWith('/') || path.startsWith("~/") || path.startsWith("./"))
-        runner.setWorkingDirectory(path.left(path.lastIndexOf("/")).replace("C:", NeroFS::GetPrefixesPath().canonicalPath()+'/'+NeroFS::GetCurrentPrefix()+"/drive_c/"));
+        runner.setWorkingDirectory(path.left(path.lastIndexOf("/")).replace("C:", NeroFS::GetPrefixesPath()->canonicalPath()+'/'+NeroFS::GetCurrentPrefix()+"/drive_c/"));
 
     QString command = arguments.takeFirst();
 
-    QDir logsDir(NeroFS::GetPrefixesPath().path()+'/'+NeroFS::GetCurrentPrefix());
+    QDir logsDir(NeroFS::GetPrefixesPath()->path()+'/'+NeroFS::GetCurrentPrefix());
     if(!logsDir.exists(".logs"))
         logsDir.mkdir(".logs");
     logsDir.cd(".logs");
@@ -864,13 +874,13 @@ void NeroRunner::StopProcess()
     env.remove("UMU_RUNTIME_UPDATE");
     env.insert("UMU_RUNTIME_UPDATE", "0");
     wineStopper.setProcessEnvironment(env);
-    wineStopper.start(NeroFS::GetUmU(), { NeroFS::GetProtonsPath().path()+'/'+NeroFS::GetCurrentRunner()+'/'+"proton", "runinprefix", "wineboot", "-e" });
+    wineStopper.start(NeroFS::GetUmU(), { NeroFS::GetProtonsPath()->path()+'/'+NeroFS::GetCurrentRunner()+'/'+"proton", "runinprefix", "wineboot", "-e" });
     wineStopper.waitForFinished();
 }
 
 void NeroRunner::InitCache()
 {
-    QDir cachePath(NeroFS::GetPrefixesPath().path()+'/'+NeroFS::GetCurrentPrefix());
+    QDir cachePath(NeroFS::GetPrefixesPath()->path()+'/'+NeroFS::GetCurrentPrefix());
     if(!cachePath.exists(".shaderCache")) {
         cachePath.mkdir(".shaderCache");
         if(!cachePath.cd(".shaderCache")) printf("Prefix cache directory not available! Not using cache...");

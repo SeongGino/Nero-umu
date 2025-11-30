@@ -40,7 +40,7 @@ NeroPrefixWizard::NeroPrefixWizard(QWidget *parent)
 	connect(shortcutClose, &QShortcut::activated, this,&NeroPrefixWizard::close);
 
     currentPrefixes = NeroFS::GetPrefixes();
-    ui->protonRunnerBox->addItems(NeroFS::GetAvailableProtons());
+    ui->protonRunnerBox->addItems(*NeroFS::GetAvailableProtons());
     ui->protonRunnerBox->setCurrentIndex(0);
 
     boldFont.setPointSize(11);
