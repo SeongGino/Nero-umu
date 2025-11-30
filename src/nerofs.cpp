@@ -233,7 +233,7 @@ bool NeroFS::SetUmU(const QString &umuPath)
                 printf("ERROR: UMU test ended with exit code %d - not usable!", umuTester.exitCode());
                 return false;
             } else {
-                printf("Successfully initialized %s from %s\n", umuTester.readAllStandardOutput().removeLast().constData(), umuPath.toLocal8Bit().constData());
+                printf("Successfully initialized %s from %s\n", umuTester.readAllStandardOutput().trimmed().constData(), umuPath.toLocal8Bit().constData());
                 currentUMU = umuPath;
                 return true;
             }
