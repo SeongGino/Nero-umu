@@ -41,8 +41,11 @@ NeroManagerPreferences::NeroManagerPreferences(QWidget *parent)
     //ui->runnerNotifs->setChecked(managerCfg->value("UseNotifier").toBool());
     ui->shortcutHide->setChecked(managerCfg->value("ShortcutHidesManager").toBool());
     ui->umuPath->setText(managerCfg->value("UMUpath").toString());
-    if(ui->umuPath->text().isEmpty()) ui->umuPath->setPlaceholderText(ui->umuPath->placeholderText() + " (" +
-                                                                      QStandardPaths::findExecutable("umu-run") + ")");
+    if(ui->umuPath->text().isEmpty()) {
+        ui->umuPath->setPlaceholderText(ui->umuPath->placeholderText() + " (" +
+                                        QStandardPaths::findExecutable("umu-run") + ")");
+        ui->umuPathClearBtn->setVisible(false);
+    }
 }
 
 NeroManagerPreferences::~NeroManagerPreferences()
@@ -51,12 +54,14 @@ NeroManagerPreferences::~NeroManagerPreferences()
         //managerCfg->setValue("UseNotifier", ui->runnerNotifs->isChecked());
         managerCfg->setValue("ShortcutHidesManager", ui->shortcutHide->isChecked());
 
-        if(ui->umuPath->text().isEmpty() && !managerCfg->value("UMUpath").toString().isEmpty()) {
-            if(NeroFS::SetUmU(QStandardPaths::findExecutable("umu-run"))) managerCfg->setValue("UMUpath", "");
-            else QMessageBox::warning(NULL,
-                                      "No working system UMU!",
-                                      "System paths do not contain a working UMU instance!\n"
-                                      "Reverting to previous working path.");
+        if(ui->umuPath->text().isEmpty()) {
+            if(!managerCfg->value("UMUpath").toString().isEmpty()) {
+                if(NeroFS::SetUmU(QStandardPaths::findExecutable("umu-run"))) managerCfg->setValue("UMUpath", "");
+                else QMessageBox::warning(NULL,
+                                          "No working system UMU!",
+                                          "System paths do not contain a working UMU instance!\n"
+                                          "Reverting to previous working path.");
+            }
         } else if(NeroFS::SetUmU(ui->umuPath->text())) managerCfg->setValue("UMUpath", ui->umuPath->text());
         else QMessageBox::warning(NULL,
                                   "No working UMU found!",
