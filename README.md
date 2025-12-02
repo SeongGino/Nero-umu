@@ -53,7 +53,6 @@ sudo apt install build-essential cmake qt6-base-dev qt6-tools-dev qt6-5compat-de
 
 Additionally, Nero uses the following external components, either implicitly or optionally:
  - `umu-launcher` [required] - the Proton runner backend, *duh.* Can either be installed directly from repos (currently in Arch's `multilib`), or via the package bundles in the releases page for your distro.
- - `curl` [optional] - for grabbing certain network components, currently only used for downloading the latest release of the Discord RPC bridge. TODO: See also [#12](https://github.com/SeongGino/Nero-umu/issues/12)
  - `winetricks` [optional] - if the current Proton runner for a prefix doesn't have a `protonfixes/winetricks` binary (normally included in the -GE fork, but not upstream), then system Winetricks will be used instead for Winetricks functionality - otherwise, all Winetricks functionality will be disabled.
  - `icoextract` + `icoutils` [optional] - used for getting icons from selected executables for shortcut entries. If neither of these exists, icons extraction will be skipped entirely, and only raw *.PNG* files can be used as icons - a placeholder icon vector from the XDG theme will be used if no image is available.
 
@@ -92,7 +91,6 @@ The backend tool that Nero relies on, *umu,* is *allegedly* based around a cooki
 ###### No relation to Nero, a primary protagonist of *Devil May Cry 4/5*, featuring Dante from the *Devil May Cry* series.
 
 ## TODOs (to do):
- - Add built-in downloader without external curl use ([#12](https://github.com/SeongGino/Nero-umu/issues/12))
  - Add `dxvk.conf` configuration dialog in shortcut settings.
  - Make process force-shutdown in runner more reliable
    - Since umu can't shut down the processes it spawns, Nero invokes a wineboot end command manually in the prefix, but sometimes the process is still running for some reason and needs external process killing)
