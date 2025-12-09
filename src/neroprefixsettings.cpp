@@ -609,21 +609,24 @@ void NeroPrefixSettingsWindow::on_prefixInstallDiscordRPC_clicked()
 
     NeroPrefixSettingsWindow::blockSignals(true);
     umuRunning = true;
-    ui->tabWidget->setEnabled(false);
-    ui->buttonBox->setEnabled(false);
-    ui->infoBox->setEnabled(false);
+    enableWidgets(false);
     ui->infoBox->setTitle("Downloading Discord RPC Bridge...");
     ui->infoText->setText("");
 
-    while(!reply->isFinished()) QApplication::processEvents();
+    do {
+        QApplication::processEvents();
+    } while (!reply->isFinished());
 
-    if(reply->error() != QNetworkReply::NoError)
-    {
+    if(reply->error() != QNetworkReply::NoError) {
+        QString errorReply = "Error Message: " + reply->errorString();
+        QString failedDownload = "Nero failed to download the Discord RPC Bridge.\n" + errorReply;
         QMessageBox::warning(this,
                              "Error!",
-                             QString("Failed To Download Discord Bridge!"));
+                             QString(failedDownload));
         ui->infoBox->setTitle("");
-        ui->infoText->setText(QString("Nero failed to download the Discord RPC Bridge."));
+        ui->infoText->setText(failedDownload);
+        enableWidgets(true);
+        return; //failed to download, return here
     }
 
     QByteArray bytes = reply->readAll();
@@ -661,11 +664,16 @@ void NeroPrefixSettingsWindow::on_prefixInstallDiscordRPC_clicked()
         ui->infoBox->setTitle("");
         ui->infoText->setText(QString("Bridge extraction exited with the error: %1").arg(exeToExtract.errorString()));
     }
-    ui->tabWidget->setEnabled(true);
-    ui->buttonBox->setEnabled(true);
-    ui->infoBox->setEnabled(true);
+    
+    enableWidgets(true);
     umuRunning = false;
     NeroPrefixSettingsWindow::blockSignals(false);
+}
+
+void NeroPrefixSettingsWindow::enableWidgets(bool isEnabled) {
+    ui->tabWidget->setEnabled(isEnabled);
+    ui->buttonBox->setEnabled(isEnabled);
+    ui->infoBox->setEnabled(isEnabled);
 }
 
 
