@@ -24,6 +24,8 @@
 #include "nerofs.h"
 #include "neroico.h"
 
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
 #include <QAction>
 #include <QProcess>
 #include <QSpinBox>
@@ -596,70 +598,82 @@ void NeroPrefixSettingsWindow::on_postRunClearBtn_clicked()
 
 void NeroPrefixSettingsWindow::on_prefixInstallDiscordRPC_clicked()
 {
-    // TODO(?): curl could be pulled as a dependency and done in code,
-    // but it wouldn't be much different since curl is already on most distros anyways?
-    // Maybe later.
     QDir tmpDir(QDir::temp());
     if(!tmpDir.exists("nero-manager"))
         tmpDir.mkdir("nero-manager");
-    QProcess process;
-    process.setWorkingDirectory(tmpDir.path()+"/nero-manager");
-    process.start(QStandardPaths::findExecutable("curl"), { "-o", "bridge.zip", "-L", "https://github.com/EnderIce2/rpc-bridge/releases/latest/download/bridge.zip" });
-    printf("Downloading Discord RPC Bridge...\n");
+
+    QNetworkAccessManager* manager = new QNetworkAccessManager();
+    QUrl url("https://github.com/EnderIce2/rpc-bridge/releases/latest/download/bridge.zip");
+    QNetworkRequest req(url);
+    QNetworkReply* reply = manager->get(req);
 
     NeroPrefixSettingsWindow::blockSignals(true);
     umuRunning = true;
-    ui->tabWidget->setEnabled(false);
-    ui->buttonBox->setEnabled(false);
-    ui->infoBox->setEnabled(false);
+    enableWidgets(false);
     ui->infoBox->setTitle("Downloading Discord RPC Bridge...");
     ui->infoText->setText("");
 
-    while(process.state() != QProcess::NotRunning) QApplication::processEvents();
+    do {
+        QApplication::processEvents();
+    } while (!reply->isFinished());
 
-    if(process.exitStatus() == 0) {
-        printf("Extracting bridge.zip...\n");
-        ui->infoBox->setTitle("Extracting bridge package...");
+    if(reply->error() != QNetworkReply::NoError) {
+        QString errorReply = "Error Message: " + reply->errorString();
+        QString failedDownload = "Nero failed to download the Discord RPC Bridge.\n" + errorReply;
+        QMessageBox::warning(this,
+                             "Error!",
+                             QString(failedDownload));
+        ui->infoBox->setTitle("");
+        ui->infoText->setText(failedDownload);
+        enableWidgets(true);
+        return; //failed to download, return here
+    }
 
-        // QuaZip is like minizip, except it actually works here.
-        QuaZip zipFile(tmpDir.absoluteFilePath("nero-manager/bridge.zip"));
-        zipFile.open(QuaZip::mdUnzip);
-        zipFile.setCurrentFile("bridge.exe");
-        QuaZipFile exeToExtract(&zipFile);
+    QByteArray bytes = reply->readAll();
+    QString path(tmpDir.path() + "/nero-manager/bridge.zip");
+    QSaveFile bridgeZip = QSaveFile(path);
+    bridgeZip.open(QIODevice::WriteOnly);
+    QDataStream zipStream(&bridgeZip);
+    zipStream << bytes;
+    bridgeZip.commit();
+    printf("Extracting bridge.zip...\n");
+    ui->infoBox->setTitle("Extracting bridge package...");
 
-        if(exeToExtract.open(QIODevice::ReadOnly)) {
-            QFile outFile(tmpDir.absoluteFilePath("nero-manager/bridge.exe"));
-            outFile.open(QIODevice::WriteOnly);
-            outFile.write(exeToExtract.readAll());
-            outFile.close();
+    // QuaZip is like minizip, except it actually works here.
+    QuaZip zipFile(tmpDir.absoluteFilePath("nero-manager/bridge.zip"));
+    zipFile.open(QuaZip::mdUnzip);
+    zipFile.setCurrentFile("bridge.exe");
+    QuaZipFile exeToExtract(&zipFile);
 
-            StartUmu(tmpDir.absoluteFilePath("nero-manager/bridge.exe"), { "--install" });
+    if(exeToExtract.open(QIODevice::ReadOnly)) {
+        QFile outFile(tmpDir.absoluteFilePath("nero-manager/bridge.exe"));
+        outFile.open(QIODevice::ReadWrite);
+        outFile.write(exeToExtract.readAll());
+        outFile.close();
 
-            ui->prefixInstallDiscordRPC->setEnabled(false);
-            ui->prefixInstallDiscordRPC->setText("Discord RPC Service Already Installed");
-            settings.value("DiscordRPCinstalled", true);
-            NeroFS::SetCurrentPrefixCfg("PrefixSettings", "DiscordRPCinstalled", true);
-        } else {
-            QMessageBox::warning(this,
-                                 "Error!",
-                                 QString("Bridge extraction exited with the error:\n\n%1").arg(exeToExtract.errorString()));
-            ui->infoBox->setTitle("");
-            ui->infoText->setText(QString("Bridge extraction exited with the error: %1").arg(exeToExtract.errorString()));
-        }
+        StartUmu(tmpDir.absoluteFilePath("nero-manager/bridge.exe"), { "--install" });
 
+        ui->prefixInstallDiscordRPC->setEnabled(false);
+        ui->prefixInstallDiscordRPC->setText("Discord RPC Service Already Installed");
+        settings.value("DiscordRPCinstalled", true);
+        NeroFS::SetCurrentPrefixCfg("PrefixSettings", "DiscordRPCinstalled", true);
     } else {
         QMessageBox::warning(this,
                              "Error!",
-                             QString("wget exited with an error code:\n\n%1").arg(process.exitStatus()));
+                             QString("Bridge extraction exited with the error:\n\n%1").arg(exeToExtract.errorString()));
         ui->infoBox->setTitle("");
-        ui->infoText->setText(QString("wget exited with an error code: %1.").arg(process.exitStatus()));
+        ui->infoText->setText(QString("Bridge extraction exited with the error: %1").arg(exeToExtract.errorString()));
     }
-
-    ui->tabWidget->setEnabled(true);
-    ui->buttonBox->setEnabled(true);
-    ui->infoBox->setEnabled(true);
+    
+    enableWidgets(true);
     umuRunning = false;
     NeroPrefixSettingsWindow::blockSignals(false);
+}
+
+void NeroPrefixSettingsWindow::enableWidgets(bool isEnabled) {
+    ui->tabWidget->setEnabled(isEnabled);
+    ui->buttonBox->setEnabled(isEnabled);
+    ui->infoBox->setEnabled(isEnabled);
 }
 
 

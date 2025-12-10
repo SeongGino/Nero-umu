@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 
 project(Nero-UMU
-        VERSION 1.1.4
+        VERSION 1.1.5
         DESCRIPTION "An umu-launcher manager and launcher"
         LANGUAGES CXX)
 set(NERO_CODENAME "Magnus")
@@ -37,7 +37,7 @@ else()
     find_package(QT NAMES ${NERO_QT_VERSION} REQUIRED)
 endif()
 
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets LinguistTools)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets LinguistTools Network)
 
 set(TS_FILES translations/Nero-Launcher_en_US.ts)
 
@@ -99,7 +99,7 @@ else()
 endif()
 
 add_subdirectory(lib/quazip)
-target_link_libraries(nero-umu PRIVATE Qt${QT_VERSION_MAJOR}::Widgets QuaZip::QuaZip)
+target_link_libraries(nero-umu PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Network QuaZip::QuaZip)
 
 include(GNUInstallDirs)
 install(TARGETS nero-umu
