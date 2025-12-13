@@ -93,10 +93,11 @@ The backend tool that Nero relies on, *umu,* is *allegedly* based around a cooki
 ## TODOs (to do):
  - Add `dxvk.conf` configuration dialog in shortcut settings.
  - Make process force-shutdown in runner more reliable
-   - Since umu can't shut down the processes it spawns, Nero invokes a wineboot end command manually in the prefix, but sometimes the process is still running for some reason and needs external process killing)
+   - Since umu can't shut down the processes it spawns, Nero invokes a wineboot end command manually in the prefix, but sometimes the odd rogue process might still be running and needs external process killing)
  - Add favorites system
  - Add shortcuts list sorting system (currently only does ascending alphabetical)
  - Import shortcuts for newly installed applications to prefix Shortcuts list?
+ - Add exporting shortcuts as Non-Steam Apps to a user's Steam profile
  - Add integration with SteamGridDB for downloading capsule art for potential favorites menu
  - Integrate umu's extensive protonfixes support (perhaps using OWC's fixes database?)
    - This might necessitate adding a distinction between "normal" prefixes, and one-title prefixes as protonfixes are geared towards the one-prefix-per-game thing.
