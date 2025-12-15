@@ -25,542 +25,242 @@
 #include <QProcess>
 #include <QDir>
 #include <QDebug>
+#include <QStringBuilder>
 
 int NeroRunner::StartShortcut(const QString &hash, const bool &prefixAlreadyRunning)
 {
+    settings = NeroFS::GetCurrentPrefixCfg();
     // failsafe for cli runs
     if(NeroFS::GetUmU().isEmpty()) return -1;
+    hashVal = hash;
+    NeroSetting pathSetting = NeroSetting(NeroConfig::path, *this);
+    QString prefixPath(NeroFS::GetPrefixesPath()->path() % '/' % NeroFS::GetCurrentPrefix());
+    QString pathDir = pathSetting.toString();
+    QString cPath = prefixPath % '/' % drive_c;
+    QString workingDir = pathDir.left(pathDir.lastIndexOf("/")).replace(cDrive, cPath);
 
-    QSettings *settings = NeroFS::GetCurrentPrefixCfg();
-    QFileInfo fileToRun(settings->value("Shortcuts--"+hash+"/Path").toString());
+    bool startsWith = pathDir.startsWith(cDrive);
+    bool fileExists = QFileInfo::exists(workingDir); //faster than declaring obj
+    if(!startsWith && !fileExists) {
+        // TODO: We should probably do something more
+        return -1;
+    }
 
-    if(settings->value("Shortcuts--"+hash+"/Path").toString().startsWith("C:/") || fileToRun.exists()) {
-        QProcess runner;
+    QProcess runner;
 
-        // TODO: this is ass for prerun scripts that should be running persistently.
-        if(!settings->value("Shortcuts--"+hash+"/PreRunScript").toString().isEmpty()) {
-            runner.start(settings->value("Shortcuts--"+hash+"/PreRunScript").toString(), (QStringList){});
+    // TODO: this is ass for prerun scripts that should be running persistently.
+    NeroSetting prerun = NeroSetting(NeroConfig::prerunScript, *this);
+    if(prerun.hasSetting()) {
+        runner.start(prerun.toString(), (QStringList){});
 
-            while(runner.state() != QProcess::NotRunning) {
-                runner.waitForReadyRead(-1);
-                printf("%s", runner.readAll().constData());
-            }
-
+        while(runner.state() != QProcess::NotRunning) {
+            runner.waitForReadyRead(-1);
             printf("%s", runner.readAll().constData());
         }
 
-        runner.setProcessChannelMode(QProcess::ForwardedOutputChannel);
-        runner.setReadChannel(QProcess::StandardError);
+        printf("%s", runner.readAll().constData());
+    }
 
-        env = QProcessEnvironment::systemEnvironment();
-        env.insert("WINEPREFIX", NeroFS::GetPrefixesPath()->path()+'/'+NeroFS::GetCurrentPrefix());
+    runner.setProcessChannelMode(QProcess::ForwardedOutputChannel);
+    runner.setReadChannel(QProcess::StandardError);
 
-        // Only explicit set GAMEID when not already declared by user
-        // See SeongGino/Nero-umu#66 for more info
-        if(!env.contains("GAMEID")) env.insert("GAMEID", "0");
-        
-        QString protonRunner = settings->value("PrefixSettings/CurrentRunner").toString();
-        if(!QFile::exists(NeroFS::GetProtonsPath()->path()+'/'+protonRunner)) {
-            printf("Could not find %s in '%s', ", protonRunner.toLocal8Bit().constData(), NeroFS::GetProtonsPath()->absolutePath().toLocal8Bit().constData());
-            if(!NeroFS::GetAvailableProtons()->isEmpty()) protonRunner = NeroFS::GetAvailableProtons()->first();
-            printf("using %s instead\n", protonRunner.toLocal8Bit().constData());
+    env = QProcessEnvironment::systemEnvironment();
+    env.insert(CliArgs::Wine::prefix, prefixPath);
+
+    // Only explicit set GAMEID when not already declared by user
+    // See SeongGino/Nero-umu#66 for more info
+    if(!env.contains(CliArgs::gameId)) {
+        env.insert(CliArgs::gameId, "0");
+    }
+    QString protonRunner = NeroSetting(NeroConfig::currentRunner, *this).toString();
+    QString runnerPath = NeroFS::GetProtonsPath()->path() % '/' % protonRunner;
+    if(!QFile::exists(runnerPath)) {
+        printf("Could not find %s in '%s', ", protonRunner.toLocal8Bit().constData(), NeroFS::GetProtonsPath()->absolutePath().toLocal8Bit().constData());
+        if(!NeroFS::GetAvailableProtons()->isEmpty()) {
+            protonRunner = NeroFS::GetAvailableProtons()->first();
         }
-        env.insert("PROTONPATH", NeroFS::GetProtonsPath()->path()+'/'+protonRunner);
+        printf("using %s instead\n", protonRunner.toLocal8Bit().constData());
+    }
+    env.insert(CliArgs::protonPath, runnerPath);
+    bool isRuntimeUpdate = NeroSetting(NeroConfig::runtimeUpdate, *this).toBool();
+    if(isRuntimeUpdate && !env.contains(CliArgs::umuRuntimeUpdate)){
+        env.insert(CliArgs::umuRuntimeUpdate, TRUE);
+    }
 
-        if(settings->value("PrefixSettings/RuntimeUpdateOnLaunch").toBool())
-            if(!env.contains("UMU_RUNTIME_UPDATE")) env.insert("UMU_RUNTIME_UPDATE", "1");
+    prefixAlreadyRunning
+        ? env.insert(CliArgs::verb, CliArgs::run)
+        : env.insert(CliArgs::verb, CliArgs::waitForExitRun);
 
-        if(prefixAlreadyRunning)
-            env.insert("PROTON_VERB", "run");
-        else env.insert("PROTON_VERB", "waitforexitandrun");
+    // WAS added here to unrotate Switch controllers,
+    // but may not actually be necessary on newer versions based on SDL3? iunno
+    if(!env.contains(CliArgs::sdlUseButtonLabels)) {
+        env.insert(CliArgs::sdlUseButtonLabels, FALSE);
+    }
 
-        // WAS added here to unrotate Switch controllers,
-        // but may not actually be necessary on newer versions based on SDL3? iunno
-        if(!env.contains("SDL_GAMECONTROLLER_USE_BUTTON_LABELS"))
-            env.insert("SDL_GAMECONTROLLER_USE_BUTTON_LABELS", "0");
+    InitCache();
 
-        InitCache();
+    //if(!settings->value("Shortcuts--"+hash+"/CustomEnvVars").toString().isEmpty()) {
+    //   q) << settings->value("Shortcuts--"+hash+"/CustomEnvVars").toStringList();
+    //}
+    NeroSetting dllOverride = NeroSetting(NeroConfig::dllOverride, *this);
+    NeroSetting ignoreGlobalDll = NeroSetting(NeroConfig::ignoreGlobalDlls, *this);
+    QStringList dllShortcutOverrides = dllOverride.hasSetting() && ignoreGlobalDll.hasSettingAndToBool()
+                                    ? dllOverride.toStringList() << env.value(CliArgs::Wine::dllOverrides)
+                                    : dllOverride.getPrefixVariant().toStringList() << env.value(CliArgs::Wine::dllOverrides);
+    env.insert(CliArgs::Wine::dllOverrides, dllShortcutOverrides.join(';'));
 
-        // unfortunately, env insert does NOT allow settings bools properly as-is,
-        // so all booleans have to be converted to an int string.
+    // D8VK is dependent on DXVK's existence, so forcing WineD3D overrides D8VK.
+    NeroSetting forceWine = NeroSetting(NeroConfig::Proton::forceWineD3D, *this);
+    bool disableD8vk = NeroSetting(NeroConfig::Proton::noD8VK, *this).toBool();
+    if(!forceWine.hasShortcutSetting() && forceWine.hasSetting()) {
+        QString wineD3DValue = PrefixSetting(NeroConfig::Proton::forceWineD3D, *this).convertBoolToIntString();
+        env.insert(CliArgs::Proton::useWineD3D, wineD3DValue);
+    } else if (forceWine.hasShortcutSetting()){
+        QString wineD3DValue = forceWine.convertBoolToIntString();
+        env.insert(CliArgs::Proton::useWineD3D, wineD3DValue);
+    } else {
+        disableD8vk
+            ? env.insert(CliArgs::Proton::dxvkD3D8, FALSE)
+            : env.insert(CliArgs::Proton::dxvkD3D8, TRUE);
+    }
+    NeroSetting nvApi = NeroSetting(NeroConfig::enableNvApi, *this);
+    // For what it's worth, there's also _DISABLE_NVAPI, but not sure if that's more/less useful.
+    if(nvApi.hasSetting() && nvApi.toBool()) {
+        env.insert(CliArgs::Proton::Nvidia::forceNvapi, TRUE);
+    }
+    QMap<QString, QString> boolOptions{
+        {NeroConfig::Proton::limitGlExtensions, CliArgs::Proton::oldGl},
+        {NeroConfig::vkCapture, CliArgs::obsVkCapture},
+        {NeroConfig::forceIGpu, CliArgs::forceIgpu},
+    };
+    boolOptions = InsertArgs(boolOptions, false);
+    int fpsLimit = NeroSetting(NeroConfig::limitFps, *this).toInt();
+    if(fpsLimit) {
+        env.insert(CliArgs::dxvkFrameRate, QString::number(fpsLimit));
+    }
+    int syncType = NeroSetting(NeroConfig::fileSyncMode, *this).toInt();
+    SetSyncMode(protonRunner, syncType);
+    NeroSetting debug(NeroConfig::debugOutput, *this);
+    if(debug.hasSetting()) {
+        InitDebugProperties(debug.toInt());
+    }
+    // TODO: ideally, we should set this as a colon-separated list of whitelisted "0xVID/0xPID" pairs
+    //       but I guess this'll do for now.
+    NeroSetting(NeroConfig::Proton::allowHidraw, *this).hasSettingAndToBool()
+            ? env.insert(CliArgs::Proton::hiDraw, TRUE)
+            : env.insert(CliArgs::Proton::preferSdl, TRUE);
 
-        //if(!settings->value("Shortcuts--"+hash+"/CustomEnvVars").toString().isEmpty()) {
-        //   qDebug() << settings->value("Shortcuts--"+hash+"/CustomEnvVars").toStringList();
-        //}
-        if(!settings->value("Shortcuts--"+hash+"/DLLoverrides").toStringList().isEmpty()) {
-            if(settings->value("Shortcuts--"+hash+"/IgnoreGlobalDLLs").toBool() || settings->value("PrefixSettings/DLLoverrides").toStringList().isEmpty())
-                env.insert("WINEDLLOVERRIDES", settings->value("Shortcuts--"+hash+"/DLLoverrides").toStringList().join(';')+';'
-                                               + env.value("WINEDLLOVERRIDES"));
-            // if overrides are duplicated, last overrides take priority over first overrides
-            else env.insert("WINEDLLOVERRIDES", settings->value("PrefixSettings/DLLoverrides").toStringList().join(';')+';'
-                                                + settings->value("Shortcuts--"+hash+"/DLLoverrides").toStringList().join(';')+';'
-                                                + env.value("WINEDLLOVERRIDES"));
-        } else if(!settings->value("PrefixSettings/DLLoverrides").toStringList().isEmpty())
-            env.insert("WINEDLLOVERRIDES", settings->value("PrefixSettings/DLLoverrides").toStringList().join(';')+';'
-                                           + env.value("WINEDLLOVERRIDES"));
+    NeroSetting(NeroConfig::Proton::useXalia, *this).hasSettingAndToBool()
+            ? env.insert(CliArgs::Proton::useXalia, TRUE)
+            : env.insert(CliArgs::Proton::useXalia, FALSE);
 
-        // D8VK is dependent on DXVK's existence, so forcing WineD3D overrides D8VK.
-        if(!settings->value("Shortcuts--"+hash+"/ForceWineD3D").toString().isEmpty())
-            env.insert("PROTON_USE_WINED3D", QString::number(settings->value("Shortcuts--"+hash+"/ForceWineD3D").toBool()));
-        else if(!settings->value("Shortcuts--"+hash+"/NoD8VK").toString().isEmpty()) {
-            if(!settings->value("Shortcuts--"+hash+"/NoD8VK").toBool()) env.insert("PROTON_DXVK_D3D8", "1");
-        } else if(!settings->value("PrefixSettings/NoD8VK").toBool())
-            env.insert("PROTON_USE_WINED3D", QString::number(settings->value("PrefixSettings/ForceWineD3D").toBool()));
-        else env.insert("PROTON_DXVK_D3D8", "1");
+    bool isWaylandEnv = env.contains(CliArgs::waylandDisplay)
+            ? !env.value(CliArgs::waylandDisplay).isEmpty()
+            : false;
+    NeroSetting wayland(NeroConfig::Proton::useWayland, *this);
+    if (isWaylandEnv && wayland.hasSetting() && wayland.toBool()) {
+        env.insert(CliArgs::Proton::enableWayland, TRUE);
+        bool isHdrEnabled = NeroSetting(NeroConfig::Proton::useHdr, *this).toBool();
+        if (isHdrEnabled) {
+            env.insert(CliArgs::Proton::useHdr, TRUE);
+        }
+    }
+    QStringList arguments = {NeroFS::GetUmU(), pathSetting.toString()};
+    // some arguments are parsed as stringlists and others as string, so check which first.;
 
-        // For what it's worth, there's also _DISABLE_NVAPI, but not sure if that's more/less useful.
-        if(!settings->value("Shortcuts--"+hash+"/EnableNVAPI").toString().isEmpty()) {
-            if(settings->value("Shortcuts--"+hash+"/EnableNVAPI").toBool()) env.insert("PROTON_FORCE_NVAPI", "1");
-        } else if(settings->value("PrefixSettings/EnableNVAPI").toBool())
-            env.insert("PROTON_FORCE_NVAPI", "1");
+    QVariant argsVar =  NeroSetting(NeroConfig::args, *this).getSettingVariant();
 
-        if(!settings->value("Shortcuts--"+hash+"/LimitGLextensions").toString().isEmpty()) {
-            if(settings->value("Shortcuts--"+hash+"/LimitGLextensions").toBool()) env.insert("PROTON_OLD_GL_STRING", "1");
-        } else if(settings->value("PrefixSettings/LimitGLextensions").toBool())
-            env.insert("PROTON_OLD_GL_STRING", "1");
-
-        if(!settings->value("Shortcuts--"+hash+"/VKcapture").toString().isEmpty()) {
-            if(settings->value("Shortcuts--"+hash+"/VKcapture").toBool()) env.insert("OBS_VKCAPTURE", "1");
-        } else if(settings->value("PrefixSettings/VKcapture").toBool())
-            env.insert("OBS_VKCAPTURE", "1");
-
-        if(!settings->value("Shortcuts--"+hash+"/ForceiGPU").toString().isEmpty()) {
-            if(settings->value("Shortcuts--"+hash+"/ForceiGPU").toBool()) env.insert("MESA_VK_DEVICE_SELECT_FORCE_DEFAULT_DEVICE", "1");
-        } else if(settings->value("PrefixSettings/ForceiGPU").toBool())
-            env.insert("MESA_VK_DEVICE_SELECT_FORCE_DEFAULT_DEVICE", "1");
-
-        if(settings->value("Shortcuts--"+hash+"/LimitFPS").toInt())
-            env.insert("DXVK_FRAME_RATE", QString::number(settings->value("Shortcuts--"+hash+"/LimitFPS").toInt()));
-
-        if(!settings->value("Shortcuts--"+hash+"/FileSyncMode").toString().isEmpty()) {
-            switch(settings->value("Shortcuts--"+hash+"/FileSyncMode").toInt()) {
-            // ntsync SHOULD be better in all scenarios compared to other sync options, but requires kernel 6.14+ and GE-Proton10-9+
-            // For older Protons, they should be safely ignoring this and fallback to fsync anyways.
-            // Newer protons than GE10-9 should enable this automatically from its end, and doesn't require WOW64
-            // (and currently, WOW64 seems problematic for some fringe cases, like TeknoParrot's BudgieLoader not spawning a window)
-            case NeroConstant::NTsync:
-                if(protonRunner == "GE-Proton10-9") {
-                    env.insert("PROTON_USE_NTSYNC", "1");
-                    env.insert("PROTON_USE_WOW64", "1");
+    if (argsVar.canConvert<QStringList>() && !argsVar.toStringList().isEmpty()) {
+        arguments.append(argsVar.toStringList());
+    } else if (argsVar.canConvert<QString>() && !argsVar.toString().isEmpty()) {
+        // SUPER UNGA BUNGA: manually split string into a list
+        QString buf = argsVar.toString();
+        QStringList args;
+        args.append("");
+        bool quotation = false;
+        for(const auto &chara : std::as_const(buf)) {
+            if(!quotation) {
+                if(chara != ' ' && chara != '"') args.last().append(chara);
+                else switch(chara.unicode()) {
+                    case '"': quotation = true;
+                    case ' ': if(!args.last().isEmpty()) args.append(""); break;
+                    default: break;
                 }
-                break;
-            case NeroConstant::Fsync:
-                env.insert("PROTON_NO_NTSYNC", "1");
-                break;
-            case NeroConstant::NoSync:
-                env.insert("PROTON_NO_ESYNC", "1");
-            case NeroConstant::Esync:
-                env.insert("PROTON_NO_NTSYNC", "1");
-                env.insert("PROTON_NO_FSYNC", "1");
-                break;
-            default: break;
-            }
-        } else switch(settings->value("PrefixSettings/FileSyncMode").toInt()) {
-            case NeroConstant::NTsync:
-                if(protonRunner == "GE-Proton10-9") {
-                    env.insert("PROTON_USE_NTSYNC", "1");
-                    env.insert("PROTON_USE_WOW64", "1");
-                }
-                break;
-            case NeroConstant::Fsync:
-                env.insert("PROTON_NO_NTSYNC", "1");
-                break;
-            case NeroConstant::NoSync:
-                env.insert("PROTON_NO_ESYNC", "1");
-            case NeroConstant::Esync:
-                env.insert("PROTON_NO_NTSYNC", "1");
-                env.insert("PROTON_NO_FSYNC", "1");
-                break;
-            default: break;
-        }
-
-        if(!settings->value("Shortcuts--"+hash+"/DebugOutput").toString().isEmpty()) {
-            switch(settings->value("Shortcuts--"+hash+"/DebugOutput").toInt()) {
-            case NeroConstant::DebugDisabled:
-                break;
-            case NeroConstant::DebugFull:
-                loggingEnabled = true;
-                env.insert("WINEDEBUG", "+loaddll,debugstr,mscoree,seh");
-                break;
-            case NeroConstant::DebugLoadDLL:
-                loggingEnabled = true;
-                env.insert("WINEDEBUG", "+loaddll");
-                break;
-            }
-        } else switch(settings->value("PrefixSettings/DebugOutput").toInt()) {
-            case NeroConstant::DebugDisabled:
-                break;
-            case NeroConstant::DebugFull:
-                loggingEnabled = true;
-                env.insert("WINEDEBUG", "+loaddll,debugstr,mscoree,seh");
-                break;
-            case NeroConstant::DebugLoadDLL:
-                loggingEnabled = true;
-                env.insert("WINEDEBUG", "+loaddll");
-                break;
-        }
-
-        // TODO: ideally, we should set this as a colon-separated list of whitelisted "0xVID/0xPID" pairs
-        //       but I guess this'll do for now.
-        if(!settings->value("Shortcuts--"+hash+"/AllowHidraw").toString().isEmpty()) {
-            if(settings->value("Shortcuts--"+hash+"/AllowHidraw").toBool())
-                env.insert("PROTON_ENABLE_HIDRAW", "1");
-            else env.insert("PROTON_PREFER_SDL", "1");
-        } else if(settings->value("PrefixSettings/AllowHidraw").toBool())
-            env.insert("PROTON_ENABLE_HIDRAW", "1");
-        // Forces controllers (that otherwise get preferred by hidraw by default) to go through SDL backend instead
-        else env.insert("PROTON_PREFER_SDL", "1");
-
-        if(!settings->value("Shortcuts--"+hash+"/UseXalia").toString().isEmpty()) {
-            if(settings->value("Shortcuts--"+hash+"/UseXalia").toBool())
-                env.insert("PROTON_USE_XALIA", "1");
-            else env.insert("PROTON_USE_XALIA", "0");
-        } else if(settings->value("PrefixSettings/UseXalia").toBool())
-            env.insert("PROTON_USE_XALIA", "1");
-        else env.insert("PROTON_USE_XALIA", "0");
-
-        if(env.contains("WAYLAND_DISPLAY") && !env.value("WAYLAND_DISPLAY").isEmpty()) {
-            if(!settings->value("Shortcuts--"+hash+"/UseWayland").toString().isEmpty()) {
-                if(settings->value("Shortcuts--"+hash+"/UseWayland").toBool())
-                    env.insert("PROTON_ENABLE_WAYLAND", "1");
-                    if(!settings->value("Shortcuts--"+hash+"/UseHDR").toString().isEmpty()) {
-                        if(settings->value("Shortcuts--"+hash+"/UseHDR").toBool())
-                            env.insert("PROTON_ENABLE_HDR", "1");
-                    } else if(settings->value("PrefixSettings/UseHDR").toBool())
-                        env.insert("PROTON_ENABLE_HDR", "1");
-            } else if(settings->value("PrefixSettings/UseWayland").toBool()) {
-                env.insert("PROTON_ENABLE_WAYLAND", "1");
-                if(settings->value("PrefixSettings/UseHDR").toBool())
-                    env.insert("PROTON_ENABLE_HDR", "1");
+            } else if(chara != '"') args.last().append(chara);
+            else {
+                quotation = false;
+                args.append("");
             }
         }
+        if(args.last().isEmpty()) args.removeLast();
+        arguments.append(args);
+    }
 
-        QStringList arguments;
-        arguments.append(NeroFS::GetUmU());
+    if(NeroSetting(NeroConfig::gamemode, *this).hasSetting()) {
+        arguments.prepend(CliArgs::gamemoderun);
+    }
 
-        arguments.append(settings->value("Shortcuts--"+hash+"/Path").toString());
-
-        // some arguments are parsed as stringlists and others as string, so check which first.
-        if(settings->value("Shortcuts--"+hash+"/Args").type() == QMetaType::QStringList &&
-           !settings->value("Shortcuts--"+hash+"/Args").toStringList().isEmpty())
-            arguments.append(settings->value("Shortcuts--"+hash+"/Args").toStringList());
-        else if(settings->value("Shortcuts--"+hash+"/Args").type() == QMetaType::QString &&
-                !settings->value("Shortcuts--"+hash+"/Args").toString().isEmpty()) {
-            // SUPER UNGA BUNGA: manually split string into a list
-            QString buf = settings->value("Shortcuts--"+hash+"/Args").toString();
-            QStringList args;
-            args.append("");
-            bool quotation = false;
-            for(const auto &chara : std::as_const(buf)) {
-                if(!quotation) {
-                    if(chara != ' ' && chara != '"') args.last().append(chara);
-                    else switch(chara.unicode()) {
-                        case '"': quotation = true;
-                        case ' ': if(!args.last().isEmpty()) args.append(""); break;
-                        default: break;
-                    }
-                } else if(chara != '"') args.last().append(chara);
-                else {
-                    quotation = false;
-                    args.append("");
-                }
-            }
-            if(args.last().isEmpty()) args.removeLast();
-            arguments.append(args);
+    int scalingMode = NeroSetting(NeroConfig::Gamescope::scalingMode, *this).toInt();
+    bool isNotPrefixOnly = false;
+    SetScalingMode(scalingMode, fpsLimit, isNotPrefixOnly, arguments);
+    bool mangoHudEnabled = NeroSetting(NeroConfig::mangohud, *this).hasSettingAndToBool();
+    if(mangoHudEnabled) {
+        bool isMangoEnv = env.contains(NeroConfig::mangohud.toUpper());
+        if(arguments.contains(CliArgs::Gamescope::name)) {
+            arguments.insert(1, CliArgs::mangoapp);
+        } else if (!isMangoEnv) {
+            arguments.prepend(NeroConfig::mangohud.toLower());
         }
+    }
 
-        if(!settings->value("Shortcuts--"+hash+"/Gamemode").toString().isEmpty()) {
-            if(settings->value("Shortcuts--"+hash+"/Gamemode").toBool())
-                arguments.prepend("gamemoderun");
-        } else if(settings->value("PrefixSettings/Gamemode").toBool())
-            arguments.prepend("gamemoderun");
+    runner.setProcessEnvironment(env);
+    // some apps requires working directory to be in the right location
+    // (corrected if path starts with Windows drive letter prefix)
+    // settings->value("Shortcuts--"+hash+"/Path").toString();
 
-        if(!settings->value("Shortcuts--"+hash+"/ScalingMode").toString().isEmpty()) {
-            switch(settings->value("Shortcuts--"+hash+"/ScalingMode").toInt()) {
-            case NeroConstant::ScalingIntegerScale:
-                env.insert("WINE_FULLSCREEN_INTEGER_SCALING", "1"); break;
-            case NeroConstant::ScalingFSRperformance:
-                env.insert("WINE_FULLSCREEN_FSR", "1");
-                env.insert("WINE_FULLSCREEN_FSR_STRENGTH", "0");
-                break;
-            case NeroConstant::ScalingFSRbalanced:
-                env.insert("WINE_FULLSCREEN_FSR", "1");
-                env.insert("WINE_FULLSCREEN_FSR_STRENGTH", "1");
-                break;
-            case NeroConstant::ScalingFSRquality:
-                env.insert("WINE_FULLSCREEN_FSR", "1");
-                env.insert("WINE_FULLSCREEN_FSR_STRENGTH", "2");
-                break;
-            case NeroConstant::ScalingFSRhighquality:
-                env.insert("WINE_FULLSCREEN_FSR", "1");
-                env.insert("WINE_FULLSCREEN_FSR_STRENGTH", "3");
-                break;
-            case NeroConstant::ScalingFSRhigherquality:
-                env.insert("WINE_FULLSCREEN_FSR", "1");
-                env.insert("WINE_FULLSCREEN_FSR_STRENGTH", "4");
-                break;
-            case NeroConstant::ScalingFSRhighestquality:
-                env.insert("WINE_FULLSCREEN_FSR", "1");
-                env.insert("WINE_FULLSCREEN_FSR_STRENGTH", "5");
-                break;
-            case NeroConstant::ScalingFSRcustom:
-                env.insert("WINE_FULLSCREEN_FSR", "1");
-                env.insert("WINE_FULLSCREEN_FSR_CUSTOM_MODE",
-                           settings->value("Shortcuts--"+hash+"/FSRcustomResW").toString()+'x'+
-                           settings->value("Shortcuts--"+hash+"/FSRcustomResH").toString());
-                break;
-            case NeroConstant::ScalingGamescopeFullscreen:
-                arguments.prepend("--");
-                arguments.prepend("-f");
-                if(settings->value("Shortcuts--"+hash+"/GamescopeOutResH").toInt()) {
-                    arguments.prepend(settings->value("Shortcuts--"+hash+"/GamescopeOutResH").toString());
-                    arguments.prepend("-h");
-                }
-                if(settings->value("Shortcuts--"+hash+"/GamescopeOutResW").toInt()) {
-                    arguments.prepend(settings->value("Shortcuts--"+hash+"/GamescopeOutResW").toString());
-                    arguments.prepend("-w");
-                }
-                if(settings->value("Shortcuts--"+hash+"/GamescopeFilter").toInt()) {
-                    switch(settings->value("Shortcuts--"+hash+"/GamescopeFilter").toInt()) {
-                    case NeroConstant::GSfilterNearest:
-                        arguments.prepend("nearest"); break;
-                    case NeroConstant::GSfilterFSR:
-                        arguments.prepend("fsr"); break;
-                    case NeroConstant::GSfilterNLS:
-                        arguments.prepend("nis"); break;
-                    case NeroConstant::GSfilterPixel:
-                        arguments.prepend("pixel"); break;
-                    }
-                    arguments.prepend("-F");
-                }
-                if(settings->value("Shortcuts--"+hash+"/LimitFPS").toInt()) {
-                    arguments.prepend(QByteArray::number(settings->value("Shortcuts--"+hash+"/LimitFPS").toInt()));
-                    arguments.prepend("-r");
-                    arguments.prepend(QByteArray::number(settings->value("Shortcuts--"+hash+"/LimitFPS").toInt()));
-                    arguments.prepend("-o");
-                }
-                //arguments.prepend("--adaptive-sync");
-                arguments.prepend("gamescope");
-                break;
-            case NeroConstant::ScalingGamescopeBorderless:
-                arguments.prepend("--");
-                arguments.prepend("-b");
-            case NeroConstant::ScalingGamescopeWindowed:
-                if(!arguments.contains("--")) arguments.prepend("--");
-                if(settings->value("Shortcuts--"+hash+"/GamescopeWinResH").toInt()) {
-                    arguments.prepend(settings->value("Shortcuts--"+hash+"/GamescopeWinResH").toString());
-                    arguments.prepend("-H");
-                }
-                if(settings->value("Shortcuts--"+hash+"/GamescopeWinResW").toInt()) {
-                    arguments.prepend(settings->value("Shortcuts--"+hash+"/GamescopeWinResW").toString());
-                    arguments.prepend("-W");
-                }
-                if(settings->value("Shortcuts--"+hash+"/GamescopeOutResH").toInt()) {
-                    arguments.prepend(settings->value("Shortcuts--"+hash+"/GamescopeOutResH").toString());
-                    arguments.prepend("-h");
-                }
-                if(settings->value("Shortcuts--"+hash+"/GamescopeOutResW").toInt()) {
-                    arguments.prepend(settings->value("Shortcuts--"+hash+"/GamescopeOutResW").toString());
-                    arguments.prepend("-w");
-                }
-                if(settings->value("Shortcuts--"+hash+"/GamescopeFilter").toInt()) {
-                    switch(settings->value("Shortcuts--"+hash+"/GamescopeFilter").toInt()) {
-                    case NeroConstant::GSfilterNearest:
-                        arguments.prepend("nearest"); break;
-                    case NeroConstant::GSfilterFSR:
-                        arguments.prepend("fsr"); break;
-                    case NeroConstant::GSfilterNLS:
-                        arguments.prepend("nis"); break;
-                    case NeroConstant::GSfilterPixel:
-                        arguments.prepend("pixel"); break;
-                    }
-                    arguments.prepend("-F");
-                }
-                if(settings->value("Shortcuts--"+hash+"/LimitFPS").toInt()) {
-                    arguments.prepend(QByteArray::number(settings->value("Shortcuts--"+hash+"/LimitFPS").toInt()));
-                    arguments.prepend("-r");
-                    arguments.prepend(QByteArray::number(settings->value("Shortcuts--"+hash+"/LimitFPS").toInt()));
-                    arguments.prepend("-o");
-                }
-                //arguments.prepend("--adaptive-sync");
-                arguments.prepend("gamescope");
-                break;
-            }
-        } else switch(settings->value("PrefixSettings/ScalingMode").toInt()) {
-            case NeroConstant::ScalingIntegerScale:
-                env.insert("WINE_FULLSCREEN_INTEGER_SCALING", "1"); break;
-            case NeroConstant::ScalingFSRperformance:
-                env.insert("WINE_FULLSCREEN_FSR", "1");
-                env.insert("WINE_FULLSCREEN_FSR_STRENGTH", "0");
-                break;
-            case NeroConstant::ScalingFSRbalanced:
-                env.insert("WINE_FULLSCREEN_FSR", "1");
-                env.insert("WINE_FULLSCREEN_FSR_STRENGTH", "1");
-                break;
-            case NeroConstant::ScalingFSRquality:
-                env.insert("WINE_FULLSCREEN_FSR", "1");
-                env.insert("WINE_FULLSCREEN_FSR_STRENGTH", "2");
-                break;
-            case NeroConstant::ScalingFSRhighquality:
-                env.insert("WINE_FULLSCREEN_FSR", "1");
-                env.insert("WINE_FULLSCREEN_FSR_STRENGTH", "3");
-                break;
-            case NeroConstant::ScalingFSRhigherquality:
-                env.insert("WINE_FULLSCREEN_FSR", "1");
-                env.insert("WINE_FULLSCREEN_FSR_STRENGTH", "4");
-                break;
-            case NeroConstant::ScalingFSRhighestquality:
-                env.insert("WINE_FULLSCREEN_FSR", "1");
-                env.insert("WINE_FULLSCREEN_FSR_STRENGTH", "5");
-                break;
-            case NeroConstant::ScalingFSRcustom:
-                env.insert("WINE_FULLSCREEN_FSR", "1");
-                env.insert("WINE_FULLSCREEN_FSR_CUSTOM_MODE", settings->value("PrefixSettings/FSRcustomResW").toString()+'x'+
-                                                              settings->value("PrefixSettings/FSRcustomResH").toString());
-                break;
-            case NeroConstant::ScalingGamescopeFullscreen:
-                arguments.prepend("--");
-                arguments.prepend("-f");
-                if(settings->value("PrefixSettings/GamescopeOutResH").toInt()) {
-                    arguments.prepend(settings->value("PrefixSettings/GamescopeOutResH").toString());
-                    arguments.prepend("-h");
-                }
-                if(settings->value("PrefixSettings/GamescopeOutResW").toInt()) {
-                    arguments.prepend(settings->value("PrefixSettings/GamescopeOutResW").toString());
-                    arguments.prepend("-w");
-                }
-                if(settings->value("PrefixSettings/GamescopeFilter").toInt()) {
-                    switch(settings->value("PrefixSettings/GamescopeFilter").toInt()) {
-                    case NeroConstant::GSfilterNearest:
-                        arguments.prepend("nearest"); break;
-                    case NeroConstant::GSfilterFSR:
-                        arguments.prepend("fsr"); break;
-                    case NeroConstant::GSfilterNLS:
-                        arguments.prepend("nis"); break;
-                    case NeroConstant::GSfilterPixel:
-                        arguments.prepend("pixel"); break;
-                    }
-                    arguments.prepend("-F");
-                }
-                if(settings->value("PrefixSettings/LimitFPS").toInt()) {
-                    // gamescope seems to have two different types of settings for enforcing a frame limiter?
-                    // also for some reason, neither implems really work reliably in Wayland :shrug:
-                    arguments.prepend(QByteArray::number(settings->value("PrefixSettings/LimitFPS").toInt()));
-                    arguments.prepend("--framerate-limit");
-                    /*
-                    arguments.prepend("-r");
-                    arguments.prepend(QByteArray::number(settings->value("PrefixSettings/LimitFPS").toInt()));
-                    arguments.prepend("-o");
-                    */
-                }
-                // don't think it hurts to enable adaptive sync support by default?
-                arguments.prepend("--adaptive-sync");
-                arguments.prepend("gamescope");
-                break;
-            case NeroConstant::ScalingGamescopeBorderless:
-                arguments.prepend("--");
-                arguments.prepend("-b");
-            case NeroConstant::ScalingGamescopeWindowed:
-                if(!arguments.contains("--")) arguments.prepend("--");
-                if(settings->value("PrefixSettings/GamescopeWinResH").toInt()) {
-                    arguments.prepend(settings->value("PrefixSettings/GamescopeWinResH").toString());
-                    arguments.prepend("-H");
-                }
-                if(settings->value("PrefixSettings/GamescopeWinResW").toInt()) {
-                    arguments.prepend(settings->value("PrefixSettings/GamescopeWinResW").toString());
-                    arguments.prepend("-W");
-                }
-                if(settings->value("PrefixSettings/GamescopeOutResH").toInt()) {
-                    arguments.prepend(settings->value("PrefixSettings/GamescopeOutResH").toString());
-                    arguments.prepend("-h");
-                }
-                if(settings->value("PrefixSettings/GamescopeOutResW").toInt()) {
-                    arguments.prepend(settings->value("PrefixSettings/GamescopeOutResW").toString());
-                    arguments.prepend("-w");
-                }
-                if(settings->value("PrefixSettings/GamescopeFilter").toInt()) {
-                    switch(settings->value("PrefixSettings/GamescopeFilter").toInt()) {
-                    case NeroConstant::GSfilterNearest:
-                        arguments.prepend("nearest"); break;
-                    case NeroConstant::GSfilterFSR:
-                        arguments.prepend("fsr"); break;
-                    case NeroConstant::GSfilterNLS:
-                        arguments.prepend("nis"); break;
-                    case NeroConstant::GSfilterPixel:
-                        arguments.prepend("pixel"); break;
-                    }
-                    arguments.prepend("-F");
-                }
-                if(settings->value("PrefixSettings/LimitFPS").toInt()) {
-                    arguments.prepend(QByteArray::number(settings->value("PrefixSettings/LimitFPS").toInt()));
-                    arguments.prepend("--framerate-limit");
-                    /*
-                    arguments.prepend("-r");
-                    arguments.prepend(QByteArray::number(settings->value("PrefixSettings/LimitFPS").toInt()));
-                    arguments.prepend("-o");
-                    */
-                }
-                arguments.prepend("--adaptive-sync");
-                arguments.prepend("gamescope");
-                break;
-        }
+    runner.setWorkingDirectory(workingDir);
+    QString command = arguments.takeFirst();
+    QString name = NeroSetting(NeroConfig::name, *this).toString();
+    QString logFilePath = '/' % name % '-' % hash % ".txt";
+    QString launchArgs = arguments.join(' ');
+    QFileInfo logInfo = InitLogging(LaunchInfo(prefixPath, logFilePath, command, launchArgs), runner.environment());
+    QFile log(logInfo.absoluteFilePath());
+    runner.start(command, arguments);
+    runner.waitForStarted(-1);
+    WaitLoop(runner, log);
 
-        if(!settings->value("Shortcuts--"+hash+"/Mangohud").toString().isEmpty()) {
-            if(settings->value("Shortcuts--"+hash+"/Mangohud").toBool()) {
-                if(arguments.contains("gamescope"))
-                    arguments.insert(1, "--mangoapp");
-                else if(!env.contains("MANGOHUD")) arguments.prepend("mangohud");
-            }
-        } else if(settings->value("PrefixSettings/Mangohud").toBool()) {
-            if(arguments.contains("gamescope"))
-                arguments.insert(1, "--mangoapp");
-            else if(!env.contains("MANGOHUD")) arguments.prepend("mangohud");
-        }
+    // in case settings changed from manager
+    settings = NeroFS::GetCurrentPrefixCfg();
 
-        runner.setProcessEnvironment(env);
-        // some apps requires working directory to be in the right location
-        // (corrected if path starts with Windows drive letter prefix)
-        runner.setWorkingDirectory(settings->value("Shortcuts--"+hash+"/Path")
-                                            .toString().left(settings->value("Shortcuts--"+hash+"/Path").toString().lastIndexOf("/"))
-                                            .replace("C:", NeroFS::GetPrefixesPath()->path()+'/'+NeroFS::GetCurrentPrefix()+"/drive_c/"));
-        QString command = arguments.takeFirst();
+    NeroSetting postrunScript = NeroSetting(NeroConfig::postRunScript, *this);
+    if(postrunScript.hasShortcutSetting()) {
+        runner.start(postrunScript.toString(), (QStringList){});
 
-        QDir logsDir(NeroFS::GetPrefixesPath()->path()+'/'+NeroFS::GetCurrentPrefix());
-        if(!logsDir.exists(".logs"))
-            logsDir.mkdir(".logs");
-        logsDir.cd(".logs");
-
-        QFile log(logsDir.path()+'/'+settings->value("Shortcuts--"+hash+"/Name").toString()+'-'+hash+".txt");
-        if(loggingEnabled) {
-            log.open(QIODevice::WriteOnly);
-            log.resize(0);
-            log.write("Current running environment:\n");
-            log.write(runner.environment().join('\n').toLocal8Bit());
-            log.write("\n\nRunning command:\n" + command.toLocal8Bit() + ' ' + arguments.join(' ').toLocal8Bit() + '\n');
-            log.write("==============================================\n");
-        }
-
-        runner.start(command, arguments);
-        runner.waitForStarted(-1);
-
-        WaitLoop(runner, log);
-
-        // in case settings changed from manager
-        settings = NeroFS::GetCurrentPrefixCfg();
-
-        if(!settings->value("Shortcuts--"+hash+"/PostRunScript").toString().isEmpty()) {
-            runner.start(settings->value("Shortcuts--"+hash+"/PostRunScript").toString(), (QStringList){});
-
-            while(runner.state() != QProcess::NotRunning) {
-                runner.waitForReadyRead(-1);
-                printf("%s", runner.readAll().constData());
-            }
-
+        while(runner.state() != QProcess::NotRunning) {
+            runner.waitForReadyRead(-1);
             printf("%s", runner.readAll().constData());
         }
 
-        return runner.exitCode();
-    } else return -1;
+        printf("%s", runner.readAll().constData());
+    }
+
+    return runner.exitCode();
+}
+
+QString NeroRunner::GamescopeFilterType(int filterVal) {
+    switch(filterVal) {
+    case NeroConstant::GSfilterNearest:
+        return CliArgs::Gamescope::Upscaler::nearest;
+    case NeroConstant::GSfilterFSR:
+        return CliArgs::Gamescope::Upscaler::fsr;
+    case NeroConstant::GSfilterNLS:
+        return CliArgs::Gamescope::Upscaler::nvidiaImageSharpening;
+    case NeroConstant::GSfilterPixel:
+        return CliArgs::Gamescope::Upscaler::pixel;
+    // Need to confirm on this or if we should just return blank
+    default:
+        return CliArgs::Gamescope::Upscaler::pixel;
+    }
 }
 
 int NeroRunner::StartOnetime(const QString &path, const bool &prefixAlreadyRunning, const QStringList &args)
@@ -568,7 +268,7 @@ int NeroRunner::StartOnetime(const QString &path, const bool &prefixAlreadyRunni
     // failsafe for cli runs
     if(NeroFS::GetUmU().isEmpty()) return -1;
 
-    QSettings *settings = NeroFS::GetCurrentPrefixCfg();
+    settings = NeroFS::GetCurrentPrefixCfg();
 
     QProcess runner;
     // umu seems to direct both umu-run frontend and Proton output to stderr,
@@ -577,257 +277,361 @@ int NeroRunner::StartOnetime(const QString &path, const bool &prefixAlreadyRunni
     runner.setReadChannel(QProcess::StandardError);
 
     env = QProcessEnvironment::systemEnvironment();
-    env.insert("WINEPREFIX", NeroFS::GetPrefixesPath()->path()+'/'+NeroFS::GetCurrentPrefix());
+    QString prefixPath = NeroFS::GetPrefixesPath()->path() % '/' % NeroFS::GetCurrentPrefix();
+    env.insert(CliArgs::Wine::prefix, prefixPath);
 
     // Only explicit set GAMEID when not already declared by user
     // See SeongGino/Nero-umu#66 for more info
-    if(!env.contains("GAMEID")) env.insert("GAMEID", "0");
-
-    QString protonRunner = settings->value("PrefixSettings/CurrentRunner").toString();
-    if(!QFile::exists(NeroFS::GetProtonsPath()->path()+'/'+protonRunner)) {
+    if(!env.contains(CliArgs::gameId)) {
+        //This isn't a true false value, so dont use FALSE
+        env.insert(CliArgs::gameId, "0");
+    }
+    QString protonRunner = PrefixSetting(NeroConfig::currentRunner, *this).toString();
+    QString runnerPath = NeroFS::GetProtonsPath()->path()% '/' % protonRunner;
+    if(!QFile::exists(runnerPath)) {
         printf("Could not find %s in '%s', ", protonRunner.toLocal8Bit().constData(), NeroFS::GetProtonsPath()->absolutePath().toLocal8Bit().constData());
-        if(!NeroFS::GetAvailableProtons()->isEmpty()) protonRunner = NeroFS::GetAvailableProtons()->first();
+        if(!NeroFS::GetAvailableProtons()->isEmpty()) {
+            protonRunner = NeroFS::GetAvailableProtons()->first();
+        }
         printf("using %s instead\n", protonRunner.toLocal8Bit().constData());
     }
-    env.insert("PROTONPATH", NeroFS::GetProtonsPath()->path()+'/'+protonRunner);
+    env.insert(CliArgs::protonPath, runnerPath);
 
-    if(prefixAlreadyRunning)
-        env.insert("PROTON_VERB", "run");
-    else env.insert("PROTON_VERB", "waitforexitandrun");
+    prefixAlreadyRunning
+        ? env.insert(CliArgs::verb, CliArgs::run)
+        : env.insert(CliArgs::verb, CliArgs::waitForExitRun);
 
-    if(!env.contains("SDL_GAMECONTROLLER_USE_BUTTON_LABELS"))
-        env.insert("SDL_GAMECONTROLLER_USE_BUTTON_LABELS", "0");
-
+    if(!env.contains(CliArgs::sdlUseButtonLabels)) {
+        env.insert(CliArgs::sdlUseButtonLabels, FALSE);
+    }
     InitCache();
 
-    if(settings->value("PrefixSettings/RuntimeUpdateOnLaunch").toBool())
-        env.insert("UMU_RUNTIME_UPDATE", "1");
-    if(!settings->value("PrefixSettings/DLLoverrides").toStringList().isEmpty())
-        env.insert("WINEDLLOVERRIDES", settings->value("PrefixSettings/DLLoverrides").toStringList().join(';')+';'+env.value("WINEDLLOVERRIDES"));
-    if(settings->value("PrefixSettings/ForceWineD3D").toBool())
-        env.insert("PROTON_USE_WINED3D", "1");
-    else if(!settings->value("PrefixSettings/NoD8VK").toBool())
-        env.insert("PROTON_DXVK_D3D8", "1");
-    if(settings->value("PrefixSettings/EnableNVAPI").toBool())
-        env.insert("PROTON_FORCE_NVAPI", "1");
-    if(settings->value("PrefixSettings/LimitGLextensions").toBool())
-        env.insert("PROTON_OLD_GL_STRING", "1");
-    if(settings->value("PrefixSettings/VKcapture").toBool())
-        env.insert("OBS_VKCAPTURE", "1");
-    if(settings->value("PrefixSettings/ForceiGPU").toBool())
-        env.insert("MESA_VK_DEVICE_SELECT_FORCE_DEFAULT_DEVICE", "1");
+    bool isRuntimeUpdateOnLaunch = PrefixSetting(NeroConfig::runtimeUpdate, *this).toBool();
+    if(isRuntimeUpdateOnLaunch) {
+        env.insert(CliArgs::umuRuntimeUpdate, TRUE);
+    }
+    QStringList dllOverrides = PrefixSetting(NeroConfig::dllOverride, *this).toStringList();
+    if(!dllOverrides.isEmpty()) {
+        env.insert(CliArgs::Wine::dllOverrides, dllOverrides.join(';')+';'+ env.value(CliArgs::Wine::dllOverrides));
+    }
+    bool isForcedWineD3D = PrefixSetting(NeroConfig::Proton::forceWineD3D, *this).toBool();
+    bool disableD8Vk =  PrefixSetting(NeroConfig::Proton::noD8VK, *this).toBool();
 
-    switch(settings->value("PrefixSettings/FileSyncMode").toInt()) {
-    // ntsync SHOULD be better in all scenarios compared to other sync options, but requires kernel 6.14+ and GE-Proton10-9+
-    // For older Protons, they should be safely ignoring this and fallback to fsync anyways.
-    // Newer protons than GE10-9 should enable this automatically from its end, and doesn't require WOW64
-    // (and currently, WOW64 seems problematic for some fringe cases, like TeknoParrot's BudgieLoader not spawning a window)
-    case NeroConstant::NTsync:
-        if(protonRunner == "GE-Proton10-9") {
-            env.insert("PROTON_USE_NTSYNC", "1");
-            env.insert("PROTON_USE_WOW64", "1");
+    if(isForcedWineD3D) {
+        env.insert(CliArgs::Proton::useWineD3D, TRUE);
+    } else if(!disableD8Vk) {
+        env.insert(CliArgs::Proton::dxvkD3D8, TRUE);
+    }
+    QMap<QString, QString> simpleBoolSettings {
+        {NeroConfig::enableNvApi, CliArgs::Proton::Nvidia::forceNvapi},
+        {NeroConfig::Proton::limitGlExtensions, CliArgs::Proton::oldGl},
+        {NeroConfig::vkCapture, CliArgs::obsVkCapture},
+        {NeroConfig::forceIGpu, CliArgs::forceIgpu}
+    };
+    bool isPrefixOnly = true;
+    simpleBoolSettings = InsertArgs(simpleBoolSettings, isPrefixOnly);
+    int fileSyncMode = PrefixSetting(NeroConfig::fileSyncMode, *this).toInt();
+    SetSyncMode(protonRunner, fileSyncMode);
+    int debugVal = PrefixSetting(NeroConfig::debugOutput, *this).toInt();
+    InitDebugProperties(debugVal);
+    // Different logic for Prefix Launch of this versus shortcut; is that intentional?
+    // shortcut launch doesn't check env for this or PROTON_USE_XALIA beforehand
+    bool isHiDraw  = PrefixSetting(NeroConfig::Proton::allowHidraw, *this).toBool();
+    if (isHiDraw) {
+        // only add if env doesn't have it already
+        if (!env.contains(CliArgs::Proton::hiDraw)) {
+            env.insert(CliArgs::Proton::hiDraw, TRUE);
         }
-        break;
-    case NeroConstant::Fsync:
-        env.insert("PROTON_NO_NTSYNC", "1");
-        break;
-    case NeroConstant::NoSync:
-        env.insert("PROTON_NO_ESYNC", "1");
-    case NeroConstant::Esync:
-        env.insert("PROTON_NO_NTSYNC", "1");
-        env.insert("PROTON_NO_FSYNC", "1");
-        break;
-    default: break;
+    } else {
+        // Forces controllers (that otherwise get preferred by hidraw by default) to go through SDL backend instead
+        env.insert(CliArgs::Proton::preferSdl, TRUE);
     }
-
-    switch(settings->value("PrefixSettings/DebugOutput").toInt()) {
-    case NeroConstant::DebugDisabled:
-        break;
-    case NeroConstant::DebugFull:
-        loggingEnabled = true;
-        env.insert("WINEDEBUG", "+loaddll,debugstr,mscoree,seh");
-        break;
-    case NeroConstant::DebugLoadDLL:
-        loggingEnabled = true;
-        env.insert("WINEDEBUG", "+loaddll");
-        break;
+    bool isUsingXalia = PrefixSetting(NeroConfig::Proton::useXalia, *this).toBool();
+    QString xalia = CliArgs::Proton::useXalia;
+    bool hasXaliaEnvArg = env.contains(xalia);
+    if (!hasXaliaEnvArg) {
+        isUsingXalia
+            ? env.insert(xalia, TRUE)
+            : env.insert(xalia, FALSE);
     }
+   
+    bool isWaylandEnv = env.contains(CliArgs::waylandDisplay)
+            ? !env.value(CliArgs::waylandDisplay).isEmpty()
+            : false;
 
-    if(settings->value("PrefixSettings/AllowHidraw").toBool()) {
-        if(!env.contains("PROTON_ENABLE_HIDRAW")) env.insert("PROTON_ENABLE_HIDRAW", "1");
-    // Forces controllers (that otherwise get preferred by hidraw by default) to go through SDL backend instead
-    } else env.insert("PROTON_PREFER_SDL", "1");
-
-    if(settings->value("PrefixSettings/UseXalia").toBool()) {
-        if(!env.contains("PROTON_USE_XALIA")) env.insert("PROTON_USE_XALIA", "1");
-    } else if(!env.contains("PROTON_USE_XALIA")) env.insert("PROTON_USE_XALIA", "0");
-
-    if(env.contains("WAYLAND_DISPLAY") && !env.value("WAYLAND_DISPLAY").isEmpty()) {
-        if(settings->value("PrefixSettings/UseWayland").toBool()) {
-            env.insert("PROTON_ENABLE_WAYLAND", "1");
-            if(settings->value("PrefixSettings/UseHDR").toBool())
-                env.insert("PROTON_ENABLE_HDR", "1");
+    bool hasWayland = PrefixSetting(NeroConfig::Proton::useWayland, *this).hasSetting();
+    if (isWaylandEnv && hasWayland) {
+        env.insert(CliArgs::Proton::enableWayland, TRUE);
+        bool isHdrEnabled = PrefixSetting(NeroConfig::Proton::useHdr, *this).toBool();
+        if (isHdrEnabled) {
+            env.insert(CliArgs::Proton::useHdr, TRUE);
         }
     }
 
-    QStringList arguments;
-    arguments.append(NeroFS::GetUmU());
+    QStringList arguments = {NeroFS::GetUmU()};
 
     // Proton/umu should be able to translate Windows-type paths on its own, no conversion needed
     arguments.append(path);
 
     if(!args.isEmpty())
         arguments.append(args);
-
-    if(settings->value("PrefixSettings/Gamemode").toBool())
-        arguments.prepend("gamemoderun");
-
-    switch(settings->value("PrefixSettings/ScalingMode").toInt()) {
-    case NeroConstant::ScalingIntegerScale:
-        env.insert("WINE_FULLSCREEN_INTEGER_SCALING", "1");
-        break;
-    case NeroConstant::ScalingFSRperformance:
-        env.insert("WINE_FULLSCREEN_FSR", "1");
-        env.insert("WINE_FULLSCREEN_FSR_STRENGTH", "0");
-        break;
-    case NeroConstant::ScalingFSRbalanced:
-        env.insert("WINE_FULLSCREEN_FSR", "1");
-        env.insert("WINE_FULLSCREEN_FSR_STRENGTH", "1");
-        break;
-    case NeroConstant::ScalingFSRquality:
-        env.insert("WINE_FULLSCREEN_FSR", "1");
-        env.insert("WINE_FULLSCREEN_FSR_STRENGTH", "2");
-        break;
-    case NeroConstant::ScalingFSRhighquality:
-        env.insert("WINE_FULLSCREEN_FSR", "1");
-        env.insert("WINE_FULLSCREEN_FSR_STRENGTH", "3");
-        break;
-    case NeroConstant::ScalingFSRhigherquality:
-        env.insert("WINE_FULLSCREEN_FSR", "1");
-        env.insert("WINE_FULLSCREEN_FSR_STRENGTH", "4");
-        break;
-    case NeroConstant::ScalingFSRhighestquality:
-        env.insert("WINE_FULLSCREEN_FSR", "1");
-        env.insert("WINE_FULLSCREEN_FSR_STRENGTH", "5");
-        break;
-    case NeroConstant::ScalingFSRcustom:
-        env.insert("WINE_FULLSCREEN_FSR", "1");
-        env.insert("WINE_FULLSCREEN_FSR_CUSTOM_MODE", QString("%1x%2").arg(settings->value("PrefixSettings/FSRcustomResW").toString(),
-                                                                           settings->value("PrefixSettings/FSRcustomResH").toString()));
-        break;
-    case NeroConstant::ScalingGamescopeFullscreen:
-        arguments.prepend("--");
-        arguments.prepend("-f");
-        if(settings->value("PrefixSettings/GamescopeOutResH").toInt()) {
-            arguments.prepend(settings->value("PrefixSettings/GamescopeOutResH").toString());
-            arguments.prepend("-h");
-        }
-        if(settings->value("PrefixSettings/GamescopeOutResW").toInt()) {
-            arguments.prepend(settings->value("PrefixSettings/GamescopeOutResW").toString());
-            arguments.prepend("-w");
-        }
-        if(settings->value("PrefixSettings/GamescopeFilter").toInt()) {
-            switch(settings->value("PrefixSettings/GamescopeFilter").toInt()) {
-            case NeroConstant::GSfilterNearest:
-                arguments.prepend("nearest"); break;
-            case NeroConstant::GSfilterFSR:
-                arguments.prepend("fsr"); break;
-            case NeroConstant::GSfilterNLS:
-                arguments.prepend("nis"); break;
-            case NeroConstant::GSfilterPixel:
-                arguments.prepend("pixel"); break;
-            }
-            arguments.prepend("-F");
-        }
-        if(settings->value("PrefixSettings/LimitFPS").toInt()) {
-            arguments.prepend(QByteArray::number(settings->value("PrefixSettings/LimitFPS").toInt()));
-            arguments.prepend("--framerate-limit");
-        }
-        arguments.prepend("--adaptive-sync");
-        arguments.prepend("gamescope");
-        break;
-    case NeroConstant::ScalingGamescopeBorderless:
-        arguments.prepend("--");
-        arguments.prepend("-b");
-    case NeroConstant::ScalingGamescopeWindowed:
-        if(!arguments.contains("--")) arguments.prepend("--");
-        if(settings->value("PrefixSettings/GamescopeWinResH").toInt()) {
-            arguments.prepend(settings->value("PrefixSettings/GamescopeWinResH").toString());
-            arguments.prepend("-H");
-        }
-        if(settings->value("PrefixSettings/GamescopeWinResW").toInt()) {
-            arguments.prepend(settings->value("PrefixSettings/GamescopeWinResW").toString());
-            arguments.prepend("-W");
-        }
-        if(settings->value("PrefixSettings/GamescopeOutResH").toInt()) {
-            arguments.prepend(settings->value("PrefixSettings/GamescopeOutResH").toString());
-            arguments.prepend("-h");
-        }
-        if(settings->value("PrefixSettings/GamescopeOutResW").toInt()) {
-            arguments.prepend(settings->value("PrefixSettings/GamescopeOutResW").toString());
-            arguments.prepend("-w");
-        }
-        if(settings->value("PrefixSettings/GamescopeFilter").toInt()) {
-            switch(settings->value("PrefixSettings/GamescopeFilter").toInt()) {
-            case NeroConstant::GSfilterNearest:
-                arguments.prepend("nearest"); break;
-            case NeroConstant::GSfilterFSR:
-                arguments.prepend("fsr"); break;
-            case NeroConstant::GSfilterNLS:
-                arguments.prepend("nis"); break;
-            case NeroConstant::GSfilterPixel:
-                arguments.prepend("pixel"); break;
-            }
-            arguments.prepend("-F");
-        }
-        if(settings->value("PrefixSettings/LimitFPS").toInt()) {
-            arguments.prepend(QByteArray::number(settings->value("PrefixSettings/LimitFPS").toInt()));
-            arguments.prepend("--framerate-limit");
-        }
-        arguments.prepend("--adaptive-sync");
-        arguments.prepend("gamescope");
-        break;
+    bool gamemodeEnabled = PrefixSetting(NeroConfig::gamemode, *this).toBool();
+    if(gamemodeEnabled) {
+        arguments.prepend(CliArgs::gamemoderun);
     }
+    int scalingMode = PrefixSetting(NeroConfig::Gamescope::scalingMode, *this).toInt();
+    int fpsLimit = PrefixSetting(NeroConfig::limitFps, *this).toInt();
+    SetScalingMode(scalingMode, fpsLimit, isPrefixOnly, arguments);
 
-    if(settings->value("PrefixSettings/Mangohud").toBool()) {
-        if(arguments.contains("gamescope"))
-            arguments.insert(1, "--mangoapp");
-        else if(!env.contains("MANGOHUD")) arguments.prepend("mangohud");
+    bool mangoHudEnabled = PrefixSetting(NeroConfig::mangohud, *this).toBool();
+    if(mangoHudEnabled) {
+        if(arguments.contains(CliArgs::Gamescope::name)) {
+            arguments.insert(1, CliArgs::mangoapp);
+        }
+        else if(!env.contains(NeroConfig::mangohud.toUpper())) {
+            arguments.prepend(NeroConfig::mangohud.toLower());
+        }
     }
-
     runner.setProcessEnvironment(env);
-    if(path.startsWith('/') || path.startsWith("~/") || path.startsWith("./"))
+    if(path.startsWith('/') || path.startsWith("~/") || path.startsWith("./")) {
         runner.setWorkingDirectory(path.left(path.lastIndexOf("/")).replace("C:", NeroFS::GetPrefixesPath()->canonicalPath()+'/'+NeroFS::GetCurrentPrefix()+"/drive_c/"));
+    }
 
     QString command = arguments.takeFirst();
 
-    QDir logsDir(NeroFS::GetPrefixesPath()->path()+'/'+NeroFS::GetCurrentPrefix());
-    if(!logsDir.exists(".logs"))
-        logsDir.mkdir(".logs");
-    logsDir.cd(".logs");
-
-    QFile log(logsDir.path()+'/'+path.mid(path.lastIndexOf('/')+1)+".txt");
-    if(loggingEnabled) {
-        log.open(QIODevice::WriteOnly);
-        log.resize(0);
-        log.write("Current running environment:\n");
-        log.write(runner.environment().join('\n').toLocal8Bit());
-        log.write("\n\nRunning command:\n" + command.toLocal8Bit() + ' ' + arguments.join(' ').toLocal8Bit() + '\n');
-        log.write("==============================================\n");
-    }
-
+    QString launchArgs = arguments.join(' ');
+    QString logFile = '/' % path.mid(path.lastIndexOf('/')+1) % ".txt";
+    QFileInfo logInfo = InitLogging(LaunchInfo(prefixPath, logFile, command, launchArgs), runner.environment());
     runner.start(command, arguments);
     runner.waitForStarted(-1);
-
+    QFile log = QFile(logInfo.absoluteFilePath());
     WaitLoop(runner, log);
 
     return runner.exitCode();
 }
 
+QStringList NeroRunner::SetScalingMode(int scalingMode, int fpsLimit, bool isPrefixOnly, QStringList arguments) {
+    scalingMode = ConvertScaling(scalingMode); //convert to more sensible ints for this method
+    switch(scalingMode) {
+    case NeroConfig::Gamescope::Scaling::IntegerScale:
+        env.insert(CliArgs::Gamescope::fsrScaling, TRUE);
+        env.insert(CliArgs::Gamescope::intScaling, TRUE);
+        break;
+    case NeroConfig::Gamescope::Scaling::FsrPerformance:
+    case NeroConfig::Gamescope::Scaling::FsrBalanced:
+    case NeroConfig::Gamescope::Scaling::FsrQuality:
+    case NeroConfig::Gamescope::Scaling::FsrHighQuality:
+    case NeroConfig::Gamescope::Scaling::FsrHigherQuality:
+    case NeroConfig::Gamescope::Scaling::FsrHighestQuality:
+        env.insert(CliArgs::Gamescope::fsrScaling, TRUE);
+        env.insert(CliArgs::Gamescope::fsrStrength, QString::number(scalingMode));
+        break;
+    case NeroConfig::Gamescope::Scaling::FsrCustom: {
+        env.insert(CliArgs::Gamescope::fsrScaling, TRUE);
+        QString fsrHeight = isPrefixOnly
+            ? PrefixSetting(NeroConfig::Gamescope::fsrCustomH, *this).toString()
+            : NeroSetting(NeroConfig::Gamescope::fsrCustomH, *this).toString();
+        QString fsrWidth = isPrefixOnly
+            ? PrefixSetting(NeroConfig::Gamescope::fsrCustomW, *this).toString()
+            : NeroSetting(NeroConfig::Gamescope::fsrCustomW, *this).toString();
+
+        env.insert(CliArgs::Gamescope::fsrCustom, fsrWidth % 'x' % fsrHeight);
+        break;
+    }
+    case NeroConfig::Gamescope::Scaling::Fullscreen: {
+        arguments.prepend(CliArgs::doubleDash);
+        arguments.prepend(CliArgs::Gamescope::fullscreen);
+        QMap<QString, QString> resMap{
+            {CliArgs::Gamescope::height, NeroConfig::Gamescope::outputResH},
+            {CliArgs::Gamescope::width, NeroConfig::Gamescope::outputResW}
+        };
+        for(auto i = resMap.begin(), end = resMap.end(); i != end; i++) {
+            QString setting = i.key();
+            auto s = isPrefixOnly
+                         ? PrefixSetting("", *this)
+                         : NeroSetting (setting, *this);
+            if (s.toInt()) {
+                arguments.prepend(s.toString());
+                QString arg = i.value();
+                arguments.prepend(arg);
+            }
+        }
+        int filterVal = NeroSetting(NeroConfig::Gamescope::filter, *this).toInt();
+        if(filterVal) {
+            arguments.prepend(GamescopeFilterType(filterVal));
+            arguments.prepend(CliArgs::Gamescope::filter);
+        }
+        if(fpsLimit && !isPrefixOnly) {
+            QByteArray a = QByteArray::number(fpsLimit);
+            arguments.prepend(a);
+            arguments.prepend(CliArgs::Gamescope::fpsLimit);
+            arguments.prepend(a);
+            arguments.prepend(CliArgs::Gamescope::unfocusedFpsLimit);
+        }
+        //arguments.prepend("--adaptive-sync");
+        arguments.prepend(CliArgs::Gamescope::name);
+        break;
+    }
+    case NeroConfig::Gamescope::Scaling::Borderless:
+        arguments.prepend(CliArgs::doubleDash);
+        arguments.prepend(CliArgs::Gamescope::borderless);
+    case NeroConfig::Gamescope::Scaling::Windowed: {
+        if(!arguments.contains(CliArgs::doubleDash)) {
+            arguments.prepend(CliArgs::doubleDash);
+        }
+        QMap<QString, QString> resMap{
+            {CliArgs::Gamescope::windowedHeight, NeroConfig::Gamescope::windowedResH},
+            {CliArgs::Gamescope::windowedWidth, NeroConfig::Gamescope::windowedResW},
+            {CliArgs::Gamescope::height, NeroConfig::Gamescope::outputResH},
+            {CliArgs::Gamescope::width, NeroConfig::Gamescope::outputResW}
+        };
+        for(auto i = resMap.begin(), end = resMap.end(); i != end; i++) {
+            QString setting = i.key();
+            NeroSetting s (setting, *this);
+            if (s.toInt()) {
+                arguments.prepend(s.toString());
+                QString arg = i.value();
+                arguments.prepend(arg);
+            }
+        }
+        int filterVal = NeroSetting(NeroConfig::Gamescope::filter, *this).toInt();
+        if(filterVal) {
+            arguments.prepend(GamescopeFilterType(filterVal));
+            arguments.prepend(CliArgs::Gamescope::filter);
+        }
+        if(fpsLimit) {
+            QByteArray a = QByteArray::number(fpsLimit);
+            arguments.prepend(a);
+            arguments.prepend(CliArgs::Gamescope::fpsLimit);
+            arguments.prepend(a);
+            arguments.prepend(CliArgs::Gamescope::unfocusedFpsLimit);
+        }
+        //arguments.prepend("--adaptive-sync");
+        arguments.prepend(CliArgs::Gamescope::name);
+        break;
+    }
+    case NeroConfig::Gamescope::Scaling::Normal:
+        break;
+    }
+    return arguments;
+}
+
+QMap<QString, QString> NeroRunner::InsertArgs(QMap<QString, QString> properties, bool isPrefixOnly) {
+    for (auto i = properties.begin(), end = properties.end(); i != end; i++) {
+        QString neroOption = i.key();
+        bool isValid = isPrefixOnly
+            ? PrefixSetting(neroOption, *this).hasSettingAndToBool()
+            : NeroSetting(neroOption, *this).hasSettingAndToBool();
+        if (isValid) {
+            QString cliArg = i.value();
+            env.insert(cliArg, TRUE);
+        }
+    }
+    properties.clear();
+    return properties;
+}
+
+QFileInfo NeroRunner::InitLogging(LaunchInfo launch, QStringList env) {
+    QDir logsDir(launch.prefixPath);
+    if(!logsDir.exists(Logs::logDirName))
+        logsDir.mkdir(Logs::logDirName);
+    logsDir.cd(Logs::logDirName);
+    QFile log = QFile(logsDir.path() % launch.logFile);
+    if(loggingEnabled) {
+        bool isOpen = log.open(QIODevice::WriteOnly);
+        if (!isOpen) {
+            QFileInfo info(log);
+            return info;
+        }
+        log.resize(0);
+        log.write(Logs::currentlyRunningEnv.toLocal8Bit());
+        log.write(env.join('\n').toLocal8Bit());
+        log.write(Logs::runningCommand.toLocal8Bit() % launch.command.toLocal8Bit() % ' ' % launch.arguments.toLocal8Bit() % Logs::newLine.toLocal8Bit());
+        log.write(Logs::blankLine.toLocal8Bit());
+    }
+    QFileInfo info(log);
+    log.close();
+    return info;
+}
+
+QStringList NeroRunner::SetGamescopeArgs(QMap<QString, QString> resMap, QStringList arguments, int fpsLimit, bool isPrefixOnly) {
+    for(auto i = resMap.begin(), end = resMap.end(); i != end; i++) {
+        QString setting = i.key();
+        NeroSetting s (setting, *this);
+        if (s.toInt()) {
+            arguments.prepend(s.toString());
+            arguments.prepend(i.value());
+        }
+    }
+    int filterVal = NeroSetting(NeroConfig::Gamescope::filter, *this).toInt();
+    if(filterVal) {
+        arguments.prepend(GamescopeFilterType(filterVal));
+        arguments.prepend(CliArgs::Gamescope::filter);
+    }
+    if(fpsLimit) {
+        QByteArray a = QByteArray::number(fpsLimit);
+        arguments.prepend(a);
+        arguments.prepend(CliArgs::Gamescope::fpsLimit);
+        arguments.prepend(a);
+        arguments.prepend(CliArgs::Gamescope::unfocusedFpsLimit);
+    }
+    //This is disabled for shortcut runner, but enabled for prefix launches.
+    if (isPrefixOnly) {
+        arguments.prepend("--adaptive-sync");
+    }
+    arguments.prepend(CliArgs::Gamescope::name);
+    return arguments;
+}
+void NeroRunner::SetSyncMode(QString protonRunner, int syncType) {
+    // ntsync SHOULD be better in all scenarios compared to other sync options, but requires kernel 6.14+ and GE-Proton10-9+
+        // For older Protons, they should be safely ignoring this and fallback to fsync anyways.
+        // Newer protons than GE10-9 should enable this automatically from its end, and doesn't require WOW64
+        // (and currently, WOW64 seems problematic for some fringe cases, like TeknoParrot's BudgieLoader not spawning a window)
+
+    switch(syncType) {
+        case NeroConstant::NTsync:
+            if(protonRunner == ge109) {
+                env.insert(CliArgs::Proton::Sync::ntSync, TRUE);
+                env.insert(CliArgs::useWow64, TRUE);
+            }
+            break;
+        case NeroConstant::Fsync:
+            env.insert(CliArgs::Proton::Sync::noNtSync, TRUE);
+            break;
+        case NeroConstant::NoSync:
+            env.insert(CliArgs::Proton::Sync::noEsync, TRUE);
+        case NeroConstant::Esync:
+            env.insert(CliArgs::Proton::Sync::noNtSync, TRUE);
+            env.insert(CliArgs::Proton::Sync::noFsync, TRUE);
+            break;
+        default:
+            break;
+    }
+}
+
+// This is really REALLY jank but i dont want to fuck with anything outside this class.
+int NeroRunner::ConvertScaling(int scalingMode) {
+    int convertedIntegerScaling = 7;
+    switch(scalingMode) {
+        case NeroConstant::ScalingIntegerScale:
+            return convertedIntegerScaling;
+        case NeroConstant::ScalingNormal:
+        case NeroConstant::ScalingFSRperformance:
+        case NeroConstant::ScalingFSRbalanced:
+        case NeroConstant::ScalingFSRquality:
+        case NeroConstant::ScalingFSRhighquality:
+        case NeroConstant::ScalingFSRhigherquality:
+        case NeroConstant::ScalingFSRhighestquality:
+            return --scalingMode; //decrement all FSR Scaling & Normal Scaling
+        default:
+            return scalingMode;
+    }
+}
+
 void NeroRunner::WaitLoop(QProcess &runner, QFile &log)
 {
     QByteArray stdout;
-
+    log.open(QIODevice::WriteOnly, QIODevice::Append);
     while(runner.state() != QProcess::NotRunning) {
         if(!halt) {
             runner.waitForReadyRead(1000);
@@ -859,8 +663,23 @@ void NeroRunner::WaitLoop(QProcess &runner, QFile &log)
             log.write(stdout);
     }
 
-    if(loggingEnabled)
+    if(loggingEnabled && log.isOpen())
         log.close();
+}
+
+void NeroRunner::InitDebugProperties(int value) {
+    switch (value) {
+        case NeroConstant::DebugDisabled:
+            break;
+        case NeroConstant::DebugFull:
+            loggingEnabled = true;
+            env.insert("WINEDEBUG", "+loaddll,debugstr,mscoree,seh");
+            break;
+        case NeroConstant::DebugLoadDLL:
+            loggingEnabled = true;
+            env.insert("WINEDEBUG", "+loaddll");
+            break;
+    }
 }
 
 void NeroRunner::StopProcess()
