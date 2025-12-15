@@ -129,18 +129,18 @@ int NeroRunner::StartShortcut(const QString &hash, const bool &prefixAlreadyRunn
         env.insert(CliArgs::Proton::Nvidia::forceNvapi, TRUE);
     }
     QMap<QString, QString> boolOptions{
-        {NeroConfig::limitGlExtensions, ProtonArgs::oldGl},
-        {NeroConfig::vkCapture, ProtonArgs::obsVkCapture},
-        {NeroConfig::forceIGpu, ProtonArgs::forceIgpu},
-        {NeroConfig::dlssIndicator, ProtonArgs::dlssIndicator},
-        {NeroConfig::nvidiaLibs, ProtonArgs::nvidiaLibs},
-        {NeroConfig::fsr4Upgrade, ProtonArgs::fsr4Upgrade},
-        {NeroConfig::fsr4Rdna3, ProtonArgs::fsr4Rdna3},
-        {NeroConfig::fsr4Indicator, ProtonArgs::fsr4Indicator},
-        {NeroConfig::xessUpgrade, ProtonArgs::xessUpgrade},
-        {NeroConfig::localShaderCache, ProtonArgs::localShaderCache},
-        {NeroConfig::noWindowDecoration, ProtonArgs::noWindowDecoration},
-        {NeroConfig::noSteamInput, ProtonArgs::noSteamInput}
+        {NeroConfig::Proton::limitGlExtensions, CliArgs::Proton::oldGl},
+        {NeroConfig::vkCapture, CliArgs::obsVkCapture},
+        {NeroConfig::forceIGpu, CliArgs::forceIgpu},
+        {NeroConfig::dlssIndicator, CliArgs::Proton::Nvidia::dlssIndicator},
+        {NeroConfig::nvidiaLibs, CliArgs::Proton::Nvidia::libs},
+        {NeroConfig::fsr4Upgrade, CliArgs::Proton::Amd::fsr4Upgrade},
+        {NeroConfig::fsr4Rdna3, CliArgs::Proton::Amd::fsr4Rdna3},
+        {NeroConfig::fsr4Indicator, CliArgs::Proton::Amd::fsr4Indicator},
+        {NeroConfig::xessUpgrade, CliArgs::Proton::Intel::xessUpgrade},
+        {NeroConfig::localShaderCache, CliArgs::Proton::localShaderCache},
+        {NeroConfig::noWindowDecoration, CliArgs::Proton::noWindowDecoration},
+        {NeroConfig::noSteamInput, CliArgs::Proton::noSteamInput}
     };
     boolOptions = InsertArgs(boolOptions, false);
     int fpsLimit = CombinedSetting(NeroConfig::limitFps, *this).toInt();
@@ -332,22 +332,21 @@ int NeroRunner::StartOnetime(const QString &path, const bool &prefixAlreadyRunni
         env.insert(CliArgs::Proton::dxvkD3D8, TRUE);
     }
     QMap<QString, QString> boolOptions{
-        {NeroConfig::limitGlExtensions, ProtonArgs::oldGl},
-        {NeroConfig::vkCapture, ProtonArgs::obsVkCapture},
-        {NeroConfig::forceIGpu, ProtonArgs::forceIgpu},
-        {NeroConfig::dlssIndicator, ProtonArgs::dlssIndicator},
-        {NeroConfig::nvidiaLibs, ProtonArgs::nvidiaLibs},
-        {NeroConfig::fsr4Upgrade, ProtonArgs::fsr4Upgrade},
-        {NeroConfig::fsr4Rdna3, ProtonArgs::fsr4Rdna3},
-        {NeroConfig::fsr4Indicator, ProtonArgs::fsr4Indicator},
-        {NeroConfig::xessUpgrade, ProtonArgs::xessUpgrade},
-        {NeroConfig::localShaderCache, ProtonArgs::localShaderCache},
-        {NeroConfig::noWindowDecoration, ProtonArgs::noWindowDecoration},
-        {NeroConfig::noSteamInput, ProtonArgs::noSteamInput}
-        // {NeroConfig::}
+        {NeroConfig::Proton::limitGlExtensions, CliArgs::Proton::oldGl},
+        {NeroConfig::vkCapture, CliArgs::obsVkCapture},
+        {NeroConfig::forceIGpu, CliArgs::forceIgpu},
+        {NeroConfig::dlssIndicator, CliArgs::Proton::Nvidia::dlssIndicator},
+        {NeroConfig::nvidiaLibs, CliArgs::Proton::Nvidia::libs},
+        {NeroConfig::fsr4Upgrade, CliArgs::Proton::Amd::fsr4Upgrade},
+        {NeroConfig::fsr4Rdna3, CliArgs::Proton::Amd::fsr4Rdna3},
+        {NeroConfig::fsr4Indicator, CliArgs::Proton::Amd::fsr4Indicator},
+        {NeroConfig::xessUpgrade, CliArgs::Proton::Intel::xessUpgrade},
+        {NeroConfig::localShaderCache, CliArgs::Proton::localShaderCache},
+        {NeroConfig::noWindowDecoration, CliArgs::Proton::noWindowDecoration},
+        {NeroConfig::noSteamInput, CliArgs::Proton::noSteamInput}
     };
     bool isPrefixOnly = true;
-    simpleBoolSettings = InsertArgs(boolOptions, isPrefixOnly);
+    boolOptions = InsertArgs(boolOptions, isPrefixOnly);
     int fileSyncMode = PrefixSetting(NeroConfig::fileSyncMode, *this).toInt();
     SetSyncMode(protonRunner, fileSyncMode);
     int debugVal = PrefixSetting(NeroConfig::debugOutput, *this).toInt();
