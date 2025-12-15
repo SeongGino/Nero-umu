@@ -129,9 +129,18 @@ int NeroRunner::StartShortcut(const QString &hash, const bool &prefixAlreadyRunn
         env.insert(CliArgs::Proton::Nvidia::forceNvapi, TRUE);
     }
     QMap<QString, QString> boolOptions{
-        {NeroConfig::Proton::limitGlExtensions, CliArgs::Proton::oldGl},
-        {NeroConfig::vkCapture, CliArgs::obsVkCapture},
-        {NeroConfig::forceIGpu, CliArgs::forceIgpu},
+        {NeroConfig::limitGlExtensions, ProtonArgs::oldGl},
+        {NeroConfig::vkCapture, ProtonArgs::obsVkCapture},
+        {NeroConfig::forceIGpu, ProtonArgs::forceIgpu},
+        {NeroConfig::dlssIndicator, ProtonArgs::dlssIndicator},
+        {NeroConfig::nvidiaLibs, ProtonArgs::nvidiaLibs},
+        {NeroConfig::fsr4Upgrade, ProtonArgs::fsr4Upgrade},
+        {NeroConfig::fsr4Rdna3, ProtonArgs::fsr4Rdna3},
+        {NeroConfig::fsr4Indicator, ProtonArgs::fsr4Indicator},
+        {NeroConfig::xessUpgrade, ProtonArgs::xessUpgrade},
+        {NeroConfig::localShaderCache, ProtonArgs::localShaderCache},
+        {NeroConfig::noWindowDecoration, ProtonArgs::noWindowDecoration},
+        {NeroConfig::noSteamInput, ProtonArgs::noSteamInput}
     };
     boolOptions = InsertArgs(boolOptions, false);
     int fpsLimit = CombinedSetting(NeroConfig::limitFps, *this).toInt();
@@ -322,14 +331,23 @@ int NeroRunner::StartOnetime(const QString &path, const bool &prefixAlreadyRunni
     } else if(!disableD8Vk) {
         env.insert(CliArgs::Proton::dxvkD3D8, TRUE);
     }
-    QMap<QString, QString> simpleBoolSettings {
-        {NeroConfig::enableNvApi, CliArgs::Proton::Nvidia::forceNvapi},
-        {NeroConfig::Proton::limitGlExtensions, CliArgs::Proton::oldGl},
-        {NeroConfig::vkCapture, CliArgs::obsVkCapture},
-        {NeroConfig::forceIGpu, CliArgs::forceIgpu}
+    QMap<QString, QString> boolOptions{
+        {NeroConfig::limitGlExtensions, ProtonArgs::oldGl},
+        {NeroConfig::vkCapture, ProtonArgs::obsVkCapture},
+        {NeroConfig::forceIGpu, ProtonArgs::forceIgpu},
+        {NeroConfig::dlssIndicator, ProtonArgs::dlssIndicator},
+        {NeroConfig::nvidiaLibs, ProtonArgs::nvidiaLibs},
+        {NeroConfig::fsr4Upgrade, ProtonArgs::fsr4Upgrade},
+        {NeroConfig::fsr4Rdna3, ProtonArgs::fsr4Rdna3},
+        {NeroConfig::fsr4Indicator, ProtonArgs::fsr4Indicator},
+        {NeroConfig::xessUpgrade, ProtonArgs::xessUpgrade},
+        {NeroConfig::localShaderCache, ProtonArgs::localShaderCache},
+        {NeroConfig::noWindowDecoration, ProtonArgs::noWindowDecoration},
+        {NeroConfig::noSteamInput, ProtonArgs::noSteamInput}
+        // {NeroConfig::}
     };
     bool isPrefixOnly = true;
-    simpleBoolSettings = InsertArgs(simpleBoolSettings, isPrefixOnly);
+    simpleBoolSettings = InsertArgs(boolOptions, isPrefixOnly);
     int fileSyncMode = PrefixSetting(NeroConfig::fileSyncMode, *this).toInt();
     SetSyncMode(protonRunner, fileSyncMode);
     int debugVal = PrefixSetting(NeroConfig::debugOutput, *this).toInt();
