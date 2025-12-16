@@ -30,6 +30,8 @@
 #include <QProcess>
 #include <QSpinBox>
 #include <QShortcut>
+#include <QThread>
+#include <QStringBuilder>
 
 #include "../lib/quazip/quazip/quazip.h"
 #include "../lib/quazip/quazip/quazipfile.h"
@@ -42,8 +44,8 @@ NeroPrefixSettingsWindow::NeroPrefixSettingsWindow(QWidget *parent, const QStrin
     ui->setupUi(this);
 
     // shortcut ctrl/cmd + W to close the popup window
-	QShortcut *shortcutClose = new QShortcut(QKeySequence::Close, this);
-	connect(shortcutClose, &QShortcut::activated, this,&NeroPrefixSettingsWindow::close);
+    QShortcut *shortcutClose = new QShortcut(QKeySequence::Close, this);
+    connect(shortcutClose, &QShortcut::activated, this,&NeroPrefixSettingsWindow::close);
 
     boldFont.setBold(true);
 
@@ -102,6 +104,7 @@ NeroPrefixSettingsWindow::NeroPrefixSettingsWindow(QWidget *parent, const QStrin
             winVersionListBackwards.append(ui->winVerBox->itemText(i-1));
     }
 
+
     // FSR scalers are only implem'd in GE-Proton
     if(!ui->prefixRunner->currentText().startsWith("GE-Proton")) {
         SetComboBoxItemEnabled(ui->setScalingBox, NeroConstant::ScalingFSRperformance, false);
@@ -134,8 +137,24 @@ NeroPrefixSettingsWindow::NeroPrefixSettingsWindow(QWidget *parent, const QStrin
     ui->gamescopeSection->setVisible(false);
     ui->goat1->setVisible(false);
     ui->goat2->setVisible(false);
+    //wine CPU topology setup
+    int threads = QThread::idealThreadCount();
+    ui->cpuCount->setMaximum(threads);
+    for (int i = 1; i <= threads; i++) {
+        QString iStr = QString::number(i);
+        QString core = "core" % iStr;
+        QCheckBox* box = new QCheckBox(ui->wineToplogy);
+        box->setObjectName(core);
+        QString prop = "UseCore" % iStr;
+        box->setProperty("isFor", prop);
+        box->setText("Core" % iStr);
+        box->setEnabled(false);
+        ui->wineGrid->addWidget(box);
+    }
 
     LoadSettings();
+
+
 
     dllList = new QCompleter(commonDLLsList);
     ui->dllAdder->setCompleter(dllList);
@@ -173,14 +192,18 @@ NeroPrefixSettingsWindow::NeroPrefixSettingsWindow(QWidget *parent, const QStrin
 
 bool NeroPrefixSettingsWindow::eventFilter(QObject* object, QEvent* event)
 {
-    if(!umuRunning)
-        if(event->type() == QEvent::Enter)
-            if(!object->property("whatsThis").isNull()) {
-                ui->infoText->setText(object->property("whatsThis").toString()),
-                ui->infoBox->setTitle(object->property("accessibleName").toString());
-            }
-
+    //owo whats this
+    bool whatsThisIsNull = !object->property("whatsThis").isNull();
+    bool hasEnterEvent = event->type() == QEvent::Enter;
+    if(!umuRunning && hasEnterEvent && !whatsThisIsNull) {
+        ui->infoText->setText(object->property("whatsThis").toString()),
+        ui->infoBox->setTitle(object->property("accessibleName").toString());
+    }
     return QWidget::eventFilter(object, event);
+}
+
+void NeroPrefixSettingsWindow::WineToplogy() {
+
 }
 
 void NeroPrefixSettingsWindow::showEvent(QShowEvent* event)
@@ -242,10 +265,17 @@ void NeroPrefixSettingsWindow::LoadSettings()
     SetCheckboxState("LimitGLextensions",  ui->toggleLimitGL);
     SetCheckboxState("NoD8VK",             ui->toggleNoD8VK);
     SetCheckboxState("ForceWineD3D",       ui->toggleWineD3D);
+
+    //Experimental
+    int imageReconstructionUpgrade = settings.value("ImageReconstructionUpgrade").toInt();
+    int imageReconstructionIndicator = settings.value("ImageReconstructionIndicator").toInt();
+    ui->imageReconstructionBox->setCurrentIndex(imageReconstructionUpgrade);
+    ui->imageReconstructionIndBox->setCurrentIndex(imageReconstructionIndicator);
     SetCheckboxState("UseWayland",         ui->toggleWayland);
     SetCheckboxState("UseHDR",             ui->toggleWaylandHDR);
     SetCheckboxState("AllowHidraw",        ui->toggleHidraw);
     SetCheckboxState("UseXalia",           ui->toggleXalia);
+    SetCheckboxState("UseNvidiaLibs",      ui->toggleNvidiaLibs);
 
     if(currentShortcutHash.isEmpty()) {
         // for prefix general settings, checkboxes are normal two-state
@@ -664,7 +694,7 @@ void NeroPrefixSettingsWindow::on_prefixInstallDiscordRPC_clicked()
         ui->infoBox->setTitle("");
         ui->infoText->setText(QString("Bridge extraction exited with the error: %1").arg(exeToExtract.errorString()));
     }
-    
+
     enableWidgets(true);
     umuRunning = false;
     NeroPrefixSettingsWindow::blockSignals(false);

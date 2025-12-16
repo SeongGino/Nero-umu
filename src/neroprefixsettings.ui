@@ -2124,7 +2124,7 @@
              <bool>false</bool>
             </property>
             <property name="text">
-             <string>Core 0</string>
+             <string notr="true">Core 0</string>
             </property>
             <property name="useFor" stdset="0">
              <string>core0</string>

@@ -97,7 +97,6 @@ private slots:
 
 private:
     Ui::NeroPrefixSettingsWindow *ui;
-
     void LoadSettings();
     void AddDLL(const QString, const int);
     void StartUmu(const QString, QStringList = {});
@@ -107,9 +106,8 @@ private:
         auto * item = model->item(index);
         item->setEnabled(enabled);
     }
-
     void SetCheckboxState(const QString &, QCheckBox*);
-
+    void WineToplogy();
     QString currentShortcutHash;
 
     QStringList existingShortcuts;
