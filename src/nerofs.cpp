@@ -33,13 +33,12 @@ QDir NeroFS::protonsPath;
 QString NeroFS::currentPrefix;
 QString NeroFS::currentRunner;
 QString NeroFS::currentUMU;
-QSettings NeroFS::managerCfg;
 QStringList NeroFS::currentPrefixOverrides;
 QStringList NeroFS::prefixes;
 QStringList NeroFS::availableProtons;
+QSettings NeroFS::managerCfg(QStandardPaths::writableLocation(QStandardPaths::GenericConfigLocation) + "/Nero-UMU.ini", QSettings::IniFormat);
 
 bool NeroFS::InitPaths() {
-    QSettings managerCfg(QStandardPaths::writableLocation(QStandardPaths::GenericConfigLocation) + "/Nero-UMU.ini", QSettings::IniFormat);
     managerCfg.beginGroup("NeroSettings");
 
     if(managerCfg.value("Home").toString().isEmpty()) {
