@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>666</width>
-    <height>813</height>
+    <height>846</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,11 +16,11 @@
   <property name="modal">
    <bool>true</bool>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout" stretch="5,3,0">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,3,0">
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>3</number>
      </property>
      <widget class="QWidget" name="generalTab">
       <attribute name="icon">
@@ -969,7 +969,7 @@
                <x>0</x>
                <y>0</y>
                <width>600</width>
-               <height>461</height>
+               <height>493</height>
               </rect>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -1211,7 +1211,7 @@
       <attribute name="title">
        <string>Advanced</string>
       </attribute>
-      <layout class="QGridLayout" name="gridLayout_5" rowstretch="0,0,1,0">
+      <layout class="QGridLayout" name="gridLayout_5" rowstretch="0,0,0">
        <item row="2" column="0">
         <widget class="QGroupBox" name="legacyGroup">
          <property name="title">
@@ -1333,6 +1333,135 @@
               <string>Use Legacy Sync only</string>
              </property>
             </item>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QGroupBox" name="runnerGroup">
+         <property name="title">
+          <string>Shortcut Runner Settings</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignmentFlag::AlignCenter</set>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_8" columnstretch="1,0,0">
+          <item row="0" column="2">
+           <widget class="QPushButton" name="preRunButton">
+            <property name="whatsThis">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select a Pre-run Script to run for this Shortcut.&lt;/p&gt;&lt;p&gt;When set, this script will be run whenever this shortcut is started &lt;span style=&quot; font-style:italic;&quot;&gt;before&lt;/span&gt; the Proton runner process. This can be used for setting up other services before the application starts.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="accessibleName">
+             <string>Pre-Run Script</string>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="icon">
+             <iconset theme="document-open"/>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>16</width>
+              <height>16</height>
+             </size>
+            </property>
+            <property name="flat">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLineEdit" name="preRunScriptPath">
+            <property name="whatsThis">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Path to a designated Pre-run Script for this Shortcut.&lt;/p&gt;&lt;p&gt;When set, this script will be run whenever this shortcut is started &lt;span style=&quot; font-style:italic;&quot;&gt;before&lt;/span&gt; the Proton runner process. This can be used for setting up other services before the application starts.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="accessibleName">
+             <string>Pre-Run Script</string>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">color: gray</string>
+            </property>
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+            <property name="placeholderText">
+             <string>Path to a Pre-run Script</string>
+            </property>
+            <property name="isFor" stdset="0">
+             <string>PreRunScript</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLineEdit" name="postRunScriptPath">
+            <property name="whatsThis">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Path to a designated Post-run Script for this Shortcut.&lt;/p&gt;&lt;p&gt;When set, this script will be run whenever this shortcut is started &lt;span style=&quot; font-style:italic;&quot;&gt;after&lt;/span&gt; the Proton runner process. This can be used for cleaning up or closing other process that may have been started for the application, but don't need to be run in perpetuity.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="accessibleName">
+             <string>Post-Run Script</string>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">color: gray</string>
+            </property>
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+            <property name="placeholderText">
+             <string>Path to a Post-run Script</string>
+            </property>
+            <property name="isFor" stdset="0">
+             <string>PostRunScript</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="2">
+           <widget class="QPushButton" name="postRunButton">
+            <property name="whatsThis">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select a Post-run Script to run for this Shortcut.&lt;/p&gt;&lt;p&gt;When set, this script will be run whenever this shortcut is started &lt;span style=&quot; font-style:italic;&quot;&gt;after&lt;/span&gt; the Proton runner process. This can be used for cleaning up or closing other process that may have been started for the application, but don't need to be run in perpetuity.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="accessibleName">
+             <string>Post-Run Script</string>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="icon">
+             <iconset theme="document-open"/>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>16</width>
+              <height>16</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QPushButton" name="preRunClearBtn">
+            <property name="text">
+             <string/>
+            </property>
+            <property name="icon">
+             <iconset theme="edit-clear"/>
+            </property>
+            <property name="flat">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QPushButton" name="postRunClearBtn">
+            <property name="text">
+             <string/>
+            </property>
+            <property name="icon">
+             <iconset theme="edit-clear"/>
+            </property>
+            <property name="flat">
+             <bool>true</bool>
+            </property>
            </widget>
           </item>
          </layout>
@@ -1587,6 +1716,9 @@
             <property name="accessibleName">
              <string>Set Proton/UMU Debug Output</string>
             </property>
+            <property name="sizeAdjustPolicy">
+             <enum>QComboBox::SizeAdjustPolicy::AdjustToContentsOnFirstShow</enum>
+            </property>
             <property name="isFor" stdset="0">
              <string>DebugOutput</string>
             </property>
@@ -1610,145 +1742,166 @@
          </layout>
         </widget>
        </item>
-       <item row="0" column="0">
-        <widget class="QGroupBox" name="runnerGroup">
+      </layout>
+     </widget>
+     <widget class="QWidget" name="experimentalTab">
+      <attribute name="icon">
+       <iconset theme="text-x-log"/>
+      </attribute>
+      <attribute name="title">
+       <string>Experimental</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout_experiment" rowstretch="0,0,0,0,0,0,0">
+       <item row="2" column="0">
+        <widget class="QGroupBox" name="runnerSpecificGroup">
          <property name="title">
-          <string>Shortcut Runner Settings</string>
+          <string>Image Reconstruction</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignmentFlag::AlignCenter</set>
          </property>
-         <layout class="QGridLayout" name="gridLayout_8" columnstretch="1,0,0">
-          <item row="0" column="2">
-           <widget class="QPushButton" name="preRunButton">
-            <property name="whatsThis">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select a Pre-run Script to run for this Shortcut.&lt;/p&gt;&lt;p&gt;When set, this script will be run whenever this shortcut is started &lt;span style=&quot; font-style:italic;&quot;&gt;before&lt;/span&gt; the Proton runner process. This can be used for setting up other services before the application starts.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-            </property>
-            <property name="accessibleName">
-             <string>Pre-Run Script</string>
+         <layout class="QGridLayout" name="RunnerSpecificGroup">
+          <item row="1" column="1">
+           <widget class="QLabel" name="label_10">
+            <property name="layoutDirection">
+             <enum>Qt::LayoutDirection::RightToLeft</enum>
             </property>
             <property name="text">
-             <string/>
+             <string>Image Reconstruction Upgrade Type:</string>
             </property>
-            <property name="icon">
-             <iconset theme="document-open"/>
+            <property name="buddy">
+             <cstring>imageReconstructionBox</cstring>
             </property>
-            <property name="iconSize">
-             <size>
-              <width>16</width>
-              <height>16</height>
-             </size>
-            </property>
-            <property name="flat">
+           </widget>
+          </item>
+          <item row="2" column="2">
+           <widget class="QComboBox" name="imageReconstructionIndBox">
+            <property name="editable">
              <bool>false</bool>
             </property>
-           </widget>
-          </item>
-          <item row="0" column="0">
-           <widget class="QLineEdit" name="preRunScriptPath">
-            <property name="whatsThis">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Path to a designated Pre-run Script for this Shortcut.&lt;/p&gt;&lt;p&gt;When set, this script will be run whenever this shortcut is started &lt;span style=&quot; font-style:italic;&quot;&gt;before&lt;/span&gt; the Proton runner process. This can be used for setting up other services before the application starts.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-            </property>
-            <property name="accessibleName">
-             <string>Pre-Run Script</string>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">color: gray</string>
-            </property>
-            <property name="readOnly">
-             <bool>true</bool>
-            </property>
             <property name="placeholderText">
-             <string>Path to a Pre-run Script</string>
+             <string>None</string>
             </property>
             <property name="isFor" stdset="0">
-             <string>PreRunScript</string>
+             <string>ImageReconstructionIndicator</string>
             </property>
+            <item>
+             <property name="text">
+              <string>None</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>FSR</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>DLSS</string>
+             </property>
+            </item>
            </widget>
           </item>
-          <item row="1" column="0">
-           <widget class="QLineEdit" name="postRunScriptPath">
-            <property name="whatsThis">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Path to a designated Post-run Script for this Shortcut.&lt;/p&gt;&lt;p&gt;When set, this script will be run whenever this shortcut is started &lt;span style=&quot; font-style:italic;&quot;&gt;after&lt;/span&gt; the Proton runner process. This can be used for cleaning up or closing other process that may have been started for the application, but don't need to be run in perpetuity.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <item row="2" column="0">
+           <spacer name="horizontalSpacer_21">
+            <property name="orientation">
+             <enum>Qt::Orientation::Horizontal</enum>
             </property>
-            <property name="accessibleName">
-             <string>Post-Run Script</string>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">color: gray</string>
-            </property>
-            <property name="readOnly">
-             <bool>true</bool>
-            </property>
-            <property name="placeholderText">
-             <string>Path to a Post-run Script</string>
-            </property>
-            <property name="isFor" stdset="0">
-             <string>PostRunScript</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="2">
-           <widget class="QPushButton" name="postRunButton">
-            <property name="whatsThis">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select a Post-run Script to run for this Shortcut.&lt;/p&gt;&lt;p&gt;When set, this script will be run whenever this shortcut is started &lt;span style=&quot; font-style:italic;&quot;&gt;after&lt;/span&gt; the Proton runner process. This can be used for cleaning up or closing other process that may have been started for the application, but don't need to be run in perpetuity.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-            </property>
-            <property name="accessibleName">
-             <string>Post-Run Script</string>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="icon">
-             <iconset theme="document-open"/>
-            </property>
-            <property name="iconSize">
+            <property name="sizeHint" stdset="0">
              <size>
-              <width>16</width>
-              <height>16</height>
+              <width>40</width>
+              <height>20</height>
              </size>
             </property>
-           </widget>
+           </spacer>
           </item>
-          <item row="0" column="1">
-           <widget class="QPushButton" name="preRunClearBtn">
+          <item row="2" column="1">
+           <widget class="QLabel" name="imageReconstructionLabel">
             <property name="text">
-             <string/>
+             <string>Image Reconstruction Indicator:</string>
             </property>
-            <property name="icon">
-             <iconset theme="edit-clear"/>
-            </property>
-            <property name="flat">
-             <bool>true</bool>
+            <property name="buddy">
+             <cstring>imageReconstructionIndBox</cstring>
             </property>
            </widget>
           </item>
-          <item row="1" column="1">
-           <widget class="QPushButton" name="postRunClearBtn">
-            <property name="text">
-             <string/>
+          <item row="2" column="3">
+           <spacer name="horizontalSpacer_22">
+            <property name="orientation">
+             <enum>Qt::Orientation::Horizontal</enum>
             </property>
-            <property name="icon">
-             <iconset theme="edit-clear"/>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
             </property>
-            <property name="flat">
-             <bool>true</bool>
+           </spacer>
+          </item>
+          <item row="1" column="2">
+           <widget class="QComboBox" name="imageReconstructionBox">
+            <property name="editable">
+             <bool>false</bool>
             </property>
+            <property name="placeholderText">
+             <string>None</string>
+            </property>
+            <property name="isFor" stdset="0">
+             <string>ImageReconstructionUpgrade</string>
+            </property>
+            <item>
+             <property name="text">
+              <string>None</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>FSR4</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>FSR4 (RDNA 3)</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>DLSS</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>XESS</string>
+             </property>
+            </item>
            </widget>
           </item>
          </layout>
         </widget>
        </item>
-       <item row="3" column="0">
-        <widget class="QGroupBox" name="experimentalGroup">
+       <item row="0" column="0">
+        <widget class="QGroupBox" name="inputGroup">
          <property name="title">
-          <string>Experimental</string>
+          <string>Inputs</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignmentFlag::AlignCenter</set>
          </property>
          <layout class="QGridLayout" name="gridLayout_11">
-          <item row="0" column="3">
+          <item row="0" column="0">
+           <spacer name="horizontalSpacer_19">
+            <property name="orientation">
+             <enum>Qt::Orientation::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="0" column="4">
            <spacer name="horizontalSpacer_20">
             <property name="orientation">
              <enum>Qt::Orientation::Horizontal</enum>
@@ -1762,6 +1915,99 @@
            </spacer>
           </item>
           <item row="0" column="2">
+           <widget class="QCheckBox" name="toggleXalia">
+            <property name="whatsThis">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set whether or not to enable Proton's &lt;a href=&quot;https://github.com/madewokherd/xalia&quot;&gt;&lt;span style=&quot; font-style:italic; text-decoration: underline; color:#8ab4f8;&quot;&gt;Xalia&lt;/span&gt;&lt;/a&gt; integration for built-in Gamepad Navigation in normal Windows dialogs.&lt;/p&gt;&lt;p&gt;Xalia allows for selecting options in normal Windows dialog popups or launchers that otherwise doesn't have any integration with controllers. This can be a very useful accessibility feature. However, Xalia has a hard dependency on &lt;span style=&quot; font-weight:700; font-style:italic;&quot;&gt;.NET 4.8&lt;/span&gt; which, by default, relies on Proton's &lt;span style=&quot; font-style:italic;&quot;&gt;Mono&lt;/span&gt; runtime; so if any dotnet Winetricks verb has been installed that is &lt;span style=&quot; font-style:italic;&quot;&gt;not &lt;/span&gt;&lt;span style=&quot; font-family:'Iosevka Extended'; font-weight:700;&quot;&gt;dotnet48&lt;/span&gt;, Proton will spawn error popups any time it's started. The only workaround is to either install &lt;span style=&quot; font-family:'Iosevka Extended'; font-weight:700;&quot;&gt;dotnet48&lt;/span&gt;, or disable Xalia.&lt;/p&gt;&lt;p&gt;If unsure, &lt;span style=&quot; font-weight:700;&quot;&gt;keep disabled&lt;/span&gt; if any &lt;span style=&quot; font-weight:700; font-style:italic;&quot;&gt;.NET&lt;/span&gt; Winetricks verb other than &lt;span style=&quot; font-family:'Iosevka Extended'; font-weight:700;&quot;&gt;dotnet48&lt;/span&gt; has been installed.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="accessibleName">
+             <string>Enable Xalia Gamepad Navigation Plugin</string>
+            </property>
+            <property name="text">
+             <string>Enable Xalia</string>
+            </property>
+            <property name="isFor" stdset="0">
+             <string>UseXalia</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QCheckBox" name="toggleHidraw">
+            <property name="whatsThis">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This determines whether or not the runner is allowed to directly interact with connected HID devices or not.&lt;/p&gt;&lt;p&gt;Some applications need this to access things like controller firmware or to individually address some devices. However, this has the side effect of certain controllers, such as the &lt;span style=&quot; font-style:italic;&quot;&gt;Sony DualSense,&lt;/span&gt; overriding the SDL interface and will not be recognized as an Xinput-compatible device.&lt;/p&gt;&lt;p&gt;This should only be enabled for applications that &lt;span style=&quot; font-weight:700;&quot;&gt;do not&lt;/span&gt; function properly without this enabled.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="accessibleName">
+             <string>Allow Proton to Access Raw HID Devices</string>
+            </property>
+            <property name="text">
+             <string>Allow HIDRAW Input Devices</string>
+            </property>
+            <property name="isFor" stdset="0">
+             <string>AllowHidraw</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="3">
+           <widget class="QCheckBox" name="toggleSteamInput">
+            <property name="text">
+             <string>Disable Steam Input</string>
+            </property>
+            <property name="isFor" stdset="0">
+             <string>SteamInputDisabled</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QGroupBox" name="waylandGroup">
+         <property name="title">
+          <string>Wayland</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignmentFlag::AlignCenter</set>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_13">
+          <item row="0" column="5">
+           <spacer name="horizontalSpacer_26">
+            <property name="orientation">
+             <enum>Qt::Orientation::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="0" column="4">
+           <widget class="QCheckBox" name="toggleWindowDecorations">
+            <property name="text">
+             <string>Disable Window Decorations</string>
+            </property>
+            <property name="isFor" stdset="0">
+             <string>UseNoDecorations</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2">
+           <widget class="QCheckBox" name="toggleWayland">
+            <property name="whatsThis">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set whether or not to force the native Wayland environment &lt;span style=&quot; font-style:italic;&quot;&gt;for supported Proton versions.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Runners based on &lt;span style=&quot; font-style:italic;&quot;&gt;Proton 10&lt;/span&gt; have added experimental &lt;span style=&quot; font-weight:700;&quot;&gt;native&lt;/span&gt; Wayland support, but will still default to the X11 backend running through XWayland. While enabling this will provide a more cohesive look &amp;amp; feel and potentially provide better performance on a native Wayland desktop, do note that &lt;span style=&quot; font-weight:700;&quot;&gt;there are known issues with mouse focus and native OpenGL/Vulkan applications, &lt;/span&gt;&lt;a href=&quot;https://github.com/GloriousEggroll/proton-ge-custom/releases&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#8ab4f8;&quot;&gt;as noted by GE.&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;Enabling this will have no effect on X11 desktops.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="accessibleName">
+             <string>Use Experimental Native Wayland Support</string>
+            </property>
+            <property name="text">
+             <string>Enable Native Wayland Support</string>
+            </property>
+            <property name="isFor" stdset="0">
+             <string>UseWayland</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
            <widget class="QCheckBox" name="toggleWaylandHDR">
             <property name="whatsThis">
              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When Enabled, the experimental &lt;span style=&quot; font-style:italic;&quot;&gt;Native Wayland Backend&lt;/span&gt; will expose and enable use of your display's HDR capabilities.&lt;/p&gt;&lt;p&gt;Because HDR implicitly relies on Wayland to function (as there is no equivalent support in X11), this will only work with &lt;span style=&quot; font-style:italic;&quot;&gt;Native Wayland Support&lt;/span&gt; enabled and &lt;span style=&quot; font-weight:700;&quot;&gt;only in a Wayland session;&lt;/span&gt; this will not take effect on X11 desktops.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -1778,7 +2024,7 @@
            </widget>
           </item>
           <item row="0" column="0">
-           <spacer name="horizontalSpacer_19">
+           <spacer name="horizontalSpacer_25">
             <property name="orientation">
              <enum>Qt::Orientation::Horizontal</enum>
             </property>
@@ -1790,375 +2036,141 @@
             </property>
            </spacer>
           </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <widget class="QGroupBox" name="miscellaneous">
+         <property name="title">
+          <string>Misc</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignmentFlag::AlignCenter</set>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_14">
           <item row="0" column="1">
-           <widget class="QCheckBox" name="toggleWayland">
+           <widget class="QCheckBox" name="toggleNvidiaLibs">
             <property name="whatsThis">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set whether or not to force the native Wayland environment &lt;span style=&quot; font-style:italic;&quot;&gt;for supported Proton versions.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Runners based on &lt;span style=&quot; font-style:italic;&quot;&gt;Proton 10&lt;/span&gt; have added experimental &lt;span style=&quot; font-weight:700;&quot;&gt;native&lt;/span&gt; Wayland support, but will still default to the X11 backend running through XWayland. While enabling this will provide a more cohesive look &amp;amp; feel and potentially provide better performance on a native Wayland desktop, do note that &lt;span style=&quot; font-weight:700;&quot;&gt;there are known issues with mouse focus and native OpenGL/Vulkan applications, &lt;/span&gt;&lt;a href=&quot;https://github.com/GloriousEggroll/proton-ge-custom/releases&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#8ab4f8;&quot;&gt;as noted by GE.&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;Enabling this will have no effect on X11 desktops.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             <string>Enable Nvidia Library support for PhysX &amp; CUDA functionality in games. Requires CachyOS Proton.</string>
             </property>
             <property name="accessibleName">
-             <string>Use Experimental Native Wayland Support</string>
+             <string>Enable Nvidia Libraries</string>
+            </property>
+            <property name="accessibleDescription">
+             <string>Enable Nvidia Library support for PhysX &amp; CUDA functionality in games. Requires CachyOS Proton.</string>
+            </property>
+            <property name="accessibleIdentifier">
+             <string>toggleNvidiaLibs</string>
             </property>
             <property name="text">
-             <string>Enable Native Wayland Support</string>
+             <string>Enable Nvidia Libraries</string>
             </property>
             <property name="isFor" stdset="0">
-             <string>UseWayland</string>
+             <string>UseNvidiaLibraries</string>
             </property>
            </widget>
           </item>
+          <item row="0" column="0">
+           <spacer name="horizontalSpacer_23">
+            <property name="orientation">
+             <enum>Qt::Orientation::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="0" column="2">
+           <spacer name="horizontalSpacer_24">
+            <property name="orientation">
+             <enum>Qt::Orientation::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="6" column="0">
+        <widget class="QGroupBox" name="wineToplogy">
+         <property name="title">
+          <string>Wine CPU Toplogy</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignmentFlag::AlignCenter</set>
+         </property>
+         <layout class="QGridLayout" name="wineGrid">
           <item row="1" column="1">
-           <widget class="QCheckBox" name="toggleHidraw">
-            <property name="whatsThis">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This determines whether or not the runner is allowed to directly interact with connected HID devices or not.&lt;/p&gt;&lt;p&gt;Some applications need this to access things like controller firmware or to individually address some devices. However, this has the side effect of certain controllers, such as the &lt;span style=&quot; font-style:italic;&quot;&gt;Sony DualSense,&lt;/span&gt; overriding the SDL interface and will not be recognized as an Xinput-compatible device.&lt;/p&gt;&lt;p&gt;This should only be enabled for applications that &lt;span style=&quot; font-weight:700;&quot;&gt;do not&lt;/span&gt; function properly without this enabled.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           <widget class="QSpinBox" name="cpuCount">
+            <property name="enabled">
+             <bool>false</bool>
             </property>
-            <property name="accessibleName">
-             <string>Allow Proton to Access Raw HID Devices</string>
-            </property>
-            <property name="text">
-             <string>Allow HIDRAW Input Devices</string>
-            </property>
-            <property name="isFor" stdset="0">
-             <string>AllowHidraw</string>
+            <property name="useFor" stdset="0">
+             <string>CpuCount</string>
             </property>
            </widget>
           </item>
           <item row="1" column="2">
-           <widget class="QCheckBox" name="toggleXalia">
-            <property name="whatsThis">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set whether or not to enable Proton's &lt;a href=&quot;https://github.com/madewokherd/xalia&quot;&gt;&lt;span style=&quot; font-style:italic; text-decoration: underline; color:#8ab4f8;&quot;&gt;Xalia&lt;/span&gt;&lt;/a&gt; integration for built-in Gamepad Navigation in normal Windows dialogs.&lt;/p&gt;&lt;p&gt;Xalia allows for selecting options in normal Windows dialog popups or launchers that otherwise doesn't have any integration with controllers. This can be a very useful accessibility feature. However, Xalia has a hard dependency on &lt;span style=&quot; font-weight:700; font-style:italic;&quot;&gt;.NET 4.8&lt;/span&gt; which, by default, relies on Proton's &lt;span style=&quot; font-style:italic;&quot;&gt;Mono&lt;/span&gt; runtime; so if any dotnet Winetricks verb has been installed that is &lt;span style=&quot; font-style:italic;&quot;&gt;not &lt;/span&gt;&lt;span style=&quot; font-family:'Iosevka Extended'; font-weight:700;&quot;&gt;dotnet48&lt;/span&gt;, Proton will spawn error popups any time it's started. The only workaround is to either install &lt;span style=&quot; font-family:'Iosevka Extended'; font-weight:700;&quot;&gt;dotnet48&lt;/span&gt;, or disable Xalia.&lt;/p&gt;&lt;p&gt;If unsure, &lt;span style=&quot; font-weight:700;&quot;&gt;keep disabled&lt;/span&gt; if any &lt;span style=&quot; font-weight:700; font-style:italic;&quot;&gt;.NET&lt;/span&gt; Winetricks verb other than &lt;span style=&quot; font-family:'Iosevka Extended'; font-weight:700;&quot;&gt;dotnet48&lt;/span&gt; has been installed.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-            </property>
-            <property name="accessibleName">
-             <string>Enable Xalia Gamepad Navigation Plugin</string>
+           <widget class="QCheckBox" name="core0">
+            <property name="enabled">
+             <bool>false</bool>
             </property>
             <property name="text">
-             <string>Enable Xalia</string>
+             <string>Core 0</string>
             </property>
-            <property name="isFor" stdset="0">
-             <string>UseXalia</string>
+            <property name="useFor" stdset="0">
+             <string>core0</string>
             </property>
            </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QCheckBox" name="toggleWineCpuTopology">
+            <property name="text">
+             <string>Enable Wine CPU Topology</string>
+            </property>
+            <property name="isFor" stdset="0">
+             <string>UseWineCpuTopology</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="3">
+           <spacer name="horizontalSpacer_28">
+            <property name="orientation">
+             <enum>Qt::Orientation::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="1" column="0">
+           <spacer name="horizontalSpacer_27">
+            <property name="orientation">
+             <enum>Qt::Orientation::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
           </item>
          </layout>
         </widget>
        </item>
       </layout>
-     </widget>
-     <widget class="QWidget" name="experimentalTab">
-      <attribute name="icon">
-       <iconset theme="text-x-log"/>
-      </attribute>
-      <attribute name="title">
-       <string>Experimental</string>
-      </attribute>
-      <widget class="QGroupBox" name="inputGroup">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>10</y>
-         <width>626</width>
-         <height>94</height>
-        </rect>
-       </property>
-       <property name="title">
-        <string>Inputs</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignmentFlag::AlignCenter</set>
-       </property>
-       <layout class="QGridLayout" name="gridLayout_11">
-        <item row="0" column="0">
-         <spacer name="horizontalSpacer_19">
-          <property name="orientation">
-           <enum>Qt::Orientation::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="0" column="3">
-         <spacer name="horizontalSpacer_20">
-          <property name="orientation">
-           <enum>Qt::Orientation::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="0" column="1">
-         <widget class="QCheckBox" name="toggleHidraw">
-          <property name="whatsThis">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This determines whether or not the runner is allowed to directly interact with connected HID devices or not.&lt;/p&gt;&lt;p&gt;Some applications need this to access things like controller firmware or to individually address some devices. However, this has the side effect of certain controllers, such as the &lt;span style=&quot; font-style:italic;&quot;&gt;Sony DualSense,&lt;/span&gt; overriding the SDL interface and will not be recognized as an Xinput-compatible device.&lt;/p&gt;&lt;p&gt;This should only be enabled for applications that &lt;span style=&quot; font-weight:700;&quot;&gt;do not&lt;/span&gt; function properly without this enabled.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-          </property>
-          <property name="accessibleName">
-           <string>Allow Proton to Access Raw HID Devices</string>
-          </property>
-          <property name="text">
-           <string>Allow HIDRAW Input Devices</string>
-          </property>
-          <property name="isFor" stdset="0">
-           <string>AllowHidraw</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="2">
-         <widget class="QCheckBox" name="toggleXalia">
-          <property name="whatsThis">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set whether or not to enable Proton's &lt;a href=&quot;https://github.com/madewokherd/xalia&quot;&gt;&lt;span style=&quot; font-style:italic; text-decoration: underline; color:#8ab4f8;&quot;&gt;Xalia&lt;/span&gt;&lt;/a&gt; integration for built-in Gamepad Navigation in normal Windows dialogs.&lt;/p&gt;&lt;p&gt;Xalia allows for selecting options in normal Windows dialog popups or launchers that otherwise doesn't have any integration with controllers. This can be a very useful accessibility feature. However, Xalia has a hard dependency on &lt;span style=&quot; font-weight:700; font-style:italic;&quot;&gt;.NET 4.8&lt;/span&gt; which, by default, relies on Proton's &lt;span style=&quot; font-style:italic;&quot;&gt;Mono&lt;/span&gt; runtime; so if any dotnet Winetricks verb has been installed that is &lt;span style=&quot; font-style:italic;&quot;&gt;not &lt;/span&gt;&lt;span style=&quot; font-family:'Iosevka Extended'; font-weight:700;&quot;&gt;dotnet48&lt;/span&gt;, Proton will spawn error popups any time it's started. The only workaround is to either install &lt;span style=&quot; font-family:'Iosevka Extended'; font-weight:700;&quot;&gt;dotnet48&lt;/span&gt;, or disable Xalia.&lt;/p&gt;&lt;p&gt;If unsure, &lt;span style=&quot; font-weight:700;&quot;&gt;keep disabled&lt;/span&gt; if any &lt;span style=&quot; font-weight:700; font-style:italic;&quot;&gt;.NET&lt;/span&gt; Winetricks verb other than &lt;span style=&quot; font-family:'Iosevka Extended'; font-weight:700;&quot;&gt;dotnet48&lt;/span&gt; has been installed.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-          </property>
-          <property name="accessibleName">
-           <string>Enable Xalia Gamepad Navigation Plugin</string>
-          </property>
-          <property name="text">
-           <string>Enable Xalia</string>
-          </property>
-          <property name="isFor" stdset="0">
-           <string>UseXalia</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QGroupBox" name="runnerSpecificGroup">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>110</y>
-         <width>631</width>
-         <height>171</height>
-        </rect>
-       </property>
-       <property name="title">
-        <string>Runner Specific Options</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignmentFlag::AlignCenter</set>
-       </property>
-       <layout class="QGridLayout" name="RunnerSpecificGroup">
-        <item row="0" column="0">
-         <spacer name="horizontalSpacer_21">
-          <property name="orientation">
-           <enum>Qt::Orientation::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="1" column="1">
-         <widget class="QCheckBox" name="toggleFsr4Rdna3">
-          <property name="text">
-           <string>Enable FSR4 RDNA3 Upgrade</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="5">
-         <spacer name="horizontalSpacer_22">
-          <property name="orientation">
-           <enum>Qt::Orientation::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="0" column="3">
-         <widget class="QCheckBox" name="toggleDlssIndicator">
-          <property name="whatsThis">
-           <string>Enables a watermark to show when DLSS is active and working. Usable only with CachyOS Proton.</string>
-          </property>
-          <property name="accessibleName">
-           <string>Enable DLSS Indicator</string>
-          </property>
-          <property name="accessibleDescription">
-           <string>Enables a watermark to show when DLSS is active and working. Usable only with CachyOS Proton.</string>
-          </property>
-          <property name="accessibleIdentifier">
-           <string>toggleDlssIndicator</string>
-          </property>
-          <property name="text">
-           <string>Enable DLSS Indicator</string>
-          </property>
-          <property name="isFor" stdset="0">
-           <string>UseDlssIndicator</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="3">
-         <widget class="QCheckBox" name="toggleFsr4Indicator">
-          <property name="text">
-           <string>Enable FSR4 Indicator</string>
-          </property>
-          <property name="isFor" stdset="0">
-           <string>UseFsr4Indicator</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1">
-         <widget class="QCheckBox" name="toggleDlssUpgrade">
-          <property name="whatsThis">
-           <string>Automatically upgrades DLSS to the latest avaliable version. Requires CachyOS Proton.</string>
-          </property>
-          <property name="accessibleName">
-           <string>Enable Automatic DLSS Upgrade</string>
-          </property>
-          <property name="accessibleDescription">
-           <string>Automatically upgrades DLSS to the latest avaliable version. Requires CachyOS Proton.</string>
-          </property>
-          <property name="accessibleIdentifier">
-           <string>toggleDlssUpgrade</string>
-          </property>
-          <property name="text">
-           <string>Enable DLSS Upgrade</string>
-          </property>
-          <property name="isFor" stdset="0">
-           <string>UseDlssUpgrade</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="2">
-         <widget class="QCheckBox" name="toggleNvidiaLibs">
-          <property name="whatsThis">
-           <string>Enable Nvidia Library support for PhysX &amp; CUDA functionality in games. Requires CachyOS Proton.</string>
-          </property>
-          <property name="accessibleName">
-           <string>Enable Nvidia Libraries</string>
-          </property>
-          <property name="accessibleDescription">
-           <string>Enable Nvidia Library support for PhysX &amp; CUDA functionality in games. Requires CachyOS Proton.</string>
-          </property>
-          <property name="accessibleIdentifier">
-           <string>toggleNvidiaLibs</string>
-          </property>
-          <property name="text">
-           <string>Enable Nvidia Libraries</string>
-          </property>
-          <property name="isFor" stdset="0">
-           <string>UseNvidiaLibraries</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="1">
-         <widget class="QCheckBox" name="toggleXessUpgrade">
-          <property name="text">
-           <string>Enable XESS Upgrade</string>
-          </property>
-          <property name="isFor" stdset="0">
-           <string>UseXessUpgrade</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="2">
-         <widget class="QCheckBox" name="toggleFsr4Upgrade">
-          <property name="text">
-           <string>Enable FSR4 Upgrade</string>
-          </property>
-          <property name="isFor" stdset="0">
-           <string>UseFsr4Upgrade</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QGroupBox" name="waylandGroup">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>289</y>
-         <width>631</width>
-         <height>94</height>
-        </rect>
-       </property>
-       <property name="title">
-        <string>Wayland</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignmentFlag::AlignCenter</set>
-       </property>
-       <layout class="QGridLayout" name="gridLayout_13">
-        <item row="0" column="1">
-         <widget class="QCheckBox" name="toggleWayland">
-          <property name="whatsThis">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set whether or not to force the native Wayland environment &lt;span style=&quot; font-style:italic;&quot;&gt;for supported Proton versions.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Runners based on &lt;span style=&quot; font-style:italic;&quot;&gt;Proton 10&lt;/span&gt; have added experimental &lt;span style=&quot; font-weight:700;&quot;&gt;native&lt;/span&gt; Wayland support, but will still default to the X11 backend running through XWayland. While enabling this will provide a more cohesive look &amp;amp; feel and potentially provide better performance on a native Wayland desktop, do note that &lt;span style=&quot; font-weight:700;&quot;&gt;there are known issues with mouse focus and native OpenGL/Vulkan applications, &lt;/span&gt;&lt;a href=&quot;https://github.com/GloriousEggroll/proton-ge-custom/releases&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#8ab4f8;&quot;&gt;as noted by GE.&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;Enabling this will have no effect on X11 desktops.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-          </property>
-          <property name="accessibleName">
-           <string>Use Experimental Native Wayland Support</string>
-          </property>
-          <property name="text">
-           <string>Enable Native Wayland Support</string>
-          </property>
-          <property name="isFor" stdset="0">
-           <string>UseWayland</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1">
-         <widget class="QCheckBox" name="toggleWaylandHDR">
-          <property name="whatsThis">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When Enabled, the experimental &lt;span style=&quot; font-style:italic;&quot;&gt;Native Wayland Backend&lt;/span&gt; will expose and enable use of your display's HDR capabilities.&lt;/p&gt;&lt;p&gt;Because HDR implicitly relies on Wayland to function (as there is no equivalent support in X11), this will only work with &lt;span style=&quot; font-style:italic;&quot;&gt;Native Wayland Support&lt;/span&gt; enabled and &lt;span style=&quot; font-weight:700;&quot;&gt;only in a Wayland session;&lt;/span&gt; this will not take effect on X11 desktops.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-          </property>
-          <property name="accessibleName">
-           <string>Use HDR With Experimental Wayland Backend</string>
-          </property>
-          <property name="text">
-           <string>Enable HDR</string>
-          </property>
-          <property name="isFor" stdset="0">
-           <string>UseHDR</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="2">
-         <widget class="QCheckBox" name="toggleWindowDecorations">
-          <property name="text">
-           <string>Disable Window Decorations</string>
-          </property>
-          <property name="isFor" stdset="0">
-           <string>UseNoDecorations</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="3">
-         <spacer name="horizontalSpacer_26">
-          <property name="orientation">
-           <enum>Qt::Orientation::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="0" column="0">
-         <spacer name="horizontalSpacer_25">
-          <property name="orientation">
-           <enum>Qt::Orientation::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-       </layout>
-      </widget>
      </widget>
     </widget>
    </item>
@@ -2199,7 +2211,7 @@
            <x>0</x>
            <y>0</y>
            <width>624</width>
-           <height>76</height>
+           <height>68</height>
           </rect>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_6">
@@ -2291,7 +2303,6 @@
   <tabstop>toggleNoD8VK</tabstop>
   <tabstop>toggleWineD3D</tabstop>
   <tabstop>toggleWayland</tabstop>
-  <tabstop>toggleWaylandHDR</tabstop>
   <tabstop>toggleHidraw</tabstop>
   <tabstop>toggleXalia</tabstop>
   <tabstop>infoScrollArea</tabstop>
