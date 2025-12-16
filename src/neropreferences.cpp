@@ -41,7 +41,8 @@ NeroManagerPreferences::NeroManagerPreferences(QWidget *parent)
     //ui->runnerNotifs->setChecked(managerCfg->value("UseNotifier").toBool());
     ui->shortcutHide->setChecked(managerCfg->value("ShortcutHidesManager").toBool());
     ui->umuPath->setText(managerCfg->value("UMUpath").toString());
-    if(ui->umuPath->text().isEmpty()) {
+    if(ui->umuPath->text().isEmpty() || ui->umuPath->text() == QStandardPaths::findExecutable("umu-run")) {
+        ui->umuPath->clear();
         ui->umuPath->setPlaceholderText(ui->umuPath->placeholderText() + " (" +
                                         QStandardPaths::findExecutable("umu-run") + ")");
         ui->umuPathClearBtn->setVisible(false);
