@@ -137,6 +137,7 @@ NeroPrefixSettingsWindow::NeroPrefixSettingsWindow(QWidget *parent, const QStrin
     ui->gamescopeSection->setVisible(false);
     ui->goat1->setVisible(false);
     ui->goat2->setVisible(false);
+
     //wine CPU topology setup
     int threads = QThread::idealThreadCount();
     ui->cpuCount->setMaximum(threads);
@@ -245,7 +246,8 @@ void NeroPrefixSettingsWindow::LoadSettings()
     // compatibility tab
     if(!settings.value("DLLoverrides").toStringList().isEmpty()) {
         dllSetting.clear();
-        dllDelete.clear();
+        dllDelete.clear();    ui->fsrCustomW->setValidator(resValidator);
+
         const QStringList dllsToAdd = settings.value("DLLoverrides").toStringList();
         for(const QString &dll : std::as_const(dllsToAdd)) {
             const QString dllName = dll.left(dll.indexOf('='));
