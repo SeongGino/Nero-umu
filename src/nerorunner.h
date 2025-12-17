@@ -151,7 +151,6 @@ namespace CliArgs {
     const QString dash = "-";
     const QString doubleDash = dash % dash;
 
-
     //Wine Compat Options
     namespace Wine {
         const QString prefix = "WINEPREFIX";
@@ -317,13 +316,13 @@ namespace NeroConfig {
     const QString args = "Args";
 
     //TBD
-    const QString nvidiaLibs = "NvidiaLibs";
-    const QString fsr4Upgrade = "Fsr4Upgrade";
-    const QString fsr4Indicator = "Fsr4Indicator";
-    const QString fsr4Rdna3 = "Fsr4Rdna3";
-    const QString xessUpgrade = "XessUpgrade";
-    const QString noWindowDecoration = "NoDecoration";
-    const QString noSteamInput = "NoSteamInput";
+    const QString nvidiaLibs = "UseNvidiaLibs";
+    const QString fsr4Upgrade = "UseFsr4Upgrade";
+    const QString fsr4Indicator = "UseFsr4Indicator";
+    const QString fsr4Rdna3 = "UseFsr4Rdna3Upgrade";
+    const QString xessUpgrade = "UseXessUpgrade";
+    const QString noWindowDecoration = "UseNoDecoration";
+    const QString noSteamInput = "DisableSteamInput";
     const QString wineCpuTopology = "WineCpuTopology";
     const QString localShaderCache = "LocalShaderCache";
     const QString prerunScript = "PreRunScript";

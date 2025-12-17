@@ -32,7 +32,7 @@
 #include <QShortcut>
 #include <QThread>
 #include <QStringBuilder>
-
+#include <QWidget>
 #include "../lib/quazip/quazip/quazip.h"
 #include "../lib/quazip/quazip/quazipfile.h"
 
@@ -105,8 +105,10 @@ NeroPrefixSettingsWindow::NeroPrefixSettingsWindow(QWidget *parent, const QStrin
     }
 
 
-    // FSR scalers are only implem'd in GE-Proton
-    if(!ui->prefixRunner->currentText().startsWith("GE-Proton")) {
+    // FSR scalers are only implem'd in non-standard proton versions
+    QString customProton = ui->prefixRunner->currentText().split("-")[0];
+    CustomRunner run(customProton);
+    if (run.isCustomProton) {
         SetComboBoxItemEnabled(ui->setScalingBox, NeroConstant::ScalingFSRperformance, false);
         SetComboBoxItemEnabled(ui->setScalingBox, NeroConstant::ScalingFSRbalanced, false);
         SetComboBoxItemEnabled(ui->setScalingBox, NeroConstant::ScalingFSRquality, false);
@@ -115,14 +117,27 @@ NeroPrefixSettingsWindow::NeroPrefixSettingsWindow(QWidget *parent, const QStrin
         SetComboBoxItemEnabled(ui->setScalingBox, NeroConstant::ScalingFSRhighestquality, false);
         SetComboBoxItemEnabled(ui->setScalingBox, NeroConstant::ScalingFSRcustom, false);
         // HACK: offset by one when this is a shortcut settings panel and not prefix settings
-        if(ui->setScalingBox->findText("Integer Scaling") == 1) SetComboBoxItemEnabled(ui->setScalingBox, NeroConstant::ScalingIntegerScale, false);
+        if(ui->setScalingBox->findText("Integer Scaling") == 1) {
+            SetComboBoxItemEnabled(ui->setScalingBox, NeroConstant::ScalingIntegerScale, false);
+        }
         else SetComboBoxItemEnabled(ui->setScalingBox, NeroConstant::ScalingGamescopeWindowed, false);
     }
-
     // Wayland requires base version to be Proton 10+
-    if(!ui->prefixRunner->currentText().startsWith("GE-Proton10") && !ui->prefixRunner->currentText().startsWith("Proton 10")) {
-        ui->toggleWayland->setEnabled(false);
-        ui->toggleWaylandHDR->setEnabled(false);
+    if (run.isCustomProton && run.isProton10OrLater) {
+        QList<QWidget*> customOptions {
+            ui->toggleNvidiaLibs,
+            ui->toggleSteamInput,
+            ui->imageReconstructionBox,
+            ui->imageReconstructionIndBox,
+            ui->toggleWayland,
+            ui->toggleWaylandHDR,
+            ui->toggleWindowDecorations,
+        };
+        // this didn't work in an STL-style iterator for some reason.
+        for (int i = 0; i < customOptions.length(); ++i) {
+            QWidget* option = customOptions[i];
+            option->setEnabled(false);
+        }
     }
 
     resValidator = new QIntValidator(0, 32767);
@@ -149,13 +164,10 @@ NeroPrefixSettingsWindow::NeroPrefixSettingsWindow(QWidget *parent, const QStrin
         QString prop = "UseCore" % iStr;
         box->setProperty("isFor", prop);
         box->setText("Core" % iStr);
-        box->setEnabled(false);
         ui->wineGrid->addWidget(box);
     }
 
     LoadSettings();
-
-
 
     dllList = new QCompleter(commonDLLsList);
     ui->dllAdder->setCompleter(dllList);
@@ -167,7 +179,7 @@ NeroPrefixSettingsWindow::NeroPrefixSettingsWindow(QWidget *parent, const QStrin
     }
     for(const auto child : this->findChildren<QCheckBox*>()) {
         if(!child->property("whatsThis").isNull()) child->installEventFilter(this);
-        if(!child->property("isFor").isNull()) connect(child, &QCheckBox::stateChanged, this, &NeroPrefixSettingsWindow::OptionSet);
+        if(!child->property("isFor").isNull()) connect(child, &QCheckBox::checkStateChanged, this, &NeroPrefixSettingsWindow::OptionSet);
     }
     for(const auto child : this->findChildren<QLineEdit*>()) {
         if(!child->property("whatsThis").isNull()) child->installEventFilter(this);
@@ -203,10 +215,6 @@ bool NeroPrefixSettingsWindow::eventFilter(QObject* object, QEvent* event)
     return QWidget::eventFilter(object, event);
 }
 
-void NeroPrefixSettingsWindow::WineToplogy() {
-
-}
-
 void NeroPrefixSettingsWindow::showEvent(QShowEvent* event)
 {
     QDialog::showEvent(event);
@@ -227,22 +235,36 @@ void NeroPrefixSettingsWindow::LoadSettings()
 {
     NeroPrefixSettingsWindow::blockSignals(true);
 
-    // general tab->graphics group
-    if(!settings.value("EnableNVAPI").toString().isEmpty()) ui->toggleNVAPI->setChecked(settings.value("EnableNVAPI").toBool());
-    ui->setScalingBox->setCurrentIndex(settings.value("ScalingMode").toInt());
-    ui->fsrCustomW->setText(settings.value("FSRcustomResW").toString());
-    ui->fsrCustomH->setText(settings.value("FSRcustomResH").toString());
-    ui->gamescopeAppWidth->setText(settings.value("GamescopeOutResW").toString());
-    ui->gamescopeAppHeight->setText(settings.value("GamescopeOutResH").toString());
-    ui->gamescopeWindowWidth->setText(settings.value("GamescopeWinResW").toString());
-    ui->gamescopeWindowHeight->setText(settings.value("GamescopeWinResH").toString());
-    ui->gamescopeSetScalerBox->setCurrentIndex(settings.value("GamescopeScaler").toInt());
-    ui->gamescopeSetUpscalingBox->setCurrentIndex(settings.value("GamescopeFilter").toInt());
-    // general tab->services group
-    SetCheckboxState("Gamemode",  ui->toggleGamemode);
-    SetCheckboxState("Mangohud",  ui->toggleMangohud);
-    SetCheckboxState("VKcapture", ui->toggleVKcap);
+    if(!settings.value("EnableNVAPI").toString().isEmpty()) {
+        ui->toggleNVAPI->setChecked(settings.value("EnableNVAPI").toBool());
+    }
+    QMap<QString, QLineEdit*> lineEdits = {
+        // general tab->graphics group
+        {"FSRcustomResW",      ui->fsrCustomW},
+        {"FSRcustomResH",      ui->fsrCustomH},
+        {"GamescopeOutResW",   ui->gamescopeAppWidth},
+        {"GamescopeOutResH",   ui->gamescopeAppHeight},
+        {"GamescopeWinResW",   ui->gamescopeWindowWidth},
+        {"GamescopeWinResH",   ui->gamescopeWindowHeight},
+        // general tab->prefix shortcut settings group
+    };
+    for (auto i = lineEdits.begin(), end = lineEdits.end(); i != end; i++) {
+        QString neroSetting = i.key();
+        QLineEdit* field = i.value();
+        field->setText(settings.value(neroSetting).toString());
+    }
 
+    QMap<QString, QComboBox*> comboBoxes = {
+        // general tab->graphics group
+        {"ScalingMode",        ui->setScalingBox},
+        {"GamescopeScaler",    ui->gamescopeSetScalerBox},
+        {"GamescopeFilter",    ui->gamescopeSetUpscalingBox},
+    };
+    for (auto i = comboBoxes.begin(), end = comboBoxes.end(); i != end; i++) {
+        QString neroSetting = i.key();
+        QComboBox* field = i.value();
+        field->setCurrentIndex(settings.value(neroSetting).toInt());
+    }
     // compatibility tab
     if(!settings.value("DLLoverrides").toStringList().isEmpty()) {
         dllSetting.clear();
@@ -263,21 +285,36 @@ void NeroPrefixSettingsWindow::LoadSettings()
     // advanced tab
     ui->debugBox->setCurrentIndex(settings.value("DebugOutput").toInt());
     ui->fileSyncBox->setCurrentIndex(settings.value("FileSyncMode").toInt());
-    SetCheckboxState("ForceiGPU",            ui->toggleiGPU);
-    SetCheckboxState("LimitGLextensions",  ui->toggleLimitGL);
-    SetCheckboxState("NoD8VK",             ui->toggleNoD8VK);
-    SetCheckboxState("ForceWineD3D",       ui->toggleWineD3D);
+
 
     //Experimental
     int imageReconstructionUpgrade = settings.value("ImageReconstructionUpgrade").toInt();
     int imageReconstructionIndicator = settings.value("ImageReconstructionIndicator").toInt();
     ui->imageReconstructionBox->setCurrentIndex(imageReconstructionUpgrade);
     ui->imageReconstructionIndBox->setCurrentIndex(imageReconstructionIndicator);
-    SetCheckboxState("UseWayland",         ui->toggleWayland);
-    SetCheckboxState("UseHDR",             ui->toggleWaylandHDR);
-    SetCheckboxState("AllowHidraw",        ui->toggleHidraw);
-    SetCheckboxState("UseXalia",           ui->toggleXalia);
-    SetCheckboxState("UseNvidiaLibs",      ui->toggleNvidiaLibs);
+
+    QMap<QString, QCheckBox*> checkboxes = {
+        // general tab->services group
+        {"Gamemode",           ui->toggleGamemode},
+        {"Mangohud",           ui->toggleMangohud},
+        {"VKcapture",          ui->toggleVKcap},
+        //advanced
+        {"ForceiGPU",          ui->toggleiGPU},
+        {"LimitGLextensions",  ui->toggleLimitGL},
+        {"NoD8VK",             ui->toggleNoD8VK},
+        {"ForceWineD3D",       ui->toggleWineD3D},
+        //experimental
+        {"UseWayland",         ui->toggleWayland},
+        {"UseHDR",             ui->toggleWaylandHDR},
+        {"AllowHidraw",        ui->toggleHidraw},
+        {"UseXalia",           ui->toggleXalia},
+        {"UseNvidiaLibs",      ui->toggleNvidiaLibs},
+    };
+    for (auto i = checkboxes.begin(), end = checkboxes.end(); i != end; i++) {
+        QString neroOption = i.key();
+        QCheckBox* widget = i.value();
+        SetCheckboxState(neroOption, widget);
+    }
 
     if(currentShortcutHash.isEmpty()) {
         // for prefix general settings, checkboxes are normal two-state
@@ -360,16 +397,16 @@ void NeroPrefixSettingsWindow::LoadSettings()
 
     if(ui->setScalingBox->currentText().startsWith("Gamescope")) {
         ui->gamescopeSection->setVisible(true);
-        if(ui->setScalingBox->currentText().endsWith("Fullscreen")) {
-            ui->gamescopeWindowLabelX->setVisible(false);
-            ui->gamescopeWindowLabel->setVisible(false);
-            ui->gamescopeWindowHeight->setVisible(false);
-            ui->gamescopeWindowWidth->setVisible(false);
-        } else {
-            ui->gamescopeWindowLabelX->setVisible(true);
-            ui->gamescopeWindowLabel->setVisible(true);
-            ui->gamescopeWindowHeight->setVisible(true);
-            ui->gamescopeWindowWidth->setVisible(true);
+        QList<QWidget*> gamescope = {
+            ui->gamescopeWindowLabelX,
+            ui->gamescopeWindowLabel,
+            ui->gamescopeWindowHeight,
+            ui->gamescopeWindowWidth,
+        };
+        bool isWindowed = !ui->setScalingBox->currentText().endsWith("Fullscreen");
+        for (int i = 0; i < gamescope.length(); i++) {
+            QWidget* widget = gamescope[i];
+            widget->setVisible(isWindowed);
         }
     } else ui->gamescopeSection->setVisible(false);
 

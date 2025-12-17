@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>666</width>
-    <height>846</height>
+    <width>761</width>
+    <height>906</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -968,8 +968,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>600</width>
-               <height>493</height>
+               <width>659</width>
+               <height>513</height>
               </rect>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -2105,13 +2105,22 @@
           <string>Wine CPU Toplogy</string>
          </property>
          <property name="alignment">
-          <set>Qt::AlignmentFlag::AlignCenter</set>
+          <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <property name="checked">
+          <bool>false</bool>
+         </property>
+         <property name="isFor" stdset="0">
+          <string/>
          </property>
          <layout class="QGridLayout" name="wineGrid">
           <item row="1" column="1">
            <widget class="QSpinBox" name="cpuCount">
             <property name="enabled">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
             <property name="useFor" stdset="0">
              <string>CpuCount</string>
@@ -2121,7 +2130,7 @@
           <item row="1" column="2">
            <widget class="QCheckBox" name="core0">
             <property name="enabled">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
             <property name="text">
              <string notr="true">Core 0</string>
@@ -2210,8 +2219,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>624</width>
-           <height>68</height>
+           <width>707</width>
+           <height>72</height>
           </rect>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_6">

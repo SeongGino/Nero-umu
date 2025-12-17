@@ -28,6 +28,7 @@
 #include <QCheckBox>
 #include <QComboBox>
 #include <QPushButton>
+#include <QStringView>
 #include <QStandardItemModel>
 #include <QDesktopServices>
 
@@ -100,14 +101,85 @@ private:
     void LoadSettings();
     void AddDLL(const QString, const int);
     void StartUmu(const QString, QStringList = {});
+    /**
+     * The CustomRunner class is used to list the valid
+     * options for each popular custom Proton launcher:
+     * GE-Proton, EM-Proton, & CachyOS-Proton.
+     * It connects with the @enum customRunners
+     * and creates a QStringList with all valid options.
+     */
+    struct CustomRunner {
+        QStringList validOptions;
+        //whew thats a clunky name
+        QStringList reconstructUpgradeOptions;
+        bool isCustomProton;
+        bool isProton10OrLater;
+        CustomRunner(QString runner) {
+            int protonStrLoc = runner.indexOf("Proton");
+            int protonVersion = runner.mid(protonStrLoc, 2).toInt();
+            if (protonVersion < 10) {
+                isProton10OrLater = false;
+                isCustomProton = false;
+                return; //no need to check more
+            }
+            QStringList validRunners = {"GE", "CachyOS", "EM"};
+            QStringList universalOptions = {
+                "UseWayland",
+                "UseWaylandHdr",
+                "ImageReconstructionUpgrade",
+            };
+            QStringList geOptions = {
+                "DisableSteamInput",
+                "NoWindowDecorations",
 
+            };
+            //none atm but just in case?
+            QStringList emOptions = {
+            };
+            QStringList cachyOsOptions = {
+                "UseNvidiaLibs",
+                "UseFsr4Indidcator",
+                "UseLocalShaderCache",
+                "DisableSteamInput",
+                "NoWindowDecorations",
+            };
+            int currentRunner = validRunners.indexOf(runner);
+            //TODO: Standardize these
+            switch (customRunners(currentRunner)) {
+            case customRunners::GE:
+                this->isCustomProton = true;
+                this->validOptions = universalOptions << geOptions;
+                this->reconstructUpgradeOptions = {"fsr4", "fsr4rdna3"};
+                break;
+            case customRunners::CACHY:
+                this->isCustomProton = true;
+                this->validOptions = universalOptions << cachyOsOptions;
+                this->reconstructUpgradeOptions = {"dlss", "xess", "fsr4", "fsr4rdna3"};
+                break;
+            case customRunners::EM:
+                this->isCustomProton = true;
+                this->validOptions = universalOptions << emOptions;
+                this->reconstructUpgradeOptions = {"fsr4", "fsr4rdna3"};
+                break;
+            default:
+                this->isCustomProton = false;
+                break;
+            }
+        }
+        //class ensures it can't be compared against
+        //enums of other types
+        enum class customRunners {
+            GE = 0,
+            CACHY,
+            EM
+        };
+    };
     void SetComboBoxItemEnabled(QComboBox * comboBox, const int index, const bool enabled) {
         auto * model = qobject_cast<QStandardItemModel*>(comboBox->model());
         auto * item = model->item(index);
         item->setEnabled(enabled);
     }
     void SetCheckboxState(const QString &, QCheckBox*);
-    void WineToplogy();
     QString currentShortcutHash;
 
     QStringList existingShortcuts;

@@ -317,9 +317,9 @@ QMap<QString, QVariant> NeroFS::GetCurrentPrefixSettings()
     const QStringList settings = prefixCfg->childKeys();
     QMap<QString, QVariant> settingsMap;
 
-    for(const auto &key : std::as_const(settings))
+    for(const auto &key : std::as_const(settings)) {
         settingsMap[key] = prefixCfg->value(key);
-
+    }
     return settingsMap;
 }
 
@@ -328,38 +328,48 @@ void NeroFS::AddNewPrefix(const QString &newPrefix, const QString &runner)
     prefixes.append(newPrefix);
     SetCurrentPrefix(newPrefix);
     GetCurrentPrefixCfg();
+    //holy fuck god bless qvariants here
+    QMap<QString, QVariant> settingsMap = {
+        {"Name", newPrefix},
+        {"CurrentRunner", runner},
+        {"WindowsVersion", NeroConstant::WinVer10},
+        {"Gamemode", false},
+        {"WindowsVersion", NeroConstant::WinVer10},
+        {"Gamemode", false},
+        {"VKcapture", false},
+        {"Mangohud", false},
+        {"EnableNVAPI", false},
+        {"ScalingMode", NeroConstant::ScalingNormal},
+        {"FSRcustomResW", ""},
+        {"FSRcustomResH", ""},
+        {"GamescopeOutResW", ""},
+        {"GamescopeOutResH", ""},
+        {"GamescopeWinResW", ""},
+        {"GamescopeWinResH", ""},
+        {"GamescopeScaler", NeroConstant::GSscalerAuto},
+        {"GamescopeFilter", NeroConstant::GSfilterLinear},
+        {"GamescopeFilterStrength", 0},
+        {"DLLoverrides", {""}},
+        {"ForceiGPU", false},
+        {"LimitGLextensions", false},
+        {"DebugOutput", NeroConstant::DebugDisabled},
+        {"FileSyncMode", NeroConstant::NTsync},
+        {"NoD8VK", false},
+        {"ForceWineD3D", false},
+        {"UseWayland", false},
+        {"UseHDR", false},
+        {"AllowHidraw", false},
+        {"UseXalia", false},
+        {"CustomEnvVars", {""}},
+        {"RuntimeUpdateOnLaunch", true},
+        {"DiscordRPCinstalled", false},
+    };
     prefixCfg->beginGroup("PrefixSettings");
-    prefixCfg->setValue("Name", newPrefix);
-    prefixCfg->setValue("CurrentRunner", runner);
-    prefixCfg->setValue("WindowsVersion", NeroConstant::WinVer10);
-    prefixCfg->setValue("Gamemode", false);
-    prefixCfg->setValue("VKcapture", false);
-    prefixCfg->setValue("Mangohud", false);
-    prefixCfg->setValue("EnableNVAPI", false);
-    prefixCfg->setValue("ScalingMode", NeroConstant::ScalingNormal);
-    prefixCfg->setValue("FSRcustomResW", "");
-    prefixCfg->setValue("FSRcustomResH", "");
-    prefixCfg->setValue("GamescopeOutResW", "");
-    prefixCfg->setValue("GamescopeOutResH", "");
-    prefixCfg->setValue("GamescopeWinResW", "");
-    prefixCfg->setValue("GamescopeWinResH", "");
-    prefixCfg->setValue("GamescopeScaler", NeroConstant::GSscalerAuto);
-    prefixCfg->setValue("GamescopeFilter", NeroConstant::GSfilterLinear);
-    //prefixCfg->setValue("GamescopeFilterStrength", 0);
-    prefixCfg->setValue("DLLoverrides", {""});
-    prefixCfg->setValue("ForceiGPU", false);
-    prefixCfg->setValue("LimitGLextensions", false);
-    prefixCfg->setValue("DebugOutput", NeroConstant::DebugDisabled);
-    prefixCfg->setValue("FileSyncMode", NeroConstant::NTsync);
-    prefixCfg->setValue("NoD8VK", false);
-    prefixCfg->setValue("ForceWineD3D", false);
-    prefixCfg->setValue("UseWayland", false);
-    prefixCfg->setValue("UseHDR", false);
-    prefixCfg->setValue("AllowHidraw", false);
-    prefixCfg->setValue("UseXalia", false);
-    prefixCfg->setValue("CustomEnvVars", {""});
-    prefixCfg->setValue("RuntimeUpdateOnLaunch", true);
-    prefixCfg->setValue("DiscordRPCinstalled", false);
+    for (auto i = settingsMap.begin(), end = settingsMap.end(); i != end; i++) {
+        QString s = i.key();
+        QVariant v = i.value();
+        prefixCfg->setValue(s, v);
+    }
     prefixCfg->endGroup();
     // since we aren't actually selecting this prefix, just clear the value.
     currentPrefix.clear();
