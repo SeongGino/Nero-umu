@@ -92,11 +92,11 @@ public:
     protected:
         QVariant settingVariant;
     };
-    struct NeroSetting : virtual PrefixSetting {
+    struct CombinedSetting : virtual PrefixSetting {
     public:
-        NeroSetting(){}
+        CombinedSetting(){}
 
-        NeroSetting (const QString settingName, NeroRunner &parent) {
+        CombinedSetting (const QString settingName, NeroRunner &parent) {
             QString hash = parent.GetHash();
             QString shortcutProperty =  shortcuts % hash % '/' % settingName;
             QString prefixProperty = prefixSettings % '/' % settingName;
@@ -281,20 +281,6 @@ namespace NeroConfig {
 
     // TODO: Standardize Resolutions
     namespace Gamescope{
-        enum Scaling {
-            Normal = -1,
-            FsrPerformance,
-            FsrBalanced,
-            FsrQuality,
-            FsrHighQuality,
-            FsrHigherQuality,
-            FsrHighestQuality,
-            FsrCustom,
-            IntegerScale,
-            Windowed,
-            Borderless,
-            Fullscreen
-        };
         //FSR Custom Resolutions
         const QString scalingMode = "ScalingMode";
         const QString fsrCustomW = "FSRcustomResW";
