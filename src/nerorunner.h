@@ -92,11 +92,11 @@ public:
     protected:
         QVariant settingVariant;
     };
-    struct NeroSetting : virtual PrefixSetting {
+    struct CombinedSetting : virtual PrefixSetting {
     public:
-        NeroSetting(){}
+        CombinedSetting(){}
 
-        NeroSetting (const QString settingName, NeroRunner &parent) {
+        CombinedSetting (const QString settingName, NeroRunner &parent) {
             QString hash = parent.GetHash();
             QString shortcutProperty =  shortcuts % hash % '/' % settingName;
             QString prefixProperty = prefixSettings % '/' % settingName;
