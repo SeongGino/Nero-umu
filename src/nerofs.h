@@ -65,7 +65,6 @@ public:
     static void DeleteShortcut(const QString &);
 
     static QSettings* GetCurrentPrefixCfg();
-
     static QString GetIcoextract();
     static QString GetIcoutils();
     static QString GetUmU();

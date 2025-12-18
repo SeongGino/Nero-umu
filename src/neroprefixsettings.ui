@@ -968,8 +968,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>659</width>
-               <height>513</height>
+               <width>695</width>
+               <height>493</height>
               </rect>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -2100,7 +2100,7 @@
         </widget>
        </item>
        <item row="6" column="0">
-        <widget class="QGroupBox" name="wineToplogy">
+        <widget class="QGroupBox" name="wineTopology">
          <property name="title">
           <string>Wine CPU Toplogy</string>
          </property>
@@ -2114,23 +2114,13 @@
           <bool>false</bool>
          </property>
          <property name="isFor" stdset="0">
-          <string/>
+          <string>wineCpuTopology</string>
          </property>
          <layout class="QGridLayout" name="wineGrid">
-          <item row="1" column="1">
-           <widget class="QSpinBox" name="cpuCount">
-            <property name="enabled">
-             <bool>true</bool>
-            </property>
-            <property name="useFor" stdset="0">
-             <string>CpuCount</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="2">
+          <item row="0" column="1">
            <widget class="QCheckBox" name="core0">
             <property name="enabled">
-             <bool>true</bool>
+             <bool>false</bool>
             </property>
             <property name="text">
              <string notr="true">Core 0</string>
@@ -2140,17 +2130,7 @@
             </property>
            </widget>
           </item>
-          <item row="0" column="0">
-           <widget class="QCheckBox" name="toggleWineCpuTopology">
-            <property name="text">
-             <string>Enable Wine CPU Topology</string>
-            </property>
-            <property name="isFor" stdset="0">
-             <string>UseWineCpuTopology</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="3">
+          <item row="1" column="4">
            <spacer name="horizontalSpacer_28">
             <property name="orientation">
              <enum>Qt::Orientation::Horizontal</enum>
@@ -2163,7 +2143,17 @@
             </property>
            </spacer>
           </item>
-          <item row="1" column="0">
+          <item row="0" column="0">
+           <widget class="QSpinBox" name="cpuCount">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="useFor" stdset="0">
+             <string>CpuCount</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="4">
            <spacer name="horizontalSpacer_27">
             <property name="orientation">
              <enum>Qt::Orientation::Horizontal</enum>
@@ -2219,8 +2209,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>707</width>
-           <height>72</height>
+           <width>719</width>
+           <height>128</height>
           </rect>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_6">

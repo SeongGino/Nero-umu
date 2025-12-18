@@ -156,11 +156,12 @@ NeroPrefixSettingsWindow::NeroPrefixSettingsWindow(QWidget *parent, const QStrin
     //wine CPU topology setup
     int threads = QThread::idealThreadCount();
     ui->cpuCount->setMaximum(threads);
-    for (int i = 1; i <= threads; i++) {
+    for (int i = 1; i < threads; i++) {
         QString iStr = QString::number(i);
         QString core = "core" % iStr;
-        QCheckBox* box = new QCheckBox(ui->wineToplogy);
+        QCheckBox* box = new QCheckBox(ui->wineTopology);
         box->setObjectName(core);
+        box->setWhatsThis("Toggle to enable/disable usage of Core #" % QString::number(i));
         QString prop = "UseCore" % iStr;
         box->setProperty("isFor", prop);
         box->setText("Core" % iStr);
@@ -175,15 +176,24 @@ NeroPrefixSettingsWindow::NeroPrefixSettingsWindow(QWidget *parent, const QStrin
 
     // should be a way to method-ify this?
     for(const auto child : this->findChildren<QPushButton*>()) {
-        if(!child->property("whatsThis").isNull()) child->installEventFilter(this);
+        if(!child->property("whatsThis").isNull())
+            child->installEventFilter(this);
     }
     for(const auto child : this->findChildren<QCheckBox*>()) {
-        if(!child->property("whatsThis").isNull()) child->installEventFilter(this);
-        if(!child->property("isFor").isNull()) connect(child, &QCheckBox::checkStateChanged, this, &NeroPrefixSettingsWindow::OptionSet);
+        QVariant isFor = child->property("isFor");
+        if(!child->property("whatsThis").isNull())
+            child->installEventFilter(this);
+        if (!isFor.isNull()) {
+            !isFor.toString().contains("UseCore")
+                ? connect(child, &QCheckBox::checkStateChanged, this, &NeroPrefixSettingsWindow::OptionSet)
+                : connect(child, &QCheckBox::checkStateChanged, this, &NeroPrefixSettingsWindow::SetWineTopology);
+        }
     }
     for(const auto child : this->findChildren<QLineEdit*>()) {
-        if(!child->property("whatsThis").isNull()) child->installEventFilter(this);
-        if(!child->property("isFor").isNull()) connect(child, &QLineEdit::textEdited, this, &NeroPrefixSettingsWindow::OptionSet);
+        if(!child->property("whatsThis").isNull())
+            child->installEventFilter(this);
+        if(!child->property("isFor").isNull())
+            connect(child, &QLineEdit::textEdited, this, &NeroPrefixSettingsWindow::OptionSet);
     }
     for(const auto child : this->findChildren<QSpinBox*>()) {
         if(!child->property("whatsThis").isNull()) child->installEventFilter(this);
@@ -687,21 +697,21 @@ void NeroPrefixSettingsWindow::on_prefixInstallDiscordRPC_clicked()
     } while (!reply->isFinished());
 
     if(reply->error() != QNetworkReply::NoError) {
-        QString errorReply = "Error Message: " + reply->errorString();
-        QString failedDownload = "Nero failed to download the Discord RPC Bridge.\n" + errorReply;
-        QMessageBox::warning(this,
-                             "Error!",
-                             QString(failedDownload));
-        ui->infoBox->setTitle("");
-        ui->infoText->setText(failedDownload);
-        enableWidgets(true);
+        QString errorReply = "Error Message: " % reply->errorString();
+        QString failedDownload = "Nero failed to download the Discord RPC Bridge.\n" % errorReply;
+        displayError(failedDownload);
         return; //failed to download, return here
     }
 
     QByteArray bytes = reply->readAll();
     QString path(tmpDir.path() + "/nero-manager/bridge.zip");
     QSaveFile bridgeZip = QSaveFile(path);
-    bridgeZip.open(QIODevice::WriteOnly);
+    if (!bridgeZip.open(QIODevice::WriteOnly)) {
+        QString error = "Error Message: " % reply->errorString();
+        QString message = "Nero failed to extract the Discord RPC Bridge.\n" % error;
+        displayError(message);
+        return; //failed to extract
+    }
     QDataStream zipStream(&bridgeZip);
     zipStream << bytes;
     bridgeZip.commit();
@@ -714,9 +724,14 @@ void NeroPrefixSettingsWindow::on_prefixInstallDiscordRPC_clicked()
     zipFile.setCurrentFile("bridge.exe");
     QuaZipFile exeToExtract(&zipFile);
 
-    if(exeToExtract.open(QIODevice::ReadOnly)) {
+    if(!exeToExtract.open(QIODevice::ReadOnly)) {
         QFile outFile(tmpDir.absoluteFilePath("nero-manager/bridge.exe"));
-        outFile.open(QIODevice::ReadWrite);
+        if (!outFile.open(QIODevice::ReadWrite)) {
+            QString error = "Error Message: " % reply->errorString();
+            QString message = "Nero failed to extract the Discord RPC Bridge.\n" % error;
+            displayError(message);
+            return;
+        }
         outFile.write(exeToExtract.readAll());
         outFile.close();
 
@@ -737,6 +752,15 @@ void NeroPrefixSettingsWindow::on_prefixInstallDiscordRPC_clicked()
     enableWidgets(true);
     umuRunning = false;
     NeroPrefixSettingsWindow::blockSignals(false);
+}
+
+void NeroPrefixSettingsWindow::displayError(QString error) {
+    QMessageBox::warning(this,
+                         "Error!",
+                         error);
+    ui->infoBox->setTitle("");
+    ui->infoText->setText(error);
+    enableWidgets(true);
 }
 
 void NeroPrefixSettingsWindow::enableWidgets(bool isEnabled) {
@@ -826,6 +850,21 @@ void NeroPrefixSettingsWindow::on_tabWidget_currentChanged(int index)
 {
     ui->infoBox->setTitle("");
     ui->infoText->setText("Hover over an option to display info about it here.");
+}
+
+void NeroPrefixSettingsWindow::SetWineTopology() {
+    QStringList enabledCpus;
+    int i = 0;
+    for (const auto &child : ui->wineGrid->findChildren<QCheckBox*>()) {
+        Qt::CheckState state = child->checkState();
+        // TODO: add shortcut setting logic
+        if (state != Qt::Unchecked) {
+            enabledCpus << QString::number(i);
+        }
+        i++;
+    }
+    QString command = QString::number(ui->cpuCount->value()) % ':' % enabledCpus.join(',');
+
 }
 
 

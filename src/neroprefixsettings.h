@@ -53,6 +53,8 @@ public:
 
     QPushButton *deleteShortcut = nullptr;
 
+    void displayError(QString error);
+
 private slots:
     void on_shortcutIco_clicked();
 
@@ -81,6 +83,8 @@ private slots:
     void on_prefixInstallDiscordRPC_clicked();
 
     void OptionSet();
+
+    void SetWineTopology();
 
     void deleteShortcut_clicked();
 
