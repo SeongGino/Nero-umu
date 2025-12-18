@@ -28,6 +28,8 @@
 #include <QLineEdit>
 #include <QStandardItemModel>
 
+#include "widgets/virtualdriveframe.h"
+
 namespace Ui {
 class NeroVirtualDriveDialog;
 }
@@ -41,79 +43,52 @@ public:
     ~NeroVirtualDriveDialog();
 
 private slots:
-    void on_addDirBtn_clicked();
+    void onVirtualDriveLetterChanged(const QString, const QString);
+    void onVirtualDriveDriveDeleted(const QString);
 
-    void letterBox_activated(const int &);
+    void onAddDirBtnClicked(bool);
 
-    void changeBtn_clicked();
-
-    void deleteBtn_clicked();
-
-    void winLabel_textEdited(const QString);
+signals:
+    void updateWidgets(void);
 
 private:
     Ui::NeroVirtualDriveDialog *ui;
 
-    void RenderList();
+    void addVirtualDrive(const QString, const QString);
 
-    void AddDir(const QString, const QString);
+    QDir m_prefix;
 
-    void UpdateUsedLetters();
-
-    void SetComboBoxItemEnabled(QComboBox * comboBox, const int index, const bool enabled) {
-        if(index > -1) {
-            auto * model = qobject_cast<QStandardItemModel*>(comboBox->model());
-            auto * item = model->item(index);
-            item->setEnabled(enabled);
-        }
-    }
-
-    QDir prefixDir;
-    QDir externalDir;
-
-    QStringList usedLetters;
-
-    const QStringList letters = {
-        "A:",
-        "B:",
-        "C:",
-        "D:",
-        "E:",
-        "F:",
-        "G:",
-        "H:",
-        "I:",
-        "J:",
-        "K:",
-        "L:",
-        "M:",
-        "N:",
-        "O:",
-        "P:",
-        "Q:",
-        "R:",
-        "S:",
-        "T:",
-        "U:",
-        "V:",
-        "W:",
-        "X:",
-        "Y:",
-        "Z:"
+    QStringList m_usedLetters;
+    const QStringList m_letters = {
+        "a:",
+        "b:",
+        "c:",
+        "d:",
+        "e:",
+        "f:",
+        "g:",
+        "h:",
+        "i:",
+        "j:",
+        "k:",
+        "l:",
+        "m:",
+        "n:",
+        "o:",
+        "p:",
+        "q:",
+        "r:",
+        "s:",
+        "t:",
+        "u:",
+        "v:",
+        "w:",
+        "x:",
+        "y:",
+        "z:"
     };
 
-    QList<QComboBox*> dirLetter;
-    QList<QLabel*> dirPath;
-    QList<QLineEdit*> dirWinLabel;
-    QList<QPushButton*> dirChange;
-    QList<QPushButton*> dirDelete;
-    QList<QHBoxLayout*> dirLetterPathLayout;
-    QList<QVBoxLayout*> dirPathAndLabelsLayout;
-    QList<QHBoxLayout*> dirWholeLine;
-
-    QFont letterFont;
-    QFont lineEditFont;
-    QFont mainLabelFont;
+    QList<VirtualDriveFrame*> dirFrames;
 };
 
 #endif // NERODRIVES_H
