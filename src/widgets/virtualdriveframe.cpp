@@ -85,11 +85,9 @@ void VirtualDriveFrame::update()
         auto data = ui->dirLetter->itemData(index, Qt::ItemDataRole::UserRole);
         QFileInfo parser(m_prefix.path().append("/").append(data.toString()));
 
-        if ( parser.isDir() ) {
-            auto * model = qobject_cast<QStandardItemModel*>(ui->dirLetter->model());
-            auto * item = model->item(index);
-            item->setEnabled(false);
-        }
+        auto * model = qobject_cast<QStandardItemModel*>(ui->dirLetter->model());
+        auto * item = model->item(index);
+        item->setEnabled( !parser.isDir() );
     }
 }
 
