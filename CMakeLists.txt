@@ -78,6 +78,9 @@ set(PROJECT_SOURCES
         src/neroonetimedialog.h
         src/neroonetimedialog.cpp
         src/neroonetimedialog.ui
+        src/widgets/virtualdriveframe.h
+        src/widgets/virtualdriveframe.cpp
+        src/widgets/virtualdriveframe.ui
         ${TS_FILES}
         img/pics.qrc
 )
