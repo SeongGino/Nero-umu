@@ -968,8 +968,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>600</width>
-               <height>493</height>
+               <width>606</width>
+               <height>423</height>
               </rect>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -1861,9 +1861,6 @@
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <item>
        <widget class="QScrollArea" name="infoScrollArea">
-        <property name="styleSheet">
-         <string notr="true">background-color: transparent</string>
-        </property>
         <property name="frameShape">
          <enum>QFrame::Shape::NoFrame</enum>
         </property>
@@ -1881,8 +1878,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>624</width>
-           <height>68</height>
+           <width>628</width>
+           <height>137</height>
           </rect>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_6">

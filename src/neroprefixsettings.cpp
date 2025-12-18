@@ -169,6 +169,10 @@ NeroPrefixSettingsWindow::NeroPrefixSettingsWindow(QWidget *parent, const QStrin
         ui->infoBox->setStyleSheet("QGroupBox::title { color: #909000 }");
         ui->infoText->setStyleSheet("color: doubledarkgray");
     }
+
+    // do not use stylesheets on QScrollAreas, they destroy the scrollbar look
+    ui->infoScrollArea->widget()->setAutoFillBackground(false);
+    ui->infoScrollArea->viewport()->setAutoFillBackground(false);
 }
 
 bool NeroPrefixSettingsWindow::eventFilter(QObject* object, QEvent* event)
