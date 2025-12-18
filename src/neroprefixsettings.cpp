@@ -153,7 +153,9 @@ NeroPrefixSettingsWindow::NeroPrefixSettingsWindow(QWidget *parent, const QStrin
     ui->goat1->setVisible(false);
     ui->goat2->setVisible(false);
 
-    //wine CPU topology setup
+    // wine CPU topology UI setup
+    // get number of threads on the system, then create
+    // checkboxes of equivalent amount of cores
     int threads = QThread::idealThreadCount();
     ui->cpuCount->setMaximum(threads);
     for (int i = 1; i < threads; i++) {
@@ -163,6 +165,7 @@ NeroPrefixSettingsWindow::NeroPrefixSettingsWindow(QWidget *parent, const QStrin
         box->setObjectName(core);
         box->setWhatsThis("Toggle to enable/disable usage of Core #" % QString::number(i));
         QString prop = "UseCore" % iStr;
+        box->setProperty("core", i);
         box->setProperty("isFor", prop);
         box->setText("Core" % iStr);
         ui->wineGrid->addWidget(box);
@@ -216,10 +219,10 @@ NeroPrefixSettingsWindow::NeroPrefixSettingsWindow(QWidget *parent, const QStrin
 bool NeroPrefixSettingsWindow::eventFilter(QObject* object, QEvent* event)
 {
     //owo whats this
-    bool whatsThisIsNull = !object->property("whatsThis").isNull();
+    QVariant whatsThis = object->property("whatsThis");
     bool hasEnterEvent = event->type() == QEvent::Enter;
-    if(!umuRunning && hasEnterEvent && !whatsThisIsNull) {
-        ui->infoText->setText(object->property("whatsThis").toString()),
+    if(!umuRunning && hasEnterEvent && whatsThis.isNull()) {
+        ui->infoText->setText(whatsThis.toString()),
         ui->infoBox->setTitle(object->property("accessibleName").toString());
     }
     return QWidget::eventFilter(object, event);
@@ -363,7 +366,11 @@ void NeroPrefixSettingsWindow::LoadSettings()
             else */
                 ui->shortcutPath->setStyleSheet("color: red");
         }
+        QVariant v = settings["wineCpuTopology"];
+        if (v != QVariant()) {
+            QString val = v.toString();
 
+        }
         QDir ico(NeroFS::GetPrefixesPath()->path()+'/'+NeroFS::GetCurrentPrefix()+"/.icoCache");
         if(ico.exists(settings["Name"].toString()+'-'+currentShortcutHash+".png")) {
             if(QPixmap(ico.path()+'/'+settings["Name"].toString()+'-'+currentShortcutHash+".png").height() < 64)
@@ -852,10 +859,30 @@ void NeroPrefixSettingsWindow::on_tabWidget_currentChanged(int index)
     ui->infoText->setText("Hover over an option to display info about it here.");
 }
 
+void NeroPrefixSettingsWindow::GetWineTopology(QString setting) {
+    QStringList split = setting.split(":");
+    int maxCores = split[0].toInt();
+    ui->cpuCount->setValue(maxCores);
+    QStringList enabledCores = split[1].split(",");
+    int i = 0;
+    for (const auto &child: ui->wineGrid->findChildren<QCheckBox*>()) {
+        if (i == child->property("cpuCore")) {
+            child->setChecked(true);
+        }
+        i++;
+    }
+}
+
 void NeroPrefixSettingsWindow::SetWineTopology() {
     QStringList enabledCpus;
+    int maxCores = ui->cpuCount->value();
     int i = 0;
+
     for (const auto &child : ui->wineGrid->findChildren<QCheckBox*>()) {
+        if(i >= maxCores) {
+            child->setEnabled(false);
+            continue;
+        }
         Qt::CheckState state = child->checkState();
         // TODO: add shortcut setting logic
         if (state != Qt::Unchecked) {
@@ -863,8 +890,8 @@ void NeroPrefixSettingsWindow::SetWineTopology() {
         }
         i++;
     }
-    QString command = QString::number(ui->cpuCount->value()) % ':' % enabledCpus.join(',');
-
+    QString command = QString::number(maxCores) % ':' % enabledCpus.join(',');
+    settings.value("WineCpuTopology", command);
 }
 
 

@@ -968,8 +968,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>695</width>
-               <height>493</height>
+               <width>659</width>
+               <height>513</height>
               </rect>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -2128,6 +2128,9 @@
             <property name="useFor" stdset="0">
              <string>core0</string>
             </property>
+            <property name="core" stdset="0">
+             <number>0</number>
+            </property>
            </widget>
           </item>
           <item row="1" column="4">
@@ -2209,8 +2212,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>719</width>
-           <height>128</height>
+           <width>707</width>
+           <height>72</height>
           </rect>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_6">

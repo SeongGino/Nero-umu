@@ -54,6 +54,7 @@ public:
     QPushButton *deleteShortcut = nullptr;
 
     void displayError(QString error);
+    void GetWineTopology(QString setting);
 
 private slots:
     void on_shortcutIco_clicked();
