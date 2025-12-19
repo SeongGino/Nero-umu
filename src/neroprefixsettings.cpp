@@ -183,11 +183,11 @@ NeroPrefixSettingsWindow::NeroPrefixSettingsWindow(QWidget *parent, const QStrin
             child->installEventFilter(this);
     }
     for(const auto child : this->findChildren<QCheckBox*>()) {
-        QVariant isFor = child->property("isFor");
+        QVariant v = child->property("isFor");
         if(!child->property("whatsThis").isNull())
             child->installEventFilter(this);
-        if (!isFor.isNull()) {
-            !isFor.toString().contains("UseCore")
+        if (!v.isNull()) {
+            !v.toString().contains("UseCore")
                 ? connect(child, &QCheckBox::checkStateChanged, this, &NeroPrefixSettingsWindow::OptionSet)
                 : connect(child, &QCheckBox::checkStateChanged, this, &NeroPrefixSettingsWindow::SetWineTopology);
         }
@@ -199,14 +199,22 @@ NeroPrefixSettingsWindow::NeroPrefixSettingsWindow(QWidget *parent, const QStrin
             connect(child, &QLineEdit::textEdited, this, &NeroPrefixSettingsWindow::OptionSet);
     }
     for(const auto child : this->findChildren<QSpinBox*>()) {
-        if(!child->property("whatsThis").isNull()) child->installEventFilter(this);
+        if(!child->property("whatsThis").isNull())
+            child->installEventFilter(this);
         // QSpinboxes' "valueChanged" signal isn't new syntax friendly?
-        if(!child->property("isFor").isNull()) connect(child, SIGNAL(valueChanged(int)), this, SLOT(OptionSet()));
+        QVariant v = child->property("isFor");
+        if(!v.isNull()) {
+            !v.toString().contains("UseCore")
+                ? connect(child, SIGNAL(valueChanged(int)), this, SLOT(OptionSet()))
+                : connect(child, SIGNAL(valueChanged(int)), this, SLOT(SetWineTopology()));
+        }
     }
     for(const auto child : this->findChildren<QComboBox*>()) {
-        if(!child->property("whatsThis").isNull()) child->installEventFilter(this);
+        if(!child->property("whatsThis").isNull())
+            child->installEventFilter(this);
         // QComboboxes aren't new syntax friendly?
-        if(!child->property("isFor").isNull()) connect(child, SIGNAL(activated(int)), this, SLOT(OptionSet()));
+        if(!child->property("isFor").isNull())
+            connect(child, SIGNAL(activated(int)), this, SLOT(OptionSet()));
     }
 
     // light mode styling adjustments:
@@ -267,11 +275,22 @@ void NeroPrefixSettingsWindow::LoadSettings()
         field->setText(settings.value(neroSetting).toString());
     }
 
+    // there was no good name for these once I realized all options
+    // could be consolidated into a scrollable field.
+    // so lets just hide that fact
+    QString up = "ImageReconstructionUpgrade";
+    QString ind = "ImageReconstructionIndicator";
     QMap<QString, QComboBox*> comboBoxes = {
         // general tab->graphics group
         {"ScalingMode",        ui->setScalingBox},
         {"GamescopeScaler",    ui->gamescopeSetScalerBox},
         {"GamescopeFilter",    ui->gamescopeSetUpscalingBox},
+        // advanced tab
+        {"DebugOutput",        ui->debugBox},
+        {"FileSyncMode",       ui->fileSyncBox},
+        //Experimental
+        {up,                   ui->imageReconstructionBox},
+        {ind,                  ui->imageReconstructionIndBox},
     };
     for (auto i = comboBoxes.begin(), end = comboBoxes.end(); i != end; i++) {
         QString neroSetting = i.key();
@@ -295,17 +314,6 @@ void NeroPrefixSettingsWindow::LoadSettings()
         }
     }
 
-    // advanced tab
-    ui->debugBox->setCurrentIndex(settings.value("DebugOutput").toInt());
-    ui->fileSyncBox->setCurrentIndex(settings.value("FileSyncMode").toInt());
-
-
-    //Experimental
-    int imageReconstructionUpgrade = settings.value("ImageReconstructionUpgrade").toInt();
-    int imageReconstructionIndicator = settings.value("ImageReconstructionIndicator").toInt();
-    ui->imageReconstructionBox->setCurrentIndex(imageReconstructionUpgrade);
-    ui->imageReconstructionIndBox->setCurrentIndex(imageReconstructionIndicator);
-
     QMap<QString, QCheckBox*> checkboxes = {
         // general tab->services group
         {"Gamemode",           ui->toggleGamemode},
@@ -322,6 +330,7 @@ void NeroPrefixSettingsWindow::LoadSettings()
         {"AllowHidraw",        ui->toggleHidraw},
         {"UseXalia",           ui->toggleXalia},
         {"UseNvidiaLibs",      ui->toggleNvidiaLibs},
+        {"DisableSteamInput",  ui->toggleSteamInput},
     };
     for (auto i = checkboxes.begin(), end = checkboxes.end(); i != end; i++) {
         QString neroOption = i.key();
@@ -883,6 +892,7 @@ void NeroPrefixSettingsWindow::SetWineTopology() {
             child->setEnabled(false);
             continue;
         }
+        child->setFont(boldFont);
         Qt::CheckState state = child->checkState();
         // TODO: add shortcut setting logic
         if (state != Qt::Unchecked) {
@@ -894,62 +904,77 @@ void NeroPrefixSettingsWindow::SetWineTopology() {
     settings.value("WineCpuTopology", command);
 }
 
-
 void NeroPrefixSettingsWindow::OptionSet()
 {
-    if(sender()->inherits("QComboBox")) {
-        QComboBox* comboBox = qobject_cast<QComboBox*>(sender());
+    // declaring here means that we dont have to iterate
+    // through settings map every time, plus avoids declaring
+    // in every flow
+    QString val = sender()->property("isFor").toString();
+    QVariant cfg = settings.value(val);
+    // is there like a way to inline declarations in cpp? id love to just have these be declared
+    // at the start of each if else instead of this or making the flow syntax worse.
+    QComboBox* comboBox = qobject_cast<QComboBox*>(sender());
+    QCheckBox* checkBox = qobject_cast<QCheckBox*>(sender());
+    QLineEdit* lineEdit = qobject_cast<QLineEdit*>(sender());
+    QSpinBox* spinBox = qobject_cast<QSpinBox*>(sender());
+    QString type = sender()->metaObject()->className();
+    if (comboBox != nullptr) {
+        QVariant cfg = settings.value(val);
         // Shortcut settings: handle "use default" (blank entry)
-        if(settings.value(comboBox->property("isFor").toString()).toString().isEmpty())
-            if(comboBox->currentIndex() > 0)
-                comboBox->setFont(boldFont);
-            else comboBox->setFont(QFont());
+        if (cfg.toString().isEmpty())
+            comboBox->currentIndex() > 0
+                ? comboBox->setFont(boldFont)
+                : comboBox->setFont(QFont());
         // Global prefix settings: always set to an index
-        else if(!currentShortcutHash.isEmpty()) {
-            if(comboBox->currentIndex()-1 != settings.value(comboBox->property("isFor").toString()).toInt())
-                comboBox->setFont(boldFont);
-            else comboBox->setFont(QFont());
-        } else if(comboBox->currentIndex() != settings.value(comboBox->property("isFor").toString()).toInt())
-            comboBox->setFont(boldFont);
-        else comboBox->setFont(QFont());
+        else if (!currentShortcutHash.isEmpty())
+            comboBox->currentIndex()-1 != cfg.toInt()
+                ? comboBox->setFont(boldFont)
+                : comboBox->setFont(QFont());
+        else
+            comboBox->currentIndex() != cfg.toInt()
+                ? comboBox->setFont(boldFont)
+                : comboBox->setFont(QFont());
         // extra check for Windows box, since the index doesn't quite match the way it's listed in the UI.
-        if(comboBox == ui->winVerBox) {
-            if(settings.value("WindowsVersion").toString().isEmpty())
+        if (comboBox == ui->winVerBox) {
+            QVariant win = settings.value("WindowsVersion");
+            if(win.toString().isEmpty())
                 // ensures that the box is marked when selecting the topmost entry.
                 comboBox->setFont(boldFont);
-            else if(comboBox->currentText() == winVersionListBackwards[settings.value("WindowsVersion").toInt()])
-                comboBox->setFont(QFont()); }
-
-    } else if(sender()->inherits("QCheckBox")) {
-        QCheckBox* checkBox = qobject_cast<QCheckBox*>(sender());
+            else if(comboBox->currentText() == winVersionListBackwards[win.toInt()])
+                comboBox->setFont(QFont());
+        }
+    } else if (checkBox != nullptr) {
         // Shortcut settings: handle "use default" half-checked state (blank entry)
-        if(checkBox->isTristate())
-            if(settings.value(checkBox->property("isFor").toString()).toString().isEmpty())
-                if(checkBox->checkState() != Qt::PartiallyChecked)
-                    checkBox->setFont(boldFont);
-                else checkBox->setFont(QFont());
-            else if(checkBox->checkState() != Qt::Checked && settings.value(checkBox->property("isFor").toString()).toBool())
+        if(checkBox->isTristate()) {
+            if(cfg.toString().isEmpty())
+                checkBox->checkState() != Qt::PartiallyChecked
+                    ? checkBox->setFont(boldFont)
+                    : checkBox->setFont(QFont());
+            else if(checkBox->checkState() != Qt::Checked && cfg.toBool())
                 checkBox->setFont(boldFont);
-            else if(checkBox->checkState() != Qt::Unchecked && !settings.value(checkBox->property("isFor").toString()).toBool())
+            else if(checkBox->checkState() != Qt::Unchecked && !cfg.toBool())
                 checkBox->setFont(boldFont);
             else checkBox->setFont(QFont());
-        // Normal Global prefix style on/off toggles
-        else if(checkBox->isChecked() != settings.value(checkBox->property("isFor").toString()).toBool())
-            checkBox->setFont(boldFont);
-        else checkBox->setFont(QFont());
+        } else {
+            // Normal Global prefix style on/off toggles
+            checkBox->isChecked() != settings.value(val).toBool()
+                ? checkBox->setFont(boldFont)
+                : checkBox->setFont(QFont());
+        }
+    } else if (spinBox != nullptr) {
+        spinBox->value() != cfg.toInt()
+            ? spinBox->setFont(boldFont)
+            : spinBox->setFont(QFont());
 
-    } else if(sender()->inherits("QSpinBox")) {
-        QSpinBox* spinBox = qobject_cast<QSpinBox*>(sender());
-        if(spinBox->value() != settings.value(spinBox->property("isFor").toString()).toInt())
-            spinBox->setFont(boldFont);
-        else spinBox->setFont(QFont());
-
-    } else if(sender()->inherits("QLineEdit")) {
-        QLineEdit* lineEdit = qobject_cast<QLineEdit*>(sender());
-        if(lineEdit->text() != settings.value(lineEdit->property("isFor").toString()).toString())
-            lineEdit->setFont(boldFont);
-        else lineEdit->setFont(QFont());
+    } else if (lineEdit != nullptr) {
+        lineEdit->text() != cfg.toString()
+            ? lineEdit->setFont(boldFont)
+            : lineEdit->setFont(QFont());
     }
+}
+
+void NeroPrefixSettingsWindow::setFont(QWidget* w) {
+    w->setFont(boldFont);
 }
 
 

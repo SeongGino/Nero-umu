@@ -203,7 +203,7 @@ private:
     QList<QPushButton*> dllDelete;
 
     QList<QAction*> dllOptions;
-
+    void setFont(QWidget* w);
     QFont boldFont;
 
     bool umuRunning = false;

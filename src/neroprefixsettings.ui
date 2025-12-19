@@ -1475,7 +1475,7 @@
          <property name="alignment">
           <set>Qt::AlignmentFlag::AlignCenter</set>
          </property>
-         <layout class="QGridLayout" name="gridLayout_6" columnstretch="1,0,2,1">
+         <layout class="QGridLayout" name="gridLayout_6" columnstretch="1,0,0,0">
           <item row="1" column="3">
            <spacer name="horizontalSpacer_8">
             <property name="orientation">
@@ -1489,6 +1489,13 @@
             </property>
            </spacer>
           </item>
+          <item row="1" column="1">
+           <widget class="QLabel" name="label_4">
+            <property name="text">
+             <string>Debug Output:</string>
+            </property>
+           </widget>
+          </item>
           <item row="1" column="0">
            <spacer name="horizontalSpacer_7">
             <property name="orientation">
@@ -1501,6 +1508,63 @@
              </size>
             </property>
            </spacer>
+          </item>
+          <item row="0" column="0" colspan="4">
+           <widget class="QGroupBox" name="envBox">
+            <property name="title">
+             <string/>
+            </property>
+            <property name="flat">
+             <bool>true</bool>
+            </property>
+            <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="1,2,1">
+             <item>
+              <spacer name="horizontalSpacer_17">
+               <property name="orientation">
+                <enum>Qt::Orientation::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QLineEdit" name="prefixEnvVars">
+               <property name="whatsThis">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enter any desired Environment Variables that you might need for this prefix.&lt;/p&gt;&lt;p&gt;Environment Variables must be entered in &lt;span style=&quot; font-weight:700;&quot;&gt;KEY=&amp;quot;values&amp;quot; &lt;/span&gt;format.&lt;/p&gt;&lt;p&gt;Any Environment Variables added here will be prepended to the main runner environment for this prefix when an application starts.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="accessibleName">
+                <string>Custom Prefix Environment Variables</string>
+               </property>
+               <property name="placeholderText">
+                <string>Enter Custom Environment Variables...</string>
+               </property>
+               <property name="clearButtonEnabled">
+                <bool>true</bool>
+               </property>
+               <property name="isFor" stdset="0">
+                <string>CustomEnvVars</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_18">
+               <property name="orientation">
+                <enum>Qt::Orientation::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </widget>
           </item>
           <item row="3" column="0" colspan="4">
            <widget class="QGroupBox" name="prefixServices">
@@ -1642,70 +1706,6 @@
               </widget>
              </item>
             </layout>
-           </widget>
-          </item>
-          <item row="0" column="0" colspan="4">
-           <widget class="QGroupBox" name="envBox">
-            <property name="title">
-             <string/>
-            </property>
-            <property name="flat">
-             <bool>true</bool>
-            </property>
-            <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="1,2,1">
-             <item>
-              <spacer name="horizontalSpacer_17">
-               <property name="orientation">
-                <enum>Qt::Orientation::Horizontal</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>40</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-             <item>
-              <widget class="QLineEdit" name="prefixEnvVars">
-               <property name="whatsThis">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enter any desired Environment Variables that you might need for this prefix.&lt;/p&gt;&lt;p&gt;Environment Variables must be entered in &lt;span style=&quot; font-weight:700;&quot;&gt;KEY=&amp;quot;values&amp;quot; &lt;/span&gt;format.&lt;/p&gt;&lt;p&gt;Any Environment Variables added here will be prepended to the main runner environment for this prefix when an application starts.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-               </property>
-               <property name="accessibleName">
-                <string>Custom Prefix Environment Variables</string>
-               </property>
-               <property name="placeholderText">
-                <string>Enter Custom Environment Variables...</string>
-               </property>
-               <property name="clearButtonEnabled">
-                <bool>true</bool>
-               </property>
-               <property name="isFor" stdset="0">
-                <string>CustomEnvVars</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <spacer name="horizontalSpacer_18">
-               <property name="orientation">
-                <enum>Qt::Orientation::Horizontal</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>40</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-            </layout>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QLabel" name="label_4">
-            <property name="text">
-             <string>Debug Output:</string>
-            </property>
            </widget>
           </item>
           <item row="1" column="2">
