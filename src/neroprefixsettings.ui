@@ -968,8 +968,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>659</width>
-               <height>513</height>
+               <width>695</width>
+               <height>493</height>
               </rect>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -2120,7 +2120,7 @@
           <item row="0" column="1">
            <widget class="QCheckBox" name="core0">
             <property name="enabled">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
             <property name="text">
              <string notr="true">Core 0</string>
@@ -2149,9 +2149,9 @@
           <item row="0" column="0">
            <widget class="QSpinBox" name="cpuCount">
             <property name="enabled">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
-            <property name="useFor" stdset="0">
+            <property name="isFor" stdset="0">
              <string>CpuCount</string>
             </property>
            </widget>
@@ -2212,8 +2212,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>707</width>
-           <height>72</height>
+           <width>719</width>
+           <height>128</height>
           </rect>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_6">
