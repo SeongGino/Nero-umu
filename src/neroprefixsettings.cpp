@@ -886,7 +886,6 @@ void NeroPrefixSettingsWindow::SetWineTopology() {
     QStringList enabledCpus;
     int maxCores = ui->cpuCount->value();
     int i = 0;
-
     for (const auto &child : ui->wineGrid->findChildren<QCheckBox*>()) {
         if(i >= maxCores) {
             child->setEnabled(false);
@@ -980,9 +979,10 @@ void NeroPrefixSettingsWindow::setFont(QWidget* w) {
 
 void NeroPrefixSettingsWindow::on_buttonBox_clicked(QAbstractButton *button)
 {
-    if(ui->buttonBox->standardButton(button) == QDialogButtonBox::Reset) {
+    if (ui->buttonBox->standardButton(button) == QDialogButtonBox::Reset) {
         LoadSettings();
-    } else if(ui->buttonBox->standardButton(button) == QDialogButtonBox::Save) {
+        return;
+    }
         QStringList dllsToAdd;
         for(const QString &key : dllOverrides.keys()) {
             switch(dllOverrides.value(key)) {
@@ -1102,10 +1102,8 @@ void NeroPrefixSettingsWindow::on_buttonBox_clicked(QAbstractButton *button)
 
 
             appName = ui->shortcutName->text().trimmed();
-
         }
     // cancel button case isn't needed, since we filter by font to find changed values.
-    }
 }
 
 
