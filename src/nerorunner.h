@@ -88,7 +88,7 @@ public:
 
         QVariant getSettingVariant() { return settingVariant; }
 
-        QString convertBoolToIntString() { return QString::number(toBool()); }
+        QString boolToStringInt() { return QString::number(toBool()); }
     protected:
         QVariant settingVariant;
     };

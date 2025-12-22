@@ -103,37 +103,35 @@ int NeroRunner::StartShortcut(const QString &hash, const bool &prefixAlreadyRunn
     //   q) << settings->value("Shortcuts--"+hash+"/CustomEnvVars").toStringList();
     //}
     CombinedSetting dllOverride = CombinedSetting(NeroConfig::dllOverride, *this);
-    bool ignoreGlobalDll = CombinedSetting(NeroConfig::ignoreGlobalDlls, *this).hasSettingAndToBool();
-    QStringList dllShortcutOverrides = dllOverride.hasSetting() && ignoreGlobalDll
-                                    ? dllOverride.toStringList() << env.value(CliArgs::Wine::dllOverrides)
-                                    : dllOverride.getPrefixVariant().toStringList() << env.value(CliArgs::Wine::dllOverrides);
+    CombinedSetting ignored(NeroConfig::ignoreGlobalDlls, *this);
+    bool ignoreGlobalDlls = ignored.toBool();
+    QStringList dllShortcutOverrides = ignoreGlobalDlls
+                                    ? dllOverride.toStringList()
+                                    : dllOverride.getPrefixVariant().toStringList() << dllOverride.toStringList();
+    dllShortcutOverrides << env.value(CliArgs::Wine::dllOverrides);
     env.insert(CliArgs::Wine::dllOverrides, dllShortcutOverrides.join(';'));
 
-    // D8VK is dependent on DXVK's existence, so forcing WineD3D overrides D8VK.
     CombinedSetting forceWine = CombinedSetting(NeroConfig::Proton::forceWineD3D, *this);
-    bool disableD8vk = CombinedSetting(NeroConfig::Proton::noD8VK, *this).toBool();
-    if(!forceWine.hasShortcutSetting() && forceWine.hasSetting()) {
-        QString wineD3DValue = PrefixSetting(NeroConfig::Proton::forceWineD3D, *this).convertBoolToIntString();
-        env.insert(CliArgs::Proton::useWineD3D, wineD3DValue);
-    } else if (forceWine.hasShortcutSetting()){
-        QString wineD3DValue = forceWine.convertBoolToIntString();
-        env.insert(CliArgs::Proton::useWineD3D, wineD3DValue);
+    CombinedSetting disableD8vk(NeroConfig::Proton::noD8VK, *this);
+    if (forceWine.hasSetting()) {
+        bool isWine = forceWine.toBool();
+        env.insert(CliArgs::Proton::useWineD3D, QString::number(isWine));
+        // D8VK is dependent on DXVK's existence, so forcing WineD3D overrides D8VK.
+        if (!disableD8vk.toBool() && !isWine)
+            env.insert(CliArgs::Proton::dxvkD3D8, TRUE);
     } else {
-        disableD8vk
-            ? env.insert(CliArgs::Proton::dxvkD3D8, FALSE)
-            : env.insert(CliArgs::Proton::dxvkD3D8, TRUE);
+        env.insert(CliArgs::Proton::dxvkD3D8, TRUE);
     }
     QMap<QString, QString> boolOptions{
-        {NeroConfig::enableNvApi, CliArgs::Proton::Nvidia::forceNvapi},
+        {NeroConfig::enableNvApi,               CliArgs::Proton::Nvidia::forceNvapi},
         {NeroConfig::Proton::limitGlExtensions, CliArgs::Proton::oldGl},
-        {NeroConfig::vkCapture, CliArgs::obsVkCapture},
-        {NeroConfig::forceIGpu, CliArgs::forceIgpu},
+        {NeroConfig::vkCapture,                 CliArgs::obsVkCapture},
+        {NeroConfig::forceIGpu,                 CliArgs::forceIgpu},
     };
     boolOptions = InsertArgs(boolOptions, false);
     int fpsLimit = CombinedSetting(NeroConfig::limitFps, *this).toInt();
-    if(fpsLimit) {
+    if(fpsLimit)
         env.insert(CliArgs::dxvkFrameRate, QString::number(fpsLimit));
-    }
     int syncType = CombinedSetting(NeroConfig::fileSyncMode, *this).toInt();
     SetSyncMode(protonRunner, syncType);
     CombinedSetting debug(NeroConfig::debugOutput, *this);
@@ -192,13 +190,12 @@ int NeroRunner::StartShortcut(const QString &hash, const bool &prefixAlreadyRunn
         arguments.append(args);
     }
 
-    if(CombinedSetting(NeroConfig::gamemode, *this).hasSetting()) {
+    if(CombinedSetting(NeroConfig::gamemode, *this).toBool())
         arguments.prepend(CliArgs::gamemoderun);
-    }
 
     int scalingMode = CombinedSetting(NeroConfig::Gamescope::scalingMode, *this).toInt();
     bool isNotPrefixOnly = false;
-    SetScalingMode(scalingMode, fpsLimit, isNotPrefixOnly, arguments);
+    arguments = SetScalingMode(scalingMode, fpsLimit, isNotPrefixOnly, arguments);
     bool mangoHudEnabled = CombinedSetting(NeroConfig::mangohud, *this).hasSettingAndToBool();
     if(mangoHudEnabled) {
         bool isMangoEnv = env.contains(NeroConfig::mangohud.toUpper());
@@ -350,7 +347,7 @@ int NeroRunner::StartOnetime(const QString &path, const bool &prefixAlreadyRunni
             ? env.insert(xalia, TRUE)
             : env.insert(xalia, FALSE);
     }
-   
+
     bool isWaylandEnv = env.contains(CliArgs::waylandDisplay)
             ? !env.value(CliArgs::waylandDisplay).isEmpty()
             : false;
@@ -377,7 +374,7 @@ int NeroRunner::StartOnetime(const QString &path, const bool &prefixAlreadyRunni
     }
     int scalingMode = PrefixSetting(NeroConfig::Gamescope::scalingMode, *this).toInt();
     int fpsLimit = PrefixSetting(NeroConfig::limitFps, *this).toInt();
-    SetScalingMode(scalingMode, fpsLimit, isPrefixOnly, arguments);
+    arguments = SetScalingMode(scalingMode, fpsLimit, isPrefixOnly, arguments);
 
     bool mangoHudEnabled = PrefixSetting(NeroConfig::mangohud, *this).toBool();
     if(mangoHudEnabled) {
@@ -436,9 +433,9 @@ QStringList NeroRunner::SetScalingMode(int scalingMode, int fpsLimit, bool isPre
     case NeroConstant::ScalingGamescopeFullscreen: {
         arguments.prepend(CliArgs::doubleDash);
         arguments.prepend(CliArgs::Gamescope::fullscreen);
-        QMap<QString, QString> resMap{
-            {CliArgs::Gamescope::height, NeroConfig::Gamescope::outputResH},
-            {CliArgs::Gamescope::width, NeroConfig::Gamescope::outputResW}
+        QMap<QString, QString> resMap {
+            {NeroConfig::Gamescope::outputResH, CliArgs::Gamescope::height},
+            {NeroConfig::Gamescope::outputResW, CliArgs::Gamescope::width},
         };
         for(auto i = resMap.begin(), end = resMap.end(); i != end; i++) {
             QString setting = i.key();
@@ -467,18 +464,18 @@ QStringList NeroRunner::SetScalingMode(int scalingMode, int fpsLimit, bool isPre
         arguments.prepend(CliArgs::Gamescope::name);
         break;
     }
-    case NeroConstant::ScalingGamescopeBorderless:
+    case NeroConstant::ScalingGamescopeBorderless: {
         arguments.prepend(CliArgs::doubleDash);
         arguments.prepend(CliArgs::Gamescope::borderless);
-    case NeroConstant::ScalingGamescopeWindowed: {
+    case NeroConstant::ScalingGamescopeWindowed:
         if(!arguments.contains(CliArgs::doubleDash)) {
             arguments.prepend(CliArgs::doubleDash);
         }
         QMap<QString, QString> resMap{
-            {CliArgs::Gamescope::windowedHeight, NeroConfig::Gamescope::windowedResH},
-            {CliArgs::Gamescope::windowedWidth, NeroConfig::Gamescope::windowedResW},
-            {CliArgs::Gamescope::height, NeroConfig::Gamescope::outputResH},
-            {CliArgs::Gamescope::width, NeroConfig::Gamescope::outputResW}
+            {NeroConfig::Gamescope::windowedResH, CliArgs::Gamescope::windowedHeight},
+            {NeroConfig::Gamescope::windowedResW, CliArgs::Gamescope::windowedWidth},
+            {NeroConfig::Gamescope::outputResH,   CliArgs::Gamescope::height},
+            {NeroConfig::Gamescope::outputResW,   CliArgs::Gamescope::width}
         };
         for(auto i = resMap.begin(), end = resMap.end(); i != end; i++) {
             QString setting = i.key();
@@ -501,7 +498,7 @@ QStringList NeroRunner::SetScalingMode(int scalingMode, int fpsLimit, bool isPre
             arguments.prepend(a);
             arguments.prepend(CliArgs::Gamescope::unfocusedFpsLimit);
         }
-        //arguments.prepend("--adaptive-sync");
+        arguments.prepend("--adaptive-sync");
         arguments.prepend(CliArgs::Gamescope::name);
         break;
     }
