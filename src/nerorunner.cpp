@@ -214,10 +214,19 @@ int NeroRunner::StartShortcut(const QString &hash, const bool &prefixAlreadyRunn
     runner.setWorkingDirectory(workingDir);
     QString command = arguments.takeFirst();
     QString name = CombinedSetting(NeroConfig::name, *this).toString();
-    QString logFilePath = '/' % name % '-' % hash % ".txt";
-    QString launchArgs = arguments.join(' ');
-    QFileInfo logInfo = InitLogging(LaunchInfo(prefixPath, logFilePath, command, launchArgs), runner.environment());
-    QFile log(logInfo.absoluteFilePath());
+    QDir logsDir(prefixPath);
+    if(!logsDir.exists(Logs::logDirName))
+        logsDir.mkdir(Logs::logDirName);
+    logsDir.cd(Logs::logDirName);
+    QFile log = QFile(logsDir.path() % '/' % name % '-' % hash % ".txt");
+    if(loggingEnabled) {
+        log.open(QIODevice::WriteOnly);
+        log.resize(0);
+        log.write(Logs::currentlyRunningEnv.toLocal8Bit());
+        log.write(runner.environment().join('\n').toLocal8Bit());
+        log.write(Logs::runningCommand.toLocal8Bit() % command.toLocal8Bit() % ' ' % arguments.join(' ').toLocal8Bit() % Logs::newLine.toLocal8Bit());
+        log.write(Logs::blankLine.toLocal8Bit());
+    }
     runner.start(command, arguments);
     runner.waitForStarted(-1);
     WaitLoop(runner, log);
@@ -392,12 +401,21 @@ int NeroRunner::StartOnetime(const QString &path, const bool &prefixAlreadyRunni
 
     QString command = arguments.takeFirst();
 
-    QString launchArgs = arguments.join(' ');
-    QString logFile = '/' % path.mid(path.lastIndexOf('/')+1) % ".txt";
-    QFileInfo logInfo = InitLogging(LaunchInfo(prefixPath, logFile, command, launchArgs), runner.environment());
+    QDir logsDir(prefixPath);
+    if(!logsDir.exists(Logs::logDirName))
+        logsDir.mkdir(Logs::logDirName);
+    logsDir.cd(Logs::logDirName);
+    QFile log = QFile(logsDir.path() % '/' % path.mid(path.lastIndexOf('/')+1) % ".txt");
+    if(loggingEnabled) {
+        log.open(QIODevice::WriteOnly);
+        log.resize(0);
+        log.write(Logs::currentlyRunningEnv.toLocal8Bit());
+        log.write(runner.environment().join('\n').toLocal8Bit());
+        log.write(Logs::runningCommand.toLocal8Bit() % command.toLocal8Bit() % ' ' % arguments.join(' ').toLocal8Bit() % Logs::newLine.toLocal8Bit());
+        log.write(Logs::blankLine.toLocal8Bit());
+    }
     runner.start(command, arguments);
     runner.waitForStarted(-1);
-    QFile log = QFile(logInfo.absoluteFilePath());
     WaitLoop(runner, log);
 
     return runner.exitCode();
@@ -523,29 +541,6 @@ QMap<QString, QString> NeroRunner::InsertArgs(QMap<QString, QString> properties,
     return properties;
 }
 
-QFileInfo NeroRunner::InitLogging(LaunchInfo launch, QStringList env) {
-    QDir logsDir(launch.prefixPath);
-    if(!logsDir.exists(Logs::logDirName))
-        logsDir.mkdir(Logs::logDirName);
-    logsDir.cd(Logs::logDirName);
-    QFile log = QFile(logsDir.path() % launch.logFile);
-    if(loggingEnabled) {
-        bool isOpen = log.open(QIODevice::WriteOnly);
-        if (!isOpen) {
-            QFileInfo info(log);
-            return info;
-        }
-        log.resize(0);
-        log.write(Logs::currentlyRunningEnv.toLocal8Bit());
-        log.write(env.join('\n').toLocal8Bit());
-        log.write(Logs::runningCommand.toLocal8Bit() % launch.command.toLocal8Bit() % ' ' % launch.arguments.toLocal8Bit() % Logs::newLine.toLocal8Bit());
-        log.write(Logs::blankLine.toLocal8Bit());
-    }
-    QFileInfo info(log);
-    log.close();
-    return info;
-}
-
 QStringList NeroRunner::SetGamescopeArgs(QMap<QString, QString> resMap, QStringList arguments, int fpsLimit, bool isPrefixOnly) {
     for(auto i = resMap.begin(), end = resMap.end(); i != end; i++) {
         QString setting = i.key();
@@ -574,7 +569,9 @@ QStringList NeroRunner::SetGamescopeArgs(QMap<QString, QString> resMap, QStringL
     arguments.prepend(CliArgs::Gamescope::name);
     return arguments;
 }
-void NeroRunner::SetSyncMode(QString protonRunner, int syncType) {
+
+void NeroRunner::SetSyncMode(QString protonRunner, int syncType)
+{
     // ntsync SHOULD be better in all scenarios compared to other sync options, but requires kernel 6.14+ and GE-Proton10-9+
         // For older Protons, they should be safely ignoring this and fallback to fsync anyways.
         // Newer protons than GE10-9 should enable this automatically from its end, and doesn't require WOW64
@@ -604,7 +601,6 @@ void NeroRunner::SetSyncMode(QString protonRunner, int syncType) {
 void NeroRunner::WaitLoop(QProcess &runner, QFile &log)
 {
     QByteArray stdout;
-    log.open(QIODevice::WriteOnly, QIODevice::Append);
     while(runner.state() != QProcess::NotRunning) {
         if(!halt) {
             runner.waitForReadyRead(1000);
@@ -640,7 +636,8 @@ void NeroRunner::WaitLoop(QProcess &runner, QFile &log)
         log.close();
 }
 
-void NeroRunner::InitDebugProperties(int value) {
+void NeroRunner::InitDebugProperties(int value)
+{
     switch (value) {
         case NeroConstant::DebugDisabled:
             break;
