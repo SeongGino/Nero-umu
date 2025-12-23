@@ -471,36 +471,42 @@ QStringList NeroRunner::SetMangohud(QStringList gamescopeArgs, QStringList argum
                : (gamescopeArgs << CliArgs::doubleDash) + arguments;
 
 }
+struct ResAxes {
+    QString setting;
+    QString arg;
+    ResAxes(QString setting, QString arg) {
+        this->arg = arg;
+        this->setting = setting;
+    }
+};
 
 QStringList NeroRunner::SetGamescopeArgs(int scalingMode, int fpsLimit, bool isPrefixOnly)
 {
+
     QString windowArg;
-    QMap<QString, QString> resMap;
+    QList<ResAxes> reses;
     if (scalingMode == NeroConstant::ScalingGamescopeBorderless) {
         windowArg = CliArgs::Gamescope::borderless;
-        resMap = {
-            {NeroConfig::Gamescope::outputResH,    CliArgs::Gamescope::height},
-            {NeroConfig::Gamescope::outputResW,    CliArgs::Gamescope::width},
-            {NeroConfig::Gamescope::windowedResH,  CliArgs::Gamescope::windowedHeight},
-            {NeroConfig::Gamescope::windowedResW,  CliArgs::Gamescope::windowedWidth},
-        };
+        reses
+            << ResAxes(NeroConfig::Gamescope::outputResW,    CliArgs::Gamescope::width)
+            << ResAxes(NeroConfig::Gamescope::outputResH,    CliArgs::Gamescope::height)
+            << ResAxes(NeroConfig::Gamescope::windowedResW,  CliArgs::Gamescope::windowedWidth)
+            << ResAxes(NeroConfig::Gamescope::windowedResH,  CliArgs::Gamescope::windowedHeight);
     } else if (scalingMode == NeroConstant::ScalingGamescopeFullscreen) {
         windowArg = CliArgs::Gamescope::fullscreen;
-        resMap = {
-                  {NeroConfig::Gamescope::outputResH,  CliArgs::Gamescope::height},
-                  {NeroConfig::Gamescope::outputResW,  CliArgs::Gamescope::width},
-                };
+        reses
+            << ResAxes(NeroConfig::Gamescope::outputResW,    CliArgs::Gamescope::width)
+            << ResAxes(NeroConfig::Gamescope::outputResH,    CliArgs::Gamescope::height);
     }
     QStringList gsArgs(CliArgs::Gamescope::name);
     // QMaps are sorted by key so we need to iterate backwards to keep correct height/width ordering.
     // Yeah i need to find a better way to do this, prob making a struct for them to keep them in a List or something
-    for(auto i = resMap.end() - 1, end = resMap.begin() - 1; i != end; i--) {
-        QString setting = i.key();
-        PrefixSetting s = initSetting(isPrefixOnly, setting);
+    for(int i = 0; i < reses.length(); i++) {
+        ResAxes axe = reses[i];
+        PrefixSetting s = initSetting(isPrefixOnly, axe.setting);
         if (s.toInt()) {
-            gsArgs << i.value() << s.toString();
+            gsArgs << axe.arg << s.toString();
         }
-        QString concat = gsArgs.join(' ') +"\n";
     }
 
     gsArgs << windowArg;
