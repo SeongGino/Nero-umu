@@ -52,19 +52,6 @@ public:
         RunnerProtonStopping,
         RunnerProtonStopped
     } RunnerStatus_e;
-    struct LaunchInfo{
-        QString prefixPath;
-        QString logFile;
-        QString command;
-        QString arguments;
-        LaunchInfo(){}
-        LaunchInfo(QString prefixPath, QString logFile, QString command, QString arguments) {
-            this->prefixPath = prefixPath;
-            this->logFile = logFile;
-            this->command = command;
-            this->arguments = arguments;
-        }
-    };
     struct PrefixSetting {
     public:
         PrefixSetting(){}
@@ -123,12 +110,19 @@ public:
         QVariant shortcut;
         const QString shortcuts = "Shortcuts--";
     };
+
+    PrefixSetting initSetting(bool isPrefixOnly, QString setting) {
+        return isPrefixOnly
+                   ? PrefixSetting(setting, *this)
+                   : CombinedSetting(setting, *this);
+    }
 private:
+    QStringList SetMangohud(QStringList gamescope, QStringList arguments);
     int ConvertScaling(int scalingVal);
     void SetSyncMode(QString protonRunner, int syncType);
-    QFileInfo InitLogging(LaunchInfo info, QStringList env);
-    QStringList SetScalingMode(int scalingType, int fpsLimit, bool isPrefixOnly, QStringList arguments);
-    QStringList SetGamescopeArgs(QMap<QString, QString> resMap, QStringList arguments, int fpsLimit, bool isPrefixOnly);
+    QStringList SetScalingMode(int scalingType, int fpsLimit, bool isPrefixOnly);
+    QStringList SetGamescopeArgs(int scalingMode, int fpsLimit, bool isPrefixOnly);
+    QStringList Gamescope(QMap<QString, QString> resMap, QStringList arguments);
     QMap<QString, QString> InsertArgs(QMap<QString, QString> properties, bool isPrefixOnly);
     QString GamescopeFilterType(int filterVal);
 
@@ -230,19 +224,27 @@ namespace CliArgs {
         const QString fullscreen = "-f";
         const QString height = "-h";
         const QString width = "-w";
-        namespace Upscaler {
+        namespace Filter {
+            const QString linear = "linear";
             const QString nearest = "nearest";
             const QString fsr = "fsr";
             const QString nvidiaImageSharpening = "nis";
             const QString pixel = "pixel";
         }
-
+        namespace Scaler {
+            const QString autoScale = "auto";
+            const QString integer = "integer";
+            const QString fit = "fit";
+            const QString fill = "fill";
+            const QString stretch = "stretch";
+        }
         const QString filter = "-F";
         const QString fpsLimit = "-r";
         const QString unfocusedFpsLimit = "-o";
         const QString borderless = "-b";
         const QString windowedWidth = "-W";
         const QString windowedHeight = "-H";
+        const QString scaler = "-S";
     }
 }
 
@@ -282,6 +284,7 @@ namespace NeroConfig {
     // TODO: Standardize Resolutions
     namespace Gamescope{
         //FSR Custom Resolutions
+        const QString scalingType = "GamescopeScaler";
         const QString scalingMode = "ScalingMode";
         const QString fsrCustomW = "FSRcustomResW";
         const QString fsrCustomH = "FSRcustomResH";
