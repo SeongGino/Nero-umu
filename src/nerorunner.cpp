@@ -482,11 +482,14 @@ struct ResAxes {
 
 QStringList NeroRunner::SetGamescopeArgs(int scalingMode, int fpsLimit, bool isPrefixOnly)
 {
-
     QString windowArg;
     QList<ResAxes> reses;
-    if (scalingMode == NeroConstant::ScalingGamescopeBorderless) {
-        windowArg = CliArgs::Gamescope::borderless;
+    bool isWindowed = scalingMode == NeroConstant::ScalingGamescopeBorderless
+                      || scalingMode == NeroConstant::ScalingGamescopeWindowed;
+    if (isWindowed) {
+        windowArg = scalingMode == NeroConstant::ScalingGamescopeBorderless
+                        ? CliArgs::Gamescope::borderless
+                        : ""; //blank string for bordered windowed
         reses
             << ResAxes(NeroConfig::Gamescope::outputResW,    CliArgs::Gamescope::width)
             << ResAxes(NeroConfig::Gamescope::outputResH,    CliArgs::Gamescope::height)
@@ -505,8 +508,9 @@ QStringList NeroRunner::SetGamescopeArgs(int scalingMode, int fpsLimit, bool isP
         if (s.toInt() && !s.toString().isEmpty())
             gsArgs << axe.arg << s.toString();
     }
-
-    gsArgs << windowArg;
+    if (!windowArg.isEmpty()) {
+        gsArgs << windowArg;
+    }
 
     int filterVal = initSetting(isPrefixOnly, NeroConfig::Gamescope::filter).toInt();
     QString filterType = GamescopeFilterType(filterVal);
