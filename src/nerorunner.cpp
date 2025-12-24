@@ -502,9 +502,8 @@ QStringList NeroRunner::SetGamescopeArgs(int scalingMode, int fpsLimit, bool isP
     for(int i = 0; i < reses.length(); i++) {
         ResAxes axe = reses[i];
         PrefixSetting s = initSetting(isPrefixOnly, axe.setting);
-        if (s.toInt()) {
+        if (s.toInt() && !s.toString().isEmpty())
             gsArgs << axe.arg << s.toString();
-        }
     }
 
     gsArgs << windowArg;
