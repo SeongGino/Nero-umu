@@ -499,8 +499,6 @@ QStringList NeroRunner::SetGamescopeArgs(int scalingMode, int fpsLimit, bool isP
             << ResAxes(NeroConfig::Gamescope::outputResH,    CliArgs::Gamescope::height);
     }
     QStringList gsArgs(CliArgs::Gamescope::name);
-    // QMaps are sorted by key so we need to iterate backwards to keep correct height/width ordering.
-    // Yeah i need to find a better way to do this, prob making a struct for them to keep them in a List or something
     for(int i = 0; i < reses.length(); i++) {
         ResAxes axe = reses[i];
         PrefixSetting s = initSetting(isPrefixOnly, axe.setting);
@@ -538,10 +536,11 @@ QStringList NeroRunner::SetGamescopeArgs(int scalingMode, int fpsLimit, bool isP
 
     if(!isPrefixOnly && fpsLimit) {
         QByteArray lim = QByteArray::number(fpsLimit);
-        gsArgs << (lim)
-               << (CliArgs::Gamescope::fpsLimit)
-               << lim
-               << CliArgs::Gamescope::unfocusedFpsLimit;
+        gsArgs
+            << CliArgs::Gamescope::fpsLimit
+            << lim
+            << CliArgs::Gamescope::unfocusedFpsLimit
+            << lim;
     }
     gsArgs << ("--adaptive-sync");
 
