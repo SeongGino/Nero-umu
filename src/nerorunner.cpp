@@ -521,19 +521,18 @@ QStringList NeroRunner::SetGamescopeArgs(int scalingMode, int fpsLimit, bool isP
 
     int scalerVal = initSetting(isPrefixOnly, NeroConfig::Gamescope::scalingType).toInt();
     switch (scalerVal) {
-    // TODO: Debug the scaler option and see why its causing gamescope launch to fail
-    // case NeroConstant::GSscalerInteger:
-    //     gsArgs << (CliArgs::Gamescope::scaler % ' ' % CliArgs::Gamescope::Scaler::integer);
-    //     break;
-    // case NeroConstant::GSscalerFit:
-    //     gsArgs << (CliArgs::Gamescope::scaler % ' ' % CliArgs::Gamescope::Scaler::fit);
-    //     break;
-    // case NeroConstant::GSscalerFill:
-    //     gsArgs << (CliArgs::Gamescope::scaler % ' ' % CliArgs::Gamescope::Scaler::fill);
-    //     break;
-    // case NeroConstant::GSscalerStretch:
-    //     gsArgs << (CliArgs::Gamescope::scaler % ' ' % CliArgs::Gamescope::Scaler::stretch);
-    //     break;
+    case NeroConstant::GSscalerInteger:
+        gsArgs << CliArgs::Gamescope::scaler << CliArgs::Gamescope::Scaler::integer;
+        break;
+    case NeroConstant::GSscalerFit:
+        gsArgs << CliArgs::Gamescope::scaler << CliArgs::Gamescope::Scaler::fit;
+        break;
+    case NeroConstant::GSscalerFill:
+        gsArgs << CliArgs::Gamescope::scaler << CliArgs::Gamescope::Scaler::fill;
+        break;
+    case NeroConstant::GSscalerStretch:
+        gsArgs << CliArgs::Gamescope::scaler << CliArgs::Gamescope::Scaler::stretch;
+        break;
     default:
         break;
     }
