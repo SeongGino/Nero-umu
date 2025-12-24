@@ -163,10 +163,10 @@ int NeroRunner::StartShortcut(const QString &hash, const bool &prefixAlreadyRunn
     // some arguments are parsed as stringlists and others as string, so check which first.;
 
     QVariant argsVar =  CombinedSetting(NeroConfig::args, *this).getSettingVariant();
-
-    if (argsVar.canConvert<QStringList>() && !argsVar.toStringList().isEmpty()) {
+    int t = argsVar.type();
+    if (t == QMetaType::QStringList && !argsVar.toStringList().isEmpty()) {
         arguments.append(argsVar.toStringList());
-    } else if (argsVar.canConvert<QString>() && !argsVar.toString().isEmpty()) {
+    } else if (t == QMetaType::QString && !argsVar.toString().isEmpty()) {
         // SUPER UNGA BUNGA: manually split string into a list
         QString buf = argsVar.toString();
         QStringList args;
