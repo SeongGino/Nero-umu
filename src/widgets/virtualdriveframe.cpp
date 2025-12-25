@@ -30,7 +30,8 @@ VirtualDriveFrame::VirtualDriveFrame(
     letterFont.setBold(true);
     ui->dirLetter->setFont(letterFont);
     ui->dirLetter->setFrame(false);
-    connect( ui->dirLetter, &QComboBox::currentIndexChanged, this, &VirtualDriveFrame::onDirLetterCurrentIndexChanged );
+    connect( ui->dirLetter, qOverload<int>(&QComboBox::currentIndexChanged),
+             this, &VirtualDriveFrame::onDirLetterCurrentIndexChanged );
 
     auto mainLabelFont = this->font();
     mainLabelFont.setPointSize(10);

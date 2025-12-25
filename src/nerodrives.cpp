@@ -101,12 +101,15 @@ void NeroVirtualDriveDialog::onAddDirBtnClicked(bool checked)
     if ( !new_path.path().isEmpty() ) {
         QString letter;
 
-        auto diff = QSet<QString>(m_letters.begin(), m_letters.end()) - QSet<QString>(m_usedLetters.begin(), m_usedLetters.end());
-        auto values = diff.values();
-        values.sort(Qt::CaseSensitivity::CaseInsensitive);
-        if ( !values.empty() ) {
-            letter = values[0];
-        } else return;
+        for ( const auto& let: m_letters ) {
+            if ( m_usedLetters.contains(let) ) {
+                continue;
+            } else {
+                letter = let;
+                break;
+            }
+            return;
+        }
 
         QFile file;
         if ( !file.exists(m_prefix.path().append("/").append(letter)) ) {
