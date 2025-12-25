@@ -54,7 +54,6 @@ VirtualDriveFrame::VirtualDriveFrame(
     ui->dirChange->setText("");
     ui->dirChange->setIcon(QIcon::fromTheme("document-open"));
     ui->dirChange->setIconSize( QSize( 23, 23 ) );
-    ui->dirChange->setFlat( true );
     ui->dirChange->setToolTip("Change symlink to new directory.");
     connect( ui->dirChange, &QPushButton::clicked, this, &VirtualDriveFrame::onDirChangeClicked );
 
