@@ -80,9 +80,9 @@ void NeroVirtualDriveDialog::addVirtualDrive(const QString letter, const QString
 {
 
     auto frame = new VirtualDriveFrame(m_prefix, letter, path, this);
-    connect( frame, SIGNAL(letterChanged(QString, QString)), this, SLOT(onVirtualDriverLetterChanged(QString, QString)) );
-    connect( frame, SIGNAL(driveDeleted(QString)), this, SLOT(onVirtualDriveDriveDeleted(QString)) );
-    connect(this, SIGNAL(updateWidgets()), frame, SLOT(update()) );
+    connect( frame, &VirtualDriveFrame::letterChanged, this, &NeroVirtualDriveDialog::onVirtualDriveLetterChanged );
+    connect( frame, &VirtualDriveFrame::driveDeleted, this, &NeroVirtualDriveDialog::onVirtualDriveDriveDeleted );
+    connect( this, &NeroVirtualDriveDialog::updateWidgets, frame, &VirtualDriveFrame::update );
     m_usedLetters.append(letter);
     m_usedLetters.sort(Qt::CaseSensitivity::CaseInsensitive);
 
