@@ -33,6 +33,7 @@ void PrintHelp()
         "  --prefix \"Prefix Name\"        Run executable within \"Prefix Name\"\n"
         "  --list                        List contents of prefix specified with --prefix\n"
         "  --shortcut \"Shortcut Name\"    Launch a specific shortcut from specified --prefix, according to the prefix's current settings.\n"
+        "  -v, --version                 Show version information.\n"
         "  -h, --help                    Show this help. Helpful, huh? c:\n"
         );
 }
@@ -139,6 +140,10 @@ int main(int argc, char *argv[])
                 printf("Nero cannot run without a home directory set! Aborting...\n");
                 return 1;
             }
+        // Version printout
+        } else if(argc < 3 && (arguments.last() == "-v" || arguments.last() == "--version")) {
+            printf("nero-umu %s \"%s\"\n", NERO_VERSION, NERO_CODENAME);
+            return 0;
         // Help printout
         } else if(argc < 3 && (arguments.last() == "-h" || arguments.last() == "--help")) {
             PrintHelp();
