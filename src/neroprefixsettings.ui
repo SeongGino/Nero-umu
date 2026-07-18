@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>666</width>
-    <height>846</height>
+    <width>816</width>
+    <height>899</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,11 +16,14 @@
   <property name="modal">
    <bool>true</bool>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout" stretch="5,3,0">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,3,0">
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
       <number>0</number>
+     </property>
+     <property name="isFor" stdset="0">
+      <string>UseZink</string>
      </property>
      <widget class="QWidget" name="generalTab">
       <attribute name="icon">
@@ -29,279 +32,7 @@
       <attribute name="title">
        <string>General</string>
       </attribute>
-      <layout class="QGridLayout" name="gridLayout" rowstretch="0,0,1" columnstretch="1,0">
-       <item row="2" column="1" alignment="Qt::AlignmentFlag::AlignTop">
-        <widget class="QGroupBox" name="servicesGroup">
-         <property name="title">
-          <string>System Services</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignmentFlag::AlignCenter</set>
-         </property>
-         <layout class="QVBoxLayout" name="verticalLayout_3">
-          <item>
-           <widget class="QCheckBox" name="toggleGamemode">
-            <property name="whatsThis">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When enabled, Proton will be run with Feral Interactive's &lt;a href=&quot;https://github.com/FeralInteractive/gamemode?tab=readme-ov-file#gamemode&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#8ab4f8;&quot;&gt;Gamemode&lt;/span&gt;&lt;/a&gt; daemon, which can provide useful optimizations for games.&lt;/p&gt;&lt;p&gt;If unsure, enable if your system has &lt;span style=&quot; font-style:italic;&quot;&gt;gamemode&lt;/span&gt; installed. Disable if a game has issues starting with &lt;span style=&quot; font-style:italic;&quot;&gt;gamemode&lt;/span&gt; enabled.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-            </property>
-            <property name="accessibleName">
-             <string>Enable Feral Gamemode</string>
-            </property>
-            <property name="text">
-             <string>Enable Feral Gamemode</string>
-            </property>
-            <property name="isFor" stdset="0">
-             <string>Gamemode</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QCheckBox" name="toggleMangohud">
-            <property name="whatsThis">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When enabled, Proton will run with the &lt;a href=&quot;https://github.com/flightlessmango/MangoHud?tab=readme-ov-file#mangohud&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#8ab4f8;&quot;&gt;Mangohud&lt;/span&gt;&lt;/a&gt; overlay enabled, which can provide useful monitoring of your system and any 3D application's performance and/or rendering metrics. Mangohud can either be used on its own, or as part of a configuration utility, such as &lt;a href=&quot;https://github.com/benjamimgois/goverlay?tab=readme-ov-file#goverlay&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#8ab4f8;&quot;&gt;GOverlay.&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;If unsure, enable if you want to monitor a game's performance.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-            </property>
-            <property name="accessibleName">
-             <string>Enable Mangohud Overlay</string>
-            </property>
-            <property name="text">
-             <string>Enable Mangohud Overlay</string>
-            </property>
-            <property name="isFor" stdset="0">
-             <string>Mangohud</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QCheckBox" name="toggleVKcap">
-            <property name="whatsThis">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When enabled, this will allow any apps using Vulkan (including DX8-11 titles w/ DXVK, or DX12 titles w/ VKD3D) to be captured in OBS Studio using the &lt;a href=&quot;https://github.com/nowrep/obs-vkcapture&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#8ab4f8;&quot;&gt;Game Capture source.&lt;/span&gt;&lt;/a&gt; This is usually provided in a user package such as &lt;span style=&quot; font-style:italic;&quot;&gt;obs-vkcapture-git&lt;/span&gt; and &lt;span style=&quot; font-style:italic;&quot;&gt;lib32-obs-vkcapture-git.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-            </property>
-            <property name="accessibleName">
-             <string>Enable OBS Studio Vulkan Capture</string>
-            </property>
-            <property name="text">
-             <string>Enable OBS Vulkan Capture</string>
-            </property>
-            <property name="isFor" stdset="0">
-             <string>VKcapture</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item row="0" column="0" colspan="2">
-        <widget class="QGroupBox" name="shortcutSettings">
-         <property name="title">
-          <string>Shortcut</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignmentFlag::AlignCenter</set>
-         </property>
-         <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,0,3,1">
-          <item>
-           <spacer name="horizontalSpacer_3">
-            <property name="orientation">
-             <enum>Qt::Orientation::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item>
-           <widget class="QPushButton" name="shortcutIco">
-            <property name="whatsThis">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Click to set the icon for this shortcut.&lt;/p&gt;&lt;p&gt;Acceptable formats are &lt;span style=&quot; font-style:italic;&quot;&gt;PNG, EXE, ICO,&lt;/span&gt; or &lt;span style=&quot; font-style:italic;&quot;&gt;DLL&lt;/span&gt; - the latter three will be extracted with &lt;span style=&quot; font-style:italic;&quot;&gt;icoextract&lt;/span&gt; and &lt;span style=&quot; font-style:italic;&quot;&gt;icoutils,&lt;/span&gt; if found on the system.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-            </property>
-            <property name="accessibleName">
-             <string>Shortcut Icon</string>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="icon">
-             <iconset theme="application-x-executable"/>
-            </property>
-            <property name="iconSize">
-             <size>
-              <width>64</width>
-              <height>64</height>
-             </size>
-            </property>
-            <property name="flat">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <layout class="QGridLayout" name="shortcutFields">
-            <item row="1" column="0" colspan="3">
-             <widget class="QLabel" name="nameMatchWarning">
-              <property name="font">
-               <font>
-                <pointsize>9</pointsize>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="styleSheet">
-               <string notr="true">color: red</string>
-              </property>
-              <property name="text">
-               <string>Another shortcut with this name already exists!</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignmentFlag::AlignCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="2">
-             <widget class="QPushButton" name="openToShortcutPath">
-              <property name="whatsThis">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Click to open the folder linked to this shortcut in the system's file explorer.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-              </property>
-              <property name="accessibleName">
-               <string>Open folder in file explorer</string>
-              </property>
-              <property name="text">
-               <string/>
-              </property>
-              <property name="icon">
-               <iconset theme="folder-visiting"/>
-              </property>
-              <property name="iconSize">
-               <size>
-                <width>16</width>
-                <height>16</height>
-               </size>
-              </property>
-              <property name="flat">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-            <item row="4" column="0" colspan="3">
-             <widget class="QLineEdit" name="shortcutArgs">
-              <property name="whatsThis">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enter any arguments that gets passed to the executable for this shortcut. These usually allow for enabling hidden or undocumented features of an app, such as borderless windowed modes or fullscreen on launch. Refer to your app's documentation for information on what arguments can be used with it.&lt;/p&gt;&lt;p&gt;If unsure, leave this field blank.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-              </property>
-              <property name="accessibleName">
-               <string>Shortcut Arguments</string>
-              </property>
-              <property name="placeholderText">
-               <string>Shortcut Arguments (-fullscreen, --borderless, etc.)</string>
-              </property>
-              <property name="clearButtonEnabled">
-               <bool>true</bool>
-              </property>
-              <property name="isFor" stdset="0">
-               <string>Args</string>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="0">
-             <widget class="QLineEdit" name="shortcutPath">
-              <property name="enabled">
-               <bool>true</bool>
-              </property>
-              <property name="whatsThis">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The current path for this shortcut.&lt;/p&gt;&lt;p&gt;If the path is within the prefix's &lt;span style=&quot; font-style:italic;&quot;&gt;drive_c&lt;/span&gt; folder (or in other words, within the virtual Windows' &lt;span style=&quot; font-style:italic;&quot;&gt;C:/&lt;/span&gt; drive), this shortcut will always be run relative to the path of this current prefix - so if the current prefix changes name or location, but not the application itself, then this shortcut will still work until the application path itself changes.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-              </property>
-              <property name="accessibleName">
-               <string>Executable Path</string>
-              </property>
-              <property name="styleSheet">
-               <string notr="true">color: gray</string>
-              </property>
-              <property name="readOnly">
-               <bool>true</bool>
-              </property>
-              <property name="placeholderText">
-               <string>Path</string>
-              </property>
-              <property name="isFor" stdset="0">
-               <string>Path</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="0" colspan="3">
-             <widget class="QLineEdit" name="shortcutName">
-              <property name="whatsThis">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enter the name of this shortcut as it appears in the shortcuts list.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-              </property>
-              <property name="accessibleName">
-               <string>Shortcut Name</string>
-              </property>
-              <property name="placeholderText">
-               <string>Shortcut Name</string>
-              </property>
-              <property name="isFor" stdset="0">
-               <string>Name</string>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="1">
-             <widget class="QPushButton" name="shortcutPathBtn">
-              <property name="whatsThis">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Click to select a new executable for this shortcut.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-              </property>
-              <property name="accessibleName">
-               <string>Select an Executable</string>
-              </property>
-              <property name="text">
-               <string/>
-              </property>
-              <property name="icon">
-               <iconset theme="document-open"/>
-              </property>
-              <property name="iconSize">
-               <size>
-                <width>16</width>
-                <height>16</height>
-               </size>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="0" colspan="3">
-             <widget class="QLabel" name="pathNoExistWarning">
-              <property name="font">
-               <font>
-                <pointsize>9</pointsize>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="styleSheet">
-               <string notr="true">color: red</string>
-              </property>
-              <property name="text">
-               <string>File does not exist! Please update the path.</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignmentFlag::AlignCenter</set>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <spacer name="horizontalSpacer_4">
-            <property name="orientation">
-             <enum>Qt::Orientation::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-         </layout>
-        </widget>
-       </item>
+      <layout class="QGridLayout" name="gridLayout" rowstretch="0,0,0" columnstretch="1,0">
        <item row="1" column="0" colspan="2">
         <widget class="QGroupBox" name="prefixSettings">
          <property name="title">
@@ -852,6 +583,316 @@
          </layout>
         </widget>
        </item>
+       <item row="2" column="1" alignment="Qt::AlignmentFlag::AlignTop">
+        <widget class="QGroupBox" name="servicesGroup">
+         <property name="title">
+          <string>System Services</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignmentFlag::AlignCenter</set>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_3">
+          <item>
+           <widget class="QCheckBox" name="toggleGamemode">
+            <property name="whatsThis">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When enabled, Proton will be run with Feral Interactive's &lt;a href=&quot;https://github.com/FeralInteractive/gamemode?tab=readme-ov-file#gamemode&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#8ab4f8;&quot;&gt;Gamemode&lt;/span&gt;&lt;/a&gt; daemon, which can provide useful optimizations for games.&lt;/p&gt;&lt;p&gt;If unsure, enable if your system has &lt;span style=&quot; font-style:italic;&quot;&gt;gamemode&lt;/span&gt; installed. Disable if a game has issues starting with &lt;span style=&quot; font-style:italic;&quot;&gt;gamemode&lt;/span&gt; enabled.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="accessibleName">
+             <string>Enable Feral Gamemode</string>
+            </property>
+            <property name="text">
+             <string>Enable Feral Gamemode</string>
+            </property>
+            <property name="isFor" stdset="0">
+             <string>Gamemode</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="toggleMangohud">
+            <property name="whatsThis">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When enabled, Proton will run with the &lt;a href=&quot;https://github.com/flightlessmango/MangoHud?tab=readme-ov-file#mangohud&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#8ab4f8;&quot;&gt;Mangohud&lt;/span&gt;&lt;/a&gt; overlay enabled, which can provide useful monitoring of your system and any 3D application's performance and/or rendering metrics. Mangohud can either be used on its own, or as part of a configuration utility, such as &lt;a href=&quot;https://github.com/benjamimgois/goverlay?tab=readme-ov-file#goverlay&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#8ab4f8;&quot;&gt;GOverlay.&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;If unsure, enable if you want to monitor a game's performance.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="accessibleName">
+             <string>Enable Mangohud Overlay</string>
+            </property>
+            <property name="text">
+             <string>Enable Mangohud Overlay</string>
+            </property>
+            <property name="isFor" stdset="0">
+             <string>Mangohud</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="toggleVKcap">
+            <property name="whatsThis">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When enabled, this will allow any apps using Vulkan (including DX8-11 titles w/ DXVK, or DX12 titles w/ VKD3D) to be captured in OBS Studio using the &lt;a href=&quot;https://github.com/nowrep/obs-vkcapture&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#8ab4f8;&quot;&gt;Game Capture source.&lt;/span&gt;&lt;/a&gt; This is usually provided in a user package such as &lt;span style=&quot; font-style:italic;&quot;&gt;obs-vkcapture-git&lt;/span&gt; and &lt;span style=&quot; font-style:italic;&quot;&gt;lib32-obs-vkcapture-git.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="accessibleName">
+             <string>Enable OBS Studio Vulkan Capture</string>
+            </property>
+            <property name="text">
+             <string>Enable OBS Vulkan Capture</string>
+            </property>
+            <property name="isFor" stdset="0">
+             <string>VKcapture</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_11">
+            <property name="text">
+             <string>UmU ID</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignmentFlag::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="umuId">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="whatsThis">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://umu.openwinecomponents.org/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#8ab4f8;&quot;&gt;UMU Game ID&lt;/span&gt;&lt;/a&gt; that corresponds to this prefix or exectuable.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="accessibleName">
+             <string>UMU Launcher ID</string>
+            </property>
+            <property name="text">
+             <string>0</string>
+            </property>
+            <property name="frame">
+             <bool>false</bool>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+            </property>
+            <property name="isFor" stdset="0">
+             <string>UmuId</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="0" column="0" colspan="2">
+        <widget class="QGroupBox" name="shortcutSettings">
+         <property name="title">
+          <string>Shortcut</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignmentFlag::AlignCenter</set>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,0,3,1">
+          <item>
+           <spacer name="horizontalSpacer_3">
+            <property name="orientation">
+             <enum>Qt::Orientation::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QPushButton" name="shortcutIco">
+            <property name="whatsThis">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Click to set the icon for this shortcut.&lt;/p&gt;&lt;p&gt;Acceptable formats are &lt;span style=&quot; font-style:italic;&quot;&gt;PNG, EXE, ICO,&lt;/span&gt; or &lt;span style=&quot; font-style:italic;&quot;&gt;DLL&lt;/span&gt; - the latter three will be extracted with &lt;span style=&quot; font-style:italic;&quot;&gt;icoextract&lt;/span&gt; and &lt;span style=&quot; font-style:italic;&quot;&gt;icoutils,&lt;/span&gt; if found on the system.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="accessibleName">
+             <string>Shortcut Icon</string>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="icon">
+             <iconset theme="application-x-executable"/>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>64</width>
+              <height>64</height>
+             </size>
+            </property>
+            <property name="flat">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QGridLayout" name="shortcutFields">
+            <item row="1" column="0" colspan="3">
+             <widget class="QLabel" name="nameMatchWarning">
+              <property name="font">
+               <font>
+                <pointsize>9</pointsize>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">color: red</string>
+              </property>
+              <property name="text">
+               <string>Another shortcut with this name already exists!</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignmentFlag::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="2">
+             <widget class="QPushButton" name="openToShortcutPath">
+              <property name="whatsThis">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Click to open the folder linked to this shortcut in the system's file explorer.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
+              <property name="accessibleName">
+               <string>Open folder in file explorer</string>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset theme="folder-visiting"/>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>16</width>
+                <height>16</height>
+               </size>
+              </property>
+              <property name="flat">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="4" column="0" colspan="3">
+             <widget class="QLineEdit" name="shortcutArgs">
+              <property name="whatsThis">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enter any arguments that gets passed to the executable for this shortcut. These usually allow for enabling hidden or undocumented features of an app, such as borderless windowed modes or fullscreen on launch. Refer to your app's documentation for information on what arguments can be used with it.&lt;/p&gt;&lt;p&gt;If unsure, leave this field blank.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
+              <property name="accessibleName">
+               <string>Shortcut Arguments</string>
+              </property>
+              <property name="placeholderText">
+               <string>Shortcut Arguments (-fullscreen, --borderless, etc.)</string>
+              </property>
+              <property name="clearButtonEnabled">
+               <bool>true</bool>
+              </property>
+              <property name="isFor" stdset="0">
+               <string>Args</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="0">
+             <widget class="QLineEdit" name="shortcutPath">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
+              <property name="whatsThis">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The current path for this shortcut.&lt;/p&gt;&lt;p&gt;If the path is within the prefix's &lt;span style=&quot; font-style:italic;&quot;&gt;drive_c&lt;/span&gt; folder (or in other words, within the virtual Windows' &lt;span style=&quot; font-style:italic;&quot;&gt;C:/&lt;/span&gt; drive), this shortcut will always be run relative to the path of this current prefix - so if the current prefix changes name or location, but not the application itself, then this shortcut will still work until the application path itself changes.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
+              <property name="accessibleName">
+               <string>Executable Path</string>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">color: gray</string>
+              </property>
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
+              <property name="placeholderText">
+               <string>Path</string>
+              </property>
+              <property name="isFor" stdset="0">
+               <string>Path</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="0" colspan="3">
+             <widget class="QLineEdit" name="shortcutName">
+              <property name="whatsThis">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enter the name of this shortcut as it appears in the shortcuts list.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
+              <property name="accessibleName">
+               <string>Shortcut Name</string>
+              </property>
+              <property name="placeholderText">
+               <string>Shortcut Name</string>
+              </property>
+              <property name="isFor" stdset="0">
+               <string>Name</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1">
+             <widget class="QPushButton" name="shortcutPathBtn">
+              <property name="whatsThis">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Click to select a new executable for this shortcut.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
+              <property name="accessibleName">
+               <string>Select an Executable</string>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset theme="document-open"/>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>16</width>
+                <height>16</height>
+               </size>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="0" colspan="3">
+             <widget class="QLabel" name="pathNoExistWarning">
+              <property name="font">
+               <font>
+                <pointsize>9</pointsize>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">color: red</string>
+              </property>
+              <property name="text">
+               <string>File does not exist! Please update the path.</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignmentFlag::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_4">
+            <property name="orientation">
+             <enum>Qt::Orientation::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </widget>
+       </item>
       </layout>
      </widget>
      <widget class="QWidget" name="compatibilityTab">
@@ -968,8 +1009,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>606</width>
-               <height>423</height>
+               <width>750</width>
+               <height>528</height>
               </rect>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -1211,7 +1252,7 @@
       <attribute name="title">
        <string>Advanced</string>
       </attribute>
-      <layout class="QGridLayout" name="gridLayout_5" rowstretch="0,0,1,0">
+      <layout class="QGridLayout" name="gridLayout_5" rowstretch="0,0,0">
        <item row="2" column="0">
         <widget class="QGroupBox" name="legacyGroup">
          <property name="title">
@@ -1315,7 +1356,7 @@
             </property>
             <item>
              <property name="text">
-              <string>Use default fastest sync (NTsync/Fsync)</string>
+              <string>Use fastest sync (NTsync with WoW64/Fsync)</string>
              </property>
             </item>
             <item>
@@ -1338,6 +1379,135 @@
          </layout>
         </widget>
        </item>
+       <item row="0" column="0">
+        <widget class="QGroupBox" name="runnerGroup">
+         <property name="title">
+          <string>Shortcut Runner Settings</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignmentFlag::AlignCenter</set>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_8" columnstretch="1,0,0">
+          <item row="0" column="2">
+           <widget class="QPushButton" name="preRunButton">
+            <property name="whatsThis">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select a Pre-run Script to run for this Shortcut.&lt;/p&gt;&lt;p&gt;When set, this script will be run whenever this shortcut is started &lt;span style=&quot; font-style:italic;&quot;&gt;before&lt;/span&gt; the Proton runner process. This can be used for setting up other services before the application starts.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="accessibleName">
+             <string>Pre-Run Script</string>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="icon">
+             <iconset theme="document-open"/>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>16</width>
+              <height>16</height>
+             </size>
+            </property>
+            <property name="flat">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLineEdit" name="preRunScriptPath">
+            <property name="whatsThis">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Path to a designated Pre-run Script for this Shortcut.&lt;/p&gt;&lt;p&gt;When set, this script will be run whenever this shortcut is started &lt;span style=&quot; font-style:italic;&quot;&gt;before&lt;/span&gt; the Proton runner process. This can be used for setting up other services before the application starts.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="accessibleName">
+             <string>Pre-Run Script</string>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">color: gray</string>
+            </property>
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+            <property name="placeholderText">
+             <string>Path to a Pre-run Script</string>
+            </property>
+            <property name="isFor" stdset="0">
+             <string>PreRunScript</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLineEdit" name="postRunScriptPath">
+            <property name="whatsThis">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Path to a designated Post-run Script for this Shortcut.&lt;/p&gt;&lt;p&gt;When set, this script will be run whenever this shortcut is started &lt;span style=&quot; font-style:italic;&quot;&gt;after&lt;/span&gt; the Proton runner process. This can be used for cleaning up or closing other process that may have been started for the application, but don't need to be run in perpetuity.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="accessibleName">
+             <string>Post-Run Script</string>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">color: gray</string>
+            </property>
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+            <property name="placeholderText">
+             <string>Path to a Post-run Script</string>
+            </property>
+            <property name="isFor" stdset="0">
+             <string>PostRunScript</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="2">
+           <widget class="QPushButton" name="postRunButton">
+            <property name="whatsThis">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select a Post-run Script to run for this Shortcut.&lt;/p&gt;&lt;p&gt;When set, this script will be run whenever this shortcut is started &lt;span style=&quot; font-style:italic;&quot;&gt;after&lt;/span&gt; the Proton runner process. This can be used for cleaning up or closing other process that may have been started for the application, but don't need to be run in perpetuity.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="accessibleName">
+             <string>Post-Run Script</string>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="icon">
+             <iconset theme="document-open"/>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>16</width>
+              <height>16</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QPushButton" name="preRunClearBtn">
+            <property name="text">
+             <string/>
+            </property>
+            <property name="icon">
+             <iconset theme="edit-clear"/>
+            </property>
+            <property name="flat">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QPushButton" name="postRunClearBtn">
+            <property name="text">
+             <string/>
+            </property>
+            <property name="icon">
+             <iconset theme="edit-clear"/>
+            </property>
+            <property name="flat">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
        <item row="1" column="0">
         <widget class="QGroupBox" name="systemGroup">
          <property name="title">
@@ -1346,32 +1516,63 @@
          <property name="alignment">
           <set>Qt::AlignmentFlag::AlignCenter</set>
          </property>
-         <layout class="QGridLayout" name="gridLayout_6" columnstretch="1,0,2,1">
-          <item row="1" column="3">
-           <spacer name="horizontalSpacer_8">
-            <property name="orientation">
-             <enum>Qt::Orientation::Horizontal</enum>
+         <layout class="QGridLayout" name="gridLayout_6" columnstretch="1,0,0,0">
+          <item row="0" column="0" colspan="4">
+           <widget class="QGroupBox" name="envBox">
+            <property name="title">
+             <string/>
             </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>0</width>
-              <height>20</height>
-             </size>
+            <property name="flat">
+             <bool>true</bool>
             </property>
-           </spacer>
-          </item>
-          <item row="1" column="0">
-           <spacer name="horizontalSpacer_7">
-            <property name="orientation">
-             <enum>Qt::Orientation::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>0</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
+            <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="1,2,1">
+             <item>
+              <spacer name="horizontalSpacer_17">
+               <property name="orientation">
+                <enum>Qt::Orientation::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QLineEdit" name="prefixEnvVars">
+               <property name="whatsThis">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enter any desired Environment Variables that you might need for this prefix.&lt;/p&gt;&lt;p&gt;Environment Variables must be entered in &lt;span style=&quot; font-weight:700;&quot;&gt;KEY=&amp;quot;values&amp;quot; &lt;/span&gt;format.&lt;/p&gt;&lt;p&gt;Any Environment Variables added here will be prepended to the main runner environment for this prefix when an application starts.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="accessibleName">
+                <string>Custom Prefix Environment Variables</string>
+               </property>
+               <property name="placeholderText">
+                <string>Enter Custom Environment Variables...</string>
+               </property>
+               <property name="clearButtonEnabled">
+                <bool>true</bool>
+               </property>
+               <property name="isFor" stdset="0">
+                <string>CustomEnvVars</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_18">
+               <property name="orientation">
+                <enum>Qt::Orientation::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </widget>
           </item>
           <item row="3" column="0" colspan="4">
            <widget class="QGroupBox" name="prefixServices">
@@ -1515,17 +1716,24 @@
             </layout>
            </widget>
           </item>
-          <item row="0" column="0" colspan="4">
-           <widget class="QGroupBox" name="envBox">
-            <property name="title">
-             <string/>
+          <item row="1" column="3">
+           <spacer name="horizontalSpacer_8">
+            <property name="orientation">
+             <enum>Qt::Orientation::Horizontal</enum>
             </property>
-            <property name="flat">
-             <bool>true</bool>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>0</width>
+              <height>20</height>
+             </size>
             </property>
-            <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="1,2,1">
+           </spacer>
+          </item>
+          <item row="1" column="0">
+           <widget class="QGroupBox" name="horizontalGroupBox">
+            <layout class="QHBoxLayout" name="horizontalLayout_8">
              <item>
-              <spacer name="horizontalSpacer_17">
+              <spacer name="horizontalSpacer_7">
                <property name="orientation">
                 <enum>Qt::Orientation::Horizontal</enum>
                </property>
@@ -1538,26 +1746,64 @@
               </spacer>
              </item>
              <item>
-              <widget class="QLineEdit" name="prefixEnvVars">
-               <property name="whatsThis">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enter any desired Environment Variables that you might need for this prefix.&lt;/p&gt;&lt;p&gt;Environment Variables must be entered in &lt;span style=&quot; font-weight:700;&quot;&gt;KEY=&amp;quot;values&amp;quot; &lt;/span&gt;format.&lt;/p&gt;&lt;p&gt;Any Environment Variables added here will be prepended to the main runner environment for this prefix when an application starts.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-               </property>
-               <property name="accessibleName">
-                <string>Custom Prefix Environment Variables</string>
-               </property>
-               <property name="placeholderText">
-                <string>Enter Custom Environment Variables...</string>
-               </property>
-               <property name="clearButtonEnabled">
-                <bool>true</bool>
-               </property>
-               <property name="isFor" stdset="0">
-                <string>CustomEnvVars</string>
+              <widget class="QLabel" name="label_4">
+               <property name="text">
+                <string>Debug Output:</string>
                </property>
               </widget>
              </item>
              <item>
-              <spacer name="horizontalSpacer_18">
+              <widget class="QComboBox" name="debugBox">
+               <property name="whatsThis">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set the desired level of debug output Nero should print when running an application in this prefix.&lt;/p&gt;&lt;p&gt;This can be useful if you are debugging a troublesome application and need to know the output.&lt;/p&gt;&lt;p&gt;Any debug output will be printed to standard output (i.e. the terminal application Nero is launched from).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="accessibleName">
+                <string>Set Proton/UMU Debug Output</string>
+               </property>
+               <property name="sizeAdjustPolicy">
+                <enum>QComboBox::SizeAdjustPolicy::AdjustToContentsOnFirstShow</enum>
+               </property>
+               <property name="isFor" stdset="0">
+                <string>DebugOutput</string>
+               </property>
+               <item>
+                <property name="text">
+                 <string>No Debug Output</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Show Loaded DLLs</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Full Debug Output</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="logFolderButton">
+               <property name="whatsThis">
+                <string>Opens the Log Directory for this prefix.</string>
+               </property>
+               <property name="accessibleName">
+                <string>Open Log Folder</string>
+               </property>
+               <property name="accessibleDescription">
+                <string>Opens the Log Directory for this prefix.</string>
+               </property>
+               <property name="text">
+                <string>Open Log Folder</string>
+               </property>
+               <property name="icon">
+                <iconset theme="QIcon::ThemeIcon::DocumentOpen"/>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_29">
                <property name="orientation">
                 <enum>Qt::Orientation::Horizontal</enum>
                </property>
@@ -1572,184 +1818,49 @@
             </layout>
            </widget>
           </item>
-          <item row="1" column="1">
-           <widget class="QLabel" name="label_4">
-            <property name="text">
-             <string>Debug Output:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="2">
-           <widget class="QComboBox" name="debugBox">
-            <property name="whatsThis">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set the desired level of debug output Nero should print when running an application in this prefix.&lt;/p&gt;&lt;p&gt;This can be useful if you are debugging a troublesome application and need to know the output.&lt;/p&gt;&lt;p&gt;Any debug output will be printed to standard output (i.e. the terminal application Nero is launched from).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-            </property>
-            <property name="accessibleName">
-             <string>Set Proton/UMU Debug Output</string>
-            </property>
-            <property name="isFor" stdset="0">
-             <string>DebugOutput</string>
-            </property>
-            <item>
-             <property name="text">
-              <string>No Debug Output</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>Show Loaded DLLs</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>Full Debug Output</string>
-             </property>
-            </item>
-           </widget>
-          </item>
          </layout>
         </widget>
        </item>
-       <item row="0" column="0">
-        <widget class="QGroupBox" name="runnerGroup">
+      </layout>
+     </widget>
+     <widget class="QWidget" name="experimentalTab">
+      <attribute name="icon">
+       <iconset theme="text-x-log"/>
+      </attribute>
+      <attribute name="title">
+       <string>Experimental</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout_experiment" rowstretch="0,0,0,0,0,0,0">
+       <property name="sizeConstraint">
+        <enum>QLayout::SizeConstraint::SetDefaultConstraint</enum>
+       </property>
+       <item row="3" column="0">
+        <widget class="QGroupBox" name="waylandGroup">
          <property name="title">
-          <string>Shortcut Runner Settings</string>
+          <string>Wayland</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignmentFlag::AlignCenter</set>
          </property>
-         <layout class="QGridLayout" name="gridLayout_8" columnstretch="1,0,0">
+         <layout class="QGridLayout" name="gridLayout_13">
           <item row="0" column="2">
-           <widget class="QPushButton" name="preRunButton">
+           <widget class="QCheckBox" name="toggleDisableHdr">
             <property name="whatsThis">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select a Pre-run Script to run for this Shortcut.&lt;/p&gt;&lt;p&gt;When set, this script will be run whenever this shortcut is started &lt;span style=&quot; font-style:italic;&quot;&gt;before&lt;/span&gt; the Proton runner process. This can be used for setting up other services before the application starts.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;CachyOS Proton now automatically enables usage of HDR when using the experimental &lt;span style=&quot; font-style:italic;&quot;&gt;Native Wayland Backend.&lt;/span&gt; This setting will force HDR to be disabled in a wayland session.&lt;/p&gt;&lt;p&gt;Because HDR implicitly relies on Wayland to function (as there is no equivalent support in X11), this will only work with &lt;span style=&quot; font-style:italic;&quot;&gt;Native Wayland Support&lt;/span&gt; enabled and &lt;span style=&quot; font-weight:700;&quot;&gt;only in a Wayland session;&lt;/span&gt; this will not take effect on X11 desktops.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
             <property name="accessibleName">
-             <string>Pre-Run Script</string>
+             <string>Disable HDR for Experimental Wayland Backend</string>
             </property>
             <property name="text">
-             <string/>
+             <string>Disable HDR</string>
             </property>
-            <property name="icon">
-             <iconset theme="document-open"/>
-            </property>
-            <property name="iconSize">
-             <size>
-              <width>16</width>
-              <height>16</height>
-             </size>
-            </property>
-            <property name="flat">
-             <bool>false</bool>
+            <property name="isFor" stdset="0">
+             <string>DisableHdr</string>
             </property>
            </widget>
           </item>
           <item row="0" column="0">
-           <widget class="QLineEdit" name="preRunScriptPath">
-            <property name="whatsThis">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Path to a designated Pre-run Script for this Shortcut.&lt;/p&gt;&lt;p&gt;When set, this script will be run whenever this shortcut is started &lt;span style=&quot; font-style:italic;&quot;&gt;before&lt;/span&gt; the Proton runner process. This can be used for setting up other services before the application starts.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-            </property>
-            <property name="accessibleName">
-             <string>Pre-Run Script</string>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">color: gray</string>
-            </property>
-            <property name="readOnly">
-             <bool>true</bool>
-            </property>
-            <property name="placeholderText">
-             <string>Path to a Pre-run Script</string>
-            </property>
-            <property name="isFor" stdset="0">
-             <string>PreRunScript</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLineEdit" name="postRunScriptPath">
-            <property name="whatsThis">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Path to a designated Post-run Script for this Shortcut.&lt;/p&gt;&lt;p&gt;When set, this script will be run whenever this shortcut is started &lt;span style=&quot; font-style:italic;&quot;&gt;after&lt;/span&gt; the Proton runner process. This can be used for cleaning up or closing other process that may have been started for the application, but don't need to be run in perpetuity.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-            </property>
-            <property name="accessibleName">
-             <string>Post-Run Script</string>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">color: gray</string>
-            </property>
-            <property name="readOnly">
-             <bool>true</bool>
-            </property>
-            <property name="placeholderText">
-             <string>Path to a Post-run Script</string>
-            </property>
-            <property name="isFor" stdset="0">
-             <string>PostRunScript</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="2">
-           <widget class="QPushButton" name="postRunButton">
-            <property name="whatsThis">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select a Post-run Script to run for this Shortcut.&lt;/p&gt;&lt;p&gt;When set, this script will be run whenever this shortcut is started &lt;span style=&quot; font-style:italic;&quot;&gt;after&lt;/span&gt; the Proton runner process. This can be used for cleaning up or closing other process that may have been started for the application, but don't need to be run in perpetuity.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-            </property>
-            <property name="accessibleName">
-             <string>Post-Run Script</string>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="icon">
-             <iconset theme="document-open"/>
-            </property>
-            <property name="iconSize">
-             <size>
-              <width>16</width>
-              <height>16</height>
-             </size>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QPushButton" name="preRunClearBtn">
-            <property name="text">
-             <string/>
-            </property>
-            <property name="icon">
-             <iconset theme="edit-clear"/>
-            </property>
-            <property name="flat">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QPushButton" name="postRunClearBtn">
-            <property name="text">
-             <string/>
-            </property>
-            <property name="icon">
-             <iconset theme="edit-clear"/>
-            </property>
-            <property name="flat">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item row="3" column="0">
-        <widget class="QGroupBox" name="experimentalGroup">
-         <property name="title">
-          <string>Experimental</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignmentFlag::AlignCenter</set>
-         </property>
-         <layout class="QGridLayout" name="gridLayout_11">
-          <item row="0" column="3">
-           <spacer name="horizontalSpacer_20">
+           <spacer name="horizontalSpacer_25">
             <property name="orientation">
              <enum>Qt::Orientation::Horizontal</enum>
             </property>
@@ -1761,24 +1872,24 @@
             </property>
            </spacer>
           </item>
-          <item row="0" column="2">
-           <widget class="QCheckBox" name="toggleWaylandHDR">
+          <item row="0" column="5">
+           <widget class="QCheckBox" name="toggleWindowDecorations">
             <property name="whatsThis">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When Enabled, the experimental &lt;span style=&quot; font-style:italic;&quot;&gt;Native Wayland Backend&lt;/span&gt; will expose and enable use of your display's HDR capabilities.&lt;/p&gt;&lt;p&gt;Because HDR implicitly relies on Wayland to function (as there is no equivalent support in X11), this will only work with &lt;span style=&quot; font-style:italic;&quot;&gt;Native Wayland Support&lt;/span&gt; enabled and &lt;span style=&quot; font-weight:700;&quot;&gt;only in a Wayland session;&lt;/span&gt; this will not take effect on X11 desktops.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Requires&lt;/span&gt;: CachyOS Proton&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Summary&lt;/span&gt;:&lt;/p&gt;&lt;p&gt;Enabling this option will disable Wine's window decorations (ie, the border around an application) on wine applications running under Wayland.&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Command&lt;/span&gt;: PROTON_NO_WM_DECORATION&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Background&lt;/span&gt;:&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;https://gitlab.winehq.org/wine/wine/-/merge_requests/3909#note_46175&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#8ab4f8;&quot;&gt;Wine does not implement support for the libdecor library&lt;/span&gt;&lt;/a&gt;, which means that Wine applications running under Wayland will fallback to the &lt;a href=&quot;https://bugs.winehq.org/attachment.cgi?id=78617&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#8ab4f8;&quot;&gt;default Wine window decorations&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Disable Window Decorations&lt;/span&gt; sets Wine to automatically remove these, which may result in improved user experience for games that have only a windowed mode &amp;amp; some launchers (such as Battle.Net).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
             <property name="accessibleName">
-             <string>Use HDR With Experimental Wayland Backend</string>
+             <string>Disable Wine Window Decorations</string>
             </property>
             <property name="text">
-             <string>Enable HDR</string>
+             <string>Disable Window Decorations</string>
             </property>
             <property name="isFor" stdset="0">
-             <string>UseHDR</string>
+             <string>UseNoDecorations</string>
             </property>
            </widget>
           </item>
-          <item row="0" column="0">
-           <spacer name="horizontalSpacer_19">
+          <item row="0" column="6">
+           <spacer name="horizontalSpacer_26">
             <property name="orientation">
              <enum>Qt::Orientation::Horizontal</enum>
             </property>
@@ -1806,7 +1917,271 @@
             </property>
            </widget>
           </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QGroupBox" name="runnerSpecificGroup">
+         <property name="title">
+          <string>Image Reconstruction</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignmentFlag::AlignCenter</set>
+         </property>
+         <layout class="QGridLayout" name="RunnerSpecificGroup">
           <item row="1" column="1">
+           <widget class="QLabel" name="label_10">
+            <property name="layoutDirection">
+             <enum>Qt::LayoutDirection::RightToLeft</enum>
+            </property>
+            <property name="text">
+             <string>Image Reconstruction Upgrade Type:</string>
+            </property>
+            <property name="buddy">
+             <cstring>imageReconstructionBox</cstring>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="2">
+           <widget class="QComboBox" name="imageReconstructionIndBox">
+            <property name="whatsThis">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Requires: CachyOS Proton&lt;/p&gt;&lt;p&gt;Argument:&lt;/p&gt;&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;PROTON_FSR4_INDICATOR&lt;/li&gt;&lt;li style=&quot; margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;PROTON_DLSS_INDICATOR&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Summary:&lt;br/&gt;Enables a watermark indicator to show when DLSS or FSR4 are in use, depending on the selected option.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="accessibleName">
+             <string>Image Reconstruction Indicator</string>
+            </property>
+            <property name="editable">
+             <bool>false</bool>
+            </property>
+            <property name="placeholderText">
+             <string>None</string>
+            </property>
+            <property name="isFor" stdset="0">
+             <string>ImageReconstructionIndicator</string>
+            </property>
+            <item>
+             <property name="text">
+              <string>None</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>FSR</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>DLSS</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <spacer name="horizontalSpacer_21">
+            <property name="orientation">
+             <enum>Qt::Orientation::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="2" column="1">
+           <widget class="QLabel" name="imageReconstructionLabel">
+            <property name="text">
+             <string>Image Reconstruction Indicator:</string>
+            </property>
+            <property name="buddy">
+             <cstring>imageReconstructionIndBox</cstring>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="3">
+           <spacer name="horizontalSpacer_22">
+            <property name="orientation">
+             <enum>Qt::Orientation::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="1" column="2">
+           <widget class="QComboBox" name="imageReconstructionBox">
+            <property name="whatsThis">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Requires:&lt;/p&gt;&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;FSR4: Any proton&lt;/li&gt;&lt;li style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;DLSS: CachyOS Proton&lt;/li&gt;&lt;li style=&quot; margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;XESS: CachyOS Proton&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Summary: Enabling this will make proton automatically download the latest version of the supplied image reconstruction option, allowing for usage of the latest version or overriding an incompatible earlier version.&lt;/p&gt;&lt;p&gt;FSR4's Upgrade will disable AMD Anti-Lag 2.&lt;/p&gt;&lt;p&gt;Arguments:&lt;/p&gt;&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;PROTON_FSR4_UPGRADE&lt;/li&gt;&lt;li style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;PROTON_DLSS_UPGRADE&lt;/li&gt;&lt;li style=&quot; margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;PROTON_XESS_UPGRADE&lt;/li&gt;&lt;/ul&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="accessibleName">
+             <string>Image Reconstruction Upgrade</string>
+            </property>
+            <property name="editable">
+             <bool>false</bool>
+            </property>
+            <property name="placeholderText">
+             <string>None</string>
+            </property>
+            <property name="isFor" stdset="0">
+             <string>ImageReconstructionUpgrade</string>
+            </property>
+            <item>
+             <property name="text">
+              <string>None</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>FSR4</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>DLSS</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>XESS</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <widget class="QGroupBox" name="miscellaneous">
+         <property name="title">
+          <string>Misc</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignmentFlag::AlignCenter</set>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_14">
+          <item row="0" column="5">
+           <spacer name="horizontalSpacer_24">
+            <property name="orientation">
+             <enum>Qt::Orientation::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="0" column="0">
+           <spacer name="horizontalSpacer_23">
+            <property name="orientation">
+             <enum>Qt::Orientation::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="0" column="1">
+           <widget class="QCheckBox" name="toggleZink">
+            <property name="whatsThis">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://docs.mesa3d.org/drivers/zink.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#8ab4f8;&quot;&gt;Zink&lt;/span&gt;&lt;/a&gt; is a translation layer that converts OpenGL applications into Vulkan applications, enabling support for functionality like &lt;a href=&quot;https://github.com/PancakeTAS/lsfg-vk&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#8ab4f8;&quot;&gt;Lossless Framegen VK&lt;/span&gt;&lt;/a&gt; or allowing OpenGL games to be streamed through obs-vkcapture.&lt;/p&gt;&lt;p&gt;Zink can cause compatability problems, including severely lowered performance on some machines.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="accessibleName">
+             <string>Enable Zink</string>
+            </property>
+            <property name="accessibleDescription">
+             <string/>
+            </property>
+            <property name="text">
+             <string>Enable Zink</string>
+            </property>
+            <property name="isFor" stdset="0">
+             <string>UseZink</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2">
+           <widget class="QCheckBox" name="toggleOptiscaler">
+            <property name="whatsThis">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This setting &lt;span style=&quot; font-weight:700;&quot;&gt;requires &lt;/span&gt;CachyOS Proton.&lt;/p&gt;&lt;p&gt;Enables auto setup and injection of &lt;a href=&quot;https://github.com/optiscaler/OptiScaler&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#8ab4f8;&quot;&gt;Optiscaler&lt;/span&gt;&lt;/a&gt;, an image reconstruction framework which allows for injecting FSR, XESS, or later versions of DLSS into games that already support one form of image reconstruction.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="accessibleName">
+             <string>Enable Optiscaler</string>
+            </property>
+            <property name="text">
+             <string>Enable Optiscaler</string>
+            </property>
+            <property name="isFor" stdset="0">
+             <string>UseOptiscaler</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="4">
+           <widget class="QCheckBox" name="toggleNvidiaLibs">
+            <property name="whatsThis">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Requires: CachyOS Proton&lt;/p&gt;&lt;p&gt;Summary:&lt;br/&gt;This command may not work on RTX 5XXX cards!&lt;/p&gt;&lt;p&gt;Enabling this option will make Proton use &lt;a href=&quot;https://github.com/SveSop/nvidia-libs&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#8ab4f8;&quot;&gt;SveSop's nvidia-libs&lt;/span&gt;&lt;/a&gt; for expanded CUDA and PhysX functionality. Using this will &lt;span style=&quot; font-weight:700;&quot;&gt;disable&lt;/span&gt; WoW64 functionality. &lt;/p&gt;&lt;p&gt;Argument: PROTON_NVIDIA_LIBS&lt;/p&gt;&lt;p&gt;Background:&lt;br/&gt;While modern functionality for dxvk-nvapi, such as DLSS and Ray Tracing, are unaffected by the exclusion of these libraries, older games that use hardware accelerated PhysX, such as the &lt;span style=&quot; font-weight:700;&quot;&gt;Batman: Arkham&lt;/span&gt; series, &lt;span style=&quot; font-weight:700;&quot;&gt;Borderlands 2&lt;/span&gt;, and the &lt;span style=&quot; font-weight:700;&quot;&gt;Metro&lt;/span&gt; Series require additional libraries than those included with in order to function.&lt;/p&gt;&lt;p&gt;In addition to the built in dxvk-nvapi functionality included on the General tab, this library includes: &lt;/p&gt;&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;a href=&quot;https://github.com/SveSop/dxvk-nvapi/tree/experimental&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#8ab4f8;&quot;&gt;Sve's dxvk-nvapi fork&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;&lt;li style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;a href=&quot;https://github.com/SveSop/nvcuda&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#8ab4f8;&quot;&gt;nvcuda&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;&lt;li style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;a href=&quot;https://github.com/SveSop/nvenc&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#8ab4f8;&quot;&gt;nvcuvid/nvencodeapi&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;&lt;li style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;a href=&quot;https://github.com/Saancreed/wine-nvml&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#8ab4f8;&quot;&gt;nvml&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;&lt;li style=&quot; margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;a href=&quot;https://github.com/SveSop/wine-nvoptix&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#8ab4f8;&quot;&gt;nvoptix&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="accessibleName">
+             <string>Enable Nvidia Libraries</string>
+            </property>
+            <property name="text">
+             <string>Enable Nvidia Libraries</string>
+            </property>
+            <property name="isFor" stdset="0">
+             <string>UseNvidiaLibs</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="3">
+           <widget class="QCheckBox" name="toggleLowLatency">
+            <property name="whatsThis">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enables the &lt;a href=&quot;https://github.com/Korthos-Software/low_latency_layer&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#8ab4f8;&quot;&gt;Low Latency Layer&lt;/span&gt;&lt;/a&gt; project for Windows applications to use.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="accessibleName">
+             <string>Enable Low Latency Layer Support</string>
+            </property>
+            <property name="text">
+             <string>Enable Low Latency Layer</string>
+            </property>
+            <property name="isFor" stdset="0">
+             <string>UseLowLatency</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QGroupBox" name="inputGroup">
+         <property name="title">
+          <string>Inputs</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignmentFlag::AlignCenter</set>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_11">
+          <item row="0" column="4">
+           <spacer name="horizontalSpacer_20">
+            <property name="orientation">
+             <enum>Qt::Orientation::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="0" column="1">
            <widget class="QCheckBox" name="toggleHidraw">
             <property name="whatsThis">
              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This determines whether or not the runner is allowed to directly interact with connected HID devices or not.&lt;/p&gt;&lt;p&gt;Some applications need this to access things like controller firmware or to individually address some devices. However, this has the side effect of certain controllers, such as the &lt;span style=&quot; font-style:italic;&quot;&gt;Sony DualSense,&lt;/span&gt; overriding the SDL interface and will not be recognized as an Xinput-compatible device.&lt;/p&gt;&lt;p&gt;This should only be enabled for applications that &lt;span style=&quot; font-weight:700;&quot;&gt;do not&lt;/span&gt; function properly without this enabled.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -1822,7 +2197,20 @@
             </property>
            </widget>
           </item>
-          <item row="1" column="2">
+          <item row="0" column="0">
+           <spacer name="horizontalSpacer_19">
+            <property name="orientation">
+             <enum>Qt::Orientation::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="0" column="2">
            <widget class="QCheckBox" name="toggleXalia">
             <property name="whatsThis">
              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set whether or not to enable Proton's &lt;a href=&quot;https://github.com/madewokherd/xalia&quot;&gt;&lt;span style=&quot; font-style:italic; text-decoration: underline; color:#8ab4f8;&quot;&gt;Xalia&lt;/span&gt;&lt;/a&gt; integration for built-in Gamepad Navigation in normal Windows dialogs.&lt;/p&gt;&lt;p&gt;Xalia allows for selecting options in normal Windows dialog popups or launchers that otherwise doesn't have any integration with controllers. This can be a very useful accessibility feature. However, Xalia has a hard dependency on &lt;span style=&quot; font-weight:700; font-style:italic;&quot;&gt;.NET 4.8&lt;/span&gt; which, by default, relies on Proton's &lt;span style=&quot; font-style:italic;&quot;&gt;Mono&lt;/span&gt; runtime; so if any dotnet Winetricks verb has been installed that is &lt;span style=&quot; font-style:italic;&quot;&gt;not &lt;/span&gt;&lt;span style=&quot; font-family:'Iosevka Extended'; font-weight:700;&quot;&gt;dotnet48&lt;/span&gt;, Proton will spawn error popups any time it's started. The only workaround is to either install &lt;span style=&quot; font-family:'Iosevka Extended'; font-weight:700;&quot;&gt;dotnet48&lt;/span&gt;, or disable Xalia.&lt;/p&gt;&lt;p&gt;If unsure, &lt;span style=&quot; font-weight:700;&quot;&gt;keep disabled&lt;/span&gt; if any &lt;span style=&quot; font-weight:700; font-style:italic;&quot;&gt;.NET&lt;/span&gt; Winetricks verb other than &lt;span style=&quot; font-family:'Iosevka Extended'; font-weight:700;&quot;&gt;dotnet48&lt;/span&gt; has been installed.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -1836,6 +2224,216 @@
             <property name="isFor" stdset="0">
              <string>UseXalia</string>
             </property>
+           </widget>
+          </item>
+          <item row="0" column="3">
+           <widget class="QCheckBox" name="toggleSteamInput">
+            <property name="whatsThis">
+             <string>Disables Steam Input for this prefix, opting instead to use built in SDL2 libraries.</string>
+            </property>
+            <property name="accessibleName">
+             <string>Disable Steam Input</string>
+            </property>
+            <property name="accessibleDescription">
+             <string>Disables Steam Input for this prefix, opting instead to use built in SDL2 libraries.</string>
+            </property>
+            <property name="text">
+             <string>Disable Steam Input</string>
+            </property>
+            <property name="isFor" stdset="0">
+             <string>SteamInputDisabled</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="6" column="0">
+        <widget class="QGroupBox" name="tempVar">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="title">
+          <string>Complex Arguments</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignTop</set>
+         </property>
+         <property name="checkable">
+          <bool>false</bool>
+         </property>
+         <property name="checked">
+          <bool>false</bool>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_7">
+          <item>
+           <widget class="QGroupBox" name="envVarBox">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+              <horstretch>2</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="whatsThis">
+             <string/>
+            </property>
+            <property name="accessibleName">
+             <string>Environment Variables</string>
+            </property>
+            <property name="layoutDirection">
+             <enum>Qt::LayoutDirection::LeftToRight</enum>
+            </property>
+            <property name="title">
+             <string>Enable Environment Variables</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+            <property name="checked">
+             <bool>false</bool>
+            </property>
+            <property name="isFor" stdset="0">
+             <string>EnvironmentalVariables</string>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_12" columnstretch="0">
+             <item row="0" column="0">
+              <widget class="QTableWidget" name="envVarTable">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
+               <property name="whatsThis">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Manual listing of environment variables, in key=value fashion.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;These are encoded in properties to the (extremely cursed) format of:&lt;/p&gt;&lt;p&gt;[E]key=value|&amp;gt;key=value|&amp;gt;[E]key=value &lt;/p&gt;&lt;p&gt;[E]: denotes whether it's enabled or not. Not being present is considered disabled. &lt;/p&gt;&lt;p&gt;key=value: the actual variable mappings &lt;/p&gt;&lt;p&gt;|&amp;gt;: pipe operator to show a new entry is beginning.&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="autoFillBackground">
+                <bool>false</bool>
+               </property>
+               <property name="horizontalScrollBarPolicy">
+                <enum>Qt::ScrollBarPolicy::ScrollBarAsNeeded</enum>
+               </property>
+               <property name="sizeAdjustPolicy">
+                <enum>QAbstractScrollArea::SizeAdjustPolicy::AdjustToContents</enum>
+               </property>
+               <property name="alternatingRowColors">
+                <bool>true</bool>
+               </property>
+               <property name="showGrid">
+                <bool>true</bool>
+               </property>
+               <property name="gridStyle">
+                <enum>Qt::PenStyle::SolidLine</enum>
+               </property>
+               <property name="cornerButtonEnabled">
+                <bool>false</bool>
+               </property>
+               <property name="rowCount">
+                <number>40</number>
+               </property>
+               <property name="columnCount">
+                <number>2</number>
+               </property>
+               <attribute name="horizontalHeaderVisible">
+                <bool>true</bool>
+               </attribute>
+               <attribute name="horizontalHeaderDefaultSectionSize">
+                <number>175</number>
+               </attribute>
+               <attribute name="horizontalHeaderStretchLastSection">
+                <bool>true</bool>
+               </attribute>
+               <attribute name="verticalHeaderVisible">
+                <bool>false</bool>
+               </attribute>
+               <row/>
+               <row/>
+               <row/>
+               <row/>
+               <row/>
+               <row/>
+               <row/>
+               <row/>
+               <row/>
+               <row/>
+               <row/>
+               <row/>
+               <row/>
+               <row/>
+               <row/>
+               <row/>
+               <row/>
+               <row/>
+               <row/>
+               <row/>
+               <row/>
+               <row/>
+               <row/>
+               <row/>
+               <row/>
+               <row/>
+               <row/>
+               <row/>
+               <row/>
+               <row/>
+               <row/>
+               <row/>
+               <row/>
+               <row/>
+               <row/>
+               <row/>
+               <row/>
+               <row/>
+               <row/>
+               <row/>
+               <column/>
+               <column/>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QGroupBox" name="wineTopology">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="whatsThis">
+             <string/>
+            </property>
+            <property name="title">
+             <string>Enable Wine CPU Topology</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+            <property name="checked">
+             <bool>false</bool>
+            </property>
+            <property name="isFor" stdset="0">
+             <string>WineCpuTopology</string>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_15">
+             <item row="0" column="0">
+              <widget class="QListWidget" name="topologyList">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Maximum" vsizetype="Expanding">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="whatsThis">
+                <string>Enables setting wine CPU topology, allowing the user to restrict some of their CPU cores from being used by an application.</string>
+               </property>
+               <property name="isFor" stdset="0">
+                <string>WineCpuTopology</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
            </widget>
           </item>
          </layout>
@@ -1878,8 +2476,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>628</width>
-           <height>137</height>
+           <width>774</width>
+           <height>68</height>
           </rect>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_6">
@@ -1961,7 +2559,6 @@
   <tabstop>postRunClearBtn</tabstop>
   <tabstop>postRunButton</tabstop>
   <tabstop>prefixEnvVars</tabstop>
-  <tabstop>debugBox</tabstop>
   <tabstop>prefixInstallDiscordRPC</tabstop>
   <tabstop>prefixDrivesBtn</tabstop>
   <tabstop>prefixRegeditBtn</tabstop>
@@ -1970,8 +2567,6 @@
   <tabstop>toggleLimitGL</tabstop>
   <tabstop>toggleNoD8VK</tabstop>
   <tabstop>toggleWineD3D</tabstop>
-  <tabstop>toggleWayland</tabstop>
-  <tabstop>toggleWaylandHDR</tabstop>
   <tabstop>toggleHidraw</tabstop>
   <tabstop>toggleXalia</tabstop>
   <tabstop>infoScrollArea</tabstop>
@@ -2007,6 +2602,22 @@
     <hint type="destinationlabel">
      <x>286</x>
      <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>envVarBox</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>envVarTable</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>134</x>
+     <y>406</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>150</x>
+     <y>490</y>
     </hint>
    </hints>
   </connection>

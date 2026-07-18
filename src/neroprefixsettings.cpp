@@ -30,10 +30,13 @@
 #include <QProcess>
 #include <QSpinBox>
 #include <QShortcut>
-
+#include <QThread>
+#include <QStringBuilder>
+#include <QWidget>
+#include <QListWidgetItem>
+#include <QStringBuilder>
 #include "../lib/quazip/quazip/quazip.h"
 #include "../lib/quazip/quazip/quazipfile.h"
-
 
 NeroPrefixSettingsWindow::NeroPrefixSettingsWindow(QWidget *parent, const QString shortcutHash)
     : QDialog(parent)
@@ -42,17 +45,21 @@ NeroPrefixSettingsWindow::NeroPrefixSettingsWindow(QWidget *parent, const QStrin
     ui->setupUi(this);
 
     // shortcut ctrl/cmd + W to close the popup window
-	QShortcut *shortcutClose = new QShortcut(QKeySequence::Close, this);
-	connect(shortcutClose, &QShortcut::activated, this,&NeroPrefixSettingsWindow::close);
+    QShortcut *shortcutClose = new QShortcut(QKeySequence::Close, this);
+    connect(shortcutClose, &QShortcut::activated, this,&NeroPrefixSettingsWindow::close);
 
     boldFont.setBold(true);
 
     // env vars shouldn't be needed (and parsing it is a pita), so hide it for now
     ui->envBox->setVisible(false);
 
+    ui->prefixRunner->blockSignals(true);
     // prefix runner box is used to govern availability of scaling options in both prefix and shortcut settings
     ui->prefixRunner->addItems(*NeroFS::GetAvailableProtons());
     ui->prefixRunner->setCurrentText(NeroFS::GetCurrentRunner());
+    ui->prefixRunner->blockSignals(false);
+
+    ui->envVarTable->setHorizontalHeaderLabels({"Variable", "Value"});
 
     if(shortcutHash.isEmpty()) {
         settings = NeroFS::GetCurrentPrefixSettings();
@@ -102,25 +109,6 @@ NeroPrefixSettingsWindow::NeroPrefixSettingsWindow(QWidget *parent, const QStrin
             winVersionListBackwards.append(ui->winVerBox->itemText(i-1));
     }
 
-    // FSR scalers are only implem'd in GE-Proton
-    if(!ui->prefixRunner->currentText().startsWith("GE-Proton")) {
-        SetComboBoxItemEnabled(ui->setScalingBox, NeroConstant::ScalingFSRperformance, false);
-        SetComboBoxItemEnabled(ui->setScalingBox, NeroConstant::ScalingFSRbalanced, false);
-        SetComboBoxItemEnabled(ui->setScalingBox, NeroConstant::ScalingFSRquality, false);
-        SetComboBoxItemEnabled(ui->setScalingBox, NeroConstant::ScalingFSRhighquality, false);
-        SetComboBoxItemEnabled(ui->setScalingBox, NeroConstant::ScalingFSRhigherquality, false);
-        SetComboBoxItemEnabled(ui->setScalingBox, NeroConstant::ScalingFSRhighestquality, false);
-        SetComboBoxItemEnabled(ui->setScalingBox, NeroConstant::ScalingFSRcustom, false);
-        // HACK: offset by one when this is a shortcut settings panel and not prefix settings
-        if(ui->setScalingBox->findText("Integer Scaling") == 1) SetComboBoxItemEnabled(ui->setScalingBox, NeroConstant::ScalingIntegerScale, false);
-        else SetComboBoxItemEnabled(ui->setScalingBox, NeroConstant::ScalingGamescopeWindowed, false);
-    }
-
-    // Wayland requires base version to be Proton 10+
-    if(!ui->prefixRunner->currentText().startsWith("GE-Proton10") && !ui->prefixRunner->currentText().startsWith("Proton 10")) {
-        ui->toggleWayland->setEnabled(false);
-        ui->toggleWaylandHDR->setEnabled(false);
-    }
 
     resValidator = new QIntValidator(0, 32767);
     ui->fsrCustomH->setValidator(resValidator);
@@ -135,34 +123,83 @@ NeroPrefixSettingsWindow::NeroPrefixSettingsWindow(QWidget *parent, const QStrin
     ui->goat1->setVisible(false);
     ui->goat2->setVisible(false);
 
+    // wine CPU topology UI setup
+    // get number of threads on the system, then create
+    // checkboxes of equivalent amount of cores
+    int currRow = 0;
+    for (int i = 0; i < QThread::idealThreadCount(); i++) {
+        QString iStr = QString::number(i);
+        QString core = "Core " % iStr;
+        QListWidgetItem *box = new QListWidgetItem(core);
+        QString description = "Enables CPU core #" % iStr % " for use when Wine CPU Topology is enabled. This feature is experimental and should only be used if facing issues.";
+        box->setWhatsThis(description);
+        box->setCheckState(Qt::Unchecked);
+        ui->topologyList->addItem(box);
+    }
+
     LoadSettings();
 
     dllList = new QCompleter(commonDLLsList);
     ui->dllAdder->setCompleter(dllList);
     connect(ui->dllAdder, &QLineEdit::returnPressed, this, &NeroPrefixSettingsWindow::on_dllAddBtn_clicked);
-
     // should be a way to method-ify this?
     for(const auto child : this->findChildren<QPushButton*>()) {
-        if(!child->property("whatsThis").isNull()) child->installEventFilter(this);
+        if(!child->property("whatsThis").isNull())
+            child->installEventFilter(this);
     }
     for(const auto child : this->findChildren<QCheckBox*>()) {
-        if(!child->property("whatsThis").isNull()) child->installEventFilter(this);
-        if(!child->property("isFor").isNull()) connect(child, &QCheckBox::stateChanged, this, &NeroPrefixSettingsWindow::OptionSet);
+        if(!child->property("whatsThis").isNull())
+            child->installEventFilter(this);
+        if(!child->property("isFor").isNull())
+            connect(
+                child,
+                &QCheckBox::stateChanged,
+                this,
+                &NeroPrefixSettingsWindow::OptionSet
+            );
     }
     for(const auto child : this->findChildren<QLineEdit*>()) {
-        if(!child->property("whatsThis").isNull()) child->installEventFilter(this);
-        if(!child->property("isFor").isNull()) connect(child, &QLineEdit::textEdited, this, &NeroPrefixSettingsWindow::OptionSet);
+        if(!child->property("whatsThis").isNull())
+            child->installEventFilter(this);
+        if(!child->property("isFor").isNull())
+            connect(
+                child,
+                &QLineEdit::textEdited,
+                this,
+                &NeroPrefixSettingsWindow::OptionSet
+            );
     }
     for(const auto child : this->findChildren<QSpinBox*>()) {
-        if(!child->property("whatsThis").isNull()) child->installEventFilter(this);
+        if(!child->property("whatsThis").isNull())
+            child->installEventFilter(this);
         // QSpinboxes' "valueChanged" signal isn't new syntax friendly?
-        if(!child->property("isFor").isNull()) connect(child, SIGNAL(valueChanged(int)), this, SLOT(OptionSet()));
+        if(!child->property("isFor").isNull())
+            connect(
+                child,
+                SIGNAL(valueChanged(int)),
+                this,
+                SLOT(OptionSet())
+            );
     }
     for(const auto child : this->findChildren<QComboBox*>()) {
-        if(!child->property("whatsThis").isNull()) child->installEventFilter(this);
+        if(!child->property("whatsThis").isNull())
+            child->installEventFilter(this);
         // QComboboxes aren't new syntax friendly?
-        if(!child->property("isFor").isNull()) connect(child, SIGNAL(activated(int)), this, SLOT(OptionSet()));
+        if(!child->property("isFor").isNull())
+            connect(
+                child,
+                SIGNAL(activated(int)),
+                this,
+                SLOT(OptionSet())
+            );
     }
+    //manual setting as this is the only QGroupBox with a checkbox.
+    connect(
+        ui->wineTopology,
+        &QGroupBox::toggled,
+        this,
+        &NeroPrefixSettingsWindow::OptionSet
+    );
 
     // light mode styling adjustments:
     if(this->palette().window().color().value() > this->palette().text().color().value()) {
@@ -177,13 +214,15 @@ NeroPrefixSettingsWindow::NeroPrefixSettingsWindow(QWidget *parent, const QStrin
 
 bool NeroPrefixSettingsWindow::eventFilter(QObject* object, QEvent* event)
 {
-    if(!umuRunning)
-        if(event->type() == QEvent::Enter)
-            if(!object->property("whatsThis").isNull()) {
-                ui->infoText->setText(object->property("whatsThis").toString()),
-                ui->infoBox->setTitle(object->property("accessibleName").toString());
-            }
-
+    if (umuRunning)
+        return QWidget::eventFilter(object, event);
+    //owo whats this
+    QVariant whatsThis = object->property("whatsThis");
+    bool hasEnterEvent = event->type() == QEvent::Enter;
+    if(hasEnterEvent && !whatsThis.isNull()) {
+        ui->infoText->setText(whatsThis.toString()),
+        ui->infoBox->setTitle(object->property("accessibleName").toString());
+    }
     return QWidget::eventFilter(object, event);
 }
 
@@ -207,26 +246,52 @@ void NeroPrefixSettingsWindow::LoadSettings()
 {
     NeroPrefixSettingsWindow::blockSignals(true);
 
-    // general tab->graphics group
-    if(!settings.value("EnableNVAPI").toString().isEmpty()) ui->toggleNVAPI->setChecked(settings.value("EnableNVAPI").toBool());
-    ui->setScalingBox->setCurrentIndex(settings.value("ScalingMode").toInt());
-    ui->fsrCustomW->setText(settings.value("FSRcustomResW").toString());
-    ui->fsrCustomH->setText(settings.value("FSRcustomResH").toString());
-    ui->gamescopeAppWidth->setText(settings.value("GamescopeOutResW").toString());
-    ui->gamescopeAppHeight->setText(settings.value("GamescopeOutResH").toString());
-    ui->gamescopeWindowWidth->setText(settings.value("GamescopeWinResW").toString());
-    ui->gamescopeWindowHeight->setText(settings.value("GamescopeWinResH").toString());
-    ui->gamescopeSetScalerBox->setCurrentIndex(settings.value("GamescopeScaler").toInt());
-    ui->gamescopeSetUpscalingBox->setCurrentIndex(settings.value("GamescopeFilter").toInt());
-    // general tab->services group
-    SetCheckboxState("Gamemode",  ui->toggleGamemode);
-    SetCheckboxState("Mangohud",  ui->toggleMangohud);
-    SetCheckboxState("VKcapture", ui->toggleVKcap);
+    if(!settings.value("EnableNVAPI").toString().isEmpty()) {
+        ui->toggleNVAPI->setChecked(settings.value("EnableNVAPI").toBool());
+    }
+    QHash<QString, QLineEdit*> lineEdits = {
+        // general tab->graphics group
+        {"FSRcustomResW",      ui->fsrCustomW},
+        {"FSRcustomResH",      ui->fsrCustomH},
+        {"GamescopeOutResW",   ui->gamescopeAppWidth},
+        {"GamescopeOutResH",   ui->gamescopeAppHeight},
+        {"GamescopeWinResW",   ui->gamescopeWindowWidth},
+        {"GamescopeWinResH",   ui->gamescopeWindowHeight},
+        // general tab->prefix shortcut settings group
+    };
+    for (auto i = lineEdits.begin(), end = lineEdits.end(); i != end; i++) {
+        QString neroSetting = i.key();
+        QLineEdit* field = i.value();
+        field->setText(settings.value(neroSetting).toString());
+    }
 
+    // there was no good name for these once I realized all options
+    // could be consolidated into a scrollable field,
+    // so lets just hide that fact so this can look a bit pretty
+    QString up = "ImageReconstructionUpgrade";
+    QString ind = "ImageReconstructionIndicator";
+    QHash<QString, QComboBox*> comboBoxes = {
+        // general tab->graphics group
+        {"ScalingMode",        ui->setScalingBox},
+        {"GamescopeScaler",    ui->gamescopeSetScalerBox},
+        {"GamescopeFilter",    ui->gamescopeSetUpscalingBox},
+        // advanced tab
+        {"DebugOutput",        ui->debugBox},
+        {"FileSyncMode",       ui->fileSyncBox},
+        //Experimental
+        {up,                   ui->imageReconstructionBox},
+        {ind,                  ui->imageReconstructionIndBox},
+    };
+    for (auto i = comboBoxes.begin(), end = comboBoxes.end(); i != end; i++) {
+        QString neroSetting = i.key();
+        QComboBox* field = i.value();
+        field->setCurrentIndex(settings.value(neroSetting).toInt());
+    }
     // compatibility tab
     if(!settings.value("DLLoverrides").toStringList().isEmpty()) {
         dllSetting.clear();
         dllDelete.clear();
+
         const QStringList dllsToAdd = settings.value("DLLoverrides").toStringList();
         for(const QString &dll : std::as_const(dllsToAdd)) {
             const QString dllName = dll.left(dll.indexOf('='));
@@ -239,25 +304,43 @@ void NeroPrefixSettingsWindow::LoadSettings()
         }
     }
 
-    // advanced tab
-    ui->debugBox->setCurrentIndex(settings.value("DebugOutput").toInt());
-    ui->fileSyncBox->setCurrentIndex(settings.value("FileSyncMode").toInt());
-    SetCheckboxState("ForceiGPU",            ui->toggleiGPU);
-    SetCheckboxState("LimitGLextensions",  ui->toggleLimitGL);
-    SetCheckboxState("NoD8VK",             ui->toggleNoD8VK);
-    SetCheckboxState("ForceWineD3D",       ui->toggleWineD3D);
-    SetCheckboxState("UseWayland",         ui->toggleWayland);
-    SetCheckboxState("UseHDR",             ui->toggleWaylandHDR);
-    SetCheckboxState("AllowHidraw",        ui->toggleHidraw);
-    SetCheckboxState("UseXalia",           ui->toggleXalia);
+    QHash<QString, QCheckBox*> checkboxes = {
+        // TODO: Change These to be the namespace constants
+        // general tab->services group
+        {"Gamemode",           ui->toggleGamemode},
+        {"Mangohud",           ui->toggleMangohud},
+        {"VKcapture",          ui->toggleVKcap},
+        //advanced
+        {"ForceiGPU",          ui->toggleiGPU},
+        {"LimitGLextensions",  ui->toggleLimitGL},
+        {"NoD8VK",             ui->toggleNoD8VK},
+        {"ForceWineD3D",       ui->toggleWineD3D},
+        //experimental
+        {"UseZink",            ui->toggleZink},
+        {"UseWayland",         ui->toggleWayland},
+        {"DisableHdr",         ui->toggleDisableHdr},
+        {"AllowHidraw",        ui->toggleHidraw},
+        {"UseXalia",           ui->toggleXalia},
+        {"UseNvidiaLibs",      ui->toggleNvidiaLibs},
+        {"SteamInputDisabled", ui->toggleSteamInput},
+        {"UseNoDecorations",   ui->toggleWindowDecorations},
+        {"UseOptiscaler",      ui->toggleOptiscaler},
+        {"UseLowLatency",      ui->toggleLowLatency},
+    };
+    for (auto i = checkboxes.begin(), end = checkboxes.end(); i != end; i++) {
+        QString neroOption = i.key();
+        QCheckBox* widget = i.value();
+        SetCheckboxState(neroOption, widget);
+    }
 
     if(currentShortcutHash.isEmpty()) {
         // for prefix general settings, checkboxes are normal two-state
 
         // general tab->prefix global settings group
         // if prefix runner doesn't exist, just set to whatever's the first entry.
-        if(NeroFS::GetAvailableProtons()->contains(settings.value("CurrentRunner").toString()))
-            ui->prefixRunner->setCurrentText(settings.value("CurrentRunner").toString());
+        QString currentRunner = settings.value("CurrentRunner").toString();
+        if(NeroFS::GetAvailableProtons()->contains(currentRunner))
+            ui->prefixRunner->setCurrentText(currentRunner);
         else ui->prefixRunner->setCurrentIndex(0),
              ui->prefixRunner->setFont(boldFont);
         ui->togglePrefixRuntimeUpdates->setChecked(settings.value("RuntimeUpdateOnLaunch").toBool());
@@ -274,6 +357,7 @@ void NeroPrefixSettingsWindow::LoadSettings()
         ui->shortcutArgs->setText(settings["Args"].toStringList().join(' '));
         ui->preRunScriptPath->setText(settings.value("PreRunScript").toString());
         ui->postRunScriptPath->setText(settings.value("PostRunScript").toString());
+        ui->umuId->setText(settings.value("UmuId").toString());
         if(ui->preRunScriptPath->text().isEmpty())  ui->preRunClearBtn->setVisible(false);
         if(ui->postRunScriptPath->text().isEmpty()) ui->postRunClearBtn->setVisible(false);
 
@@ -332,19 +416,89 @@ void NeroPrefixSettingsWindow::LoadSettings()
 
     if(ui->setScalingBox->currentText().startsWith("Gamescope")) {
         ui->gamescopeSection->setVisible(true);
-        if(ui->setScalingBox->currentText().endsWith("Fullscreen")) {
-            ui->gamescopeWindowLabelX->setVisible(false);
-            ui->gamescopeWindowLabel->setVisible(false);
-            ui->gamescopeWindowHeight->setVisible(false);
-            ui->gamescopeWindowWidth->setVisible(false);
-        } else {
-            ui->gamescopeWindowLabelX->setVisible(true);
-            ui->gamescopeWindowLabel->setVisible(true);
-            ui->gamescopeWindowHeight->setVisible(true);
-            ui->gamescopeWindowWidth->setVisible(true);
+        QList<QWidget*> gamescope = {
+            ui->gamescopeWindowLabelX,
+            ui->gamescopeWindowLabel,
+            ui->gamescopeWindowHeight,
+            ui->gamescopeWindowWidth,
+        };
+        bool isWindowed = !ui->setScalingBox->currentText().endsWith("Fullscreen");
+        for (int i = 0; i < gamescope.length(); i++) {
+            QWidget* widget = gamescope[i];
+            widget->setVisible(isWindowed);
         }
     } else ui->gamescopeSection->setVisible(false);
-
+    //WineCpuTopology UI Setup
+    QVariant topology = settings.value("WineCpuTopology");
+    bool isEnabled = settings.value("CpuTopologyEnabled").toBool();
+    bool isEmptyStr = topology.toString().isEmpty();
+    if (isEnabled && !isEmptyStr) {
+        ui->wineTopology->setChecked(true);
+    }
+    //set this even if its not enabled so that the stored values aren't lost.
+    if (!isEmptyStr) {
+        QStringList split = topology.toString().split(":");
+        QStringList enabledCores = split[1].split(",");
+        // Iterate through the topology core counts versus enabled ones.
+        // Each time we find a match, remove it so that subsequent
+        // worst case iterations are slightly cheaper
+        for (int i = 0; i < ui->topologyList->count(); ++i) {
+            QListWidgetItem* item = ui->topologyList->item(i);
+            for (int j = 0; j < enabledCores.length(); ++j) {
+                int core = enabledCores[j].toInt();
+                if (core == i) {
+                    enabledCores.removeAt(j);
+                    item->setCheckState(Qt::Checked);
+                    break;
+                }
+            }
+        }
+    }
+    auto prefixSettings = NeroFS::GetCurrentPrefixSettings();
+    // always map to prefix settings
+    QStringList envVars = prefixSettings.value("EnvVars").toString().split(NeroFS::PATH_SEPERATOR);
+    bool enabledEnv = settings.value("EnvVarsEnabled").toBool();
+    if (enabledEnv && !envVars.isEmpty()) {
+        ui->envVarBox->setChecked(true);
+    }
+    auto noEntries = envVars.size() == 1 && envVars[0].isEmpty();
+    if (!noEntries) {
+        for (int i = 0; i < envVars.size(); i++) {
+            QStringList args = envVars[i].split('=');
+            if (args[0].isEmpty() || args[1] == nullptr)
+                continue;
+            QTableWidgetItem *variable = new QTableWidgetItem(args[0]);
+            if (args[0].startsWith("[E]")) {
+                // int
+                variable->setCheckState(Qt::Checked);
+                //get all but the first 3 characters, which is the enabled flag
+                int charsToTrim = args[0].length() - 3;
+                auto var = args[0].right(charsToTrim);
+                variable->setText(var);
+            } else {
+                variable->setCheckState(Qt::Unchecked);
+                variable->setText(args[0]);
+            }
+            QTableWidgetItem *val = new QTableWidgetItem(args[1]);
+            val->setText(args[1]);
+            ui->envVarTable->setItem(i, 0, variable);
+            ui->envVarTable->setItem(i, 1, val);
+        }
+    }
+    //add blank rows
+    for (int i = noEntries ? 0 : envVars.size(); i < ui->envVarTable->rowCount(); i++) {
+        QTableWidgetItem *b = new QTableWidgetItem();
+        b->setCheckState(Qt::Unchecked);
+        ui->envVarTable->setItem(i, 0, b);
+    }
+    // disable env vars entirely for shortcuts, as
+    // getting these to stay synced is a nightmare. We could
+    // alternatively handle this by having them be completely desynced,
+    // but that gets handled by just disabling on the prefix level I feel.
+    if (!currentShortcutHash.isEmpty()) {
+        ui->envVarBox->setChecked(false);
+        ui->envVarBox->setEnabled(false);
+    }
     for(const auto &child : this->findChildren<QCheckBox*>())
         child->setFont(QFont());
 
@@ -353,7 +507,8 @@ void NeroPrefixSettingsWindow::LoadSettings()
 
     for(const auto &child : this->findChildren<QComboBox*>())
         child->setFont(QFont());
-
+    // manually call this to make sure it refreshes its state
+    on_toggleWayland_checkStateChanged(ui->toggleWayland->checkState());
     NeroPrefixSettingsWindow::blockSignals(false);
 }
 
@@ -433,7 +588,6 @@ void NeroPrefixSettingsWindow::on_shortcutPathBtn_clicked()
         }
     }
 }
-
 
 void NeroPrefixSettingsWindow::on_setScalingBox_activated(int index)
 {
@@ -622,21 +776,21 @@ void NeroPrefixSettingsWindow::on_prefixInstallDiscordRPC_clicked()
     } while (!reply->isFinished());
 
     if(reply->error() != QNetworkReply::NoError) {
-        QString errorReply = "Error Message: " + reply->errorString();
-        QString failedDownload = "Nero failed to download the Discord RPC Bridge.\n" + errorReply;
-        QMessageBox::warning(this,
-                             "Error!",
-                             QString(failedDownload));
-        ui->infoBox->setTitle("");
-        ui->infoText->setText(failedDownload);
-        enableWidgets(true);
+        QString errorReply = "Error Message: " % reply->errorString();
+        QString failedDownload = "Nero failed to download the Discord RPC Bridge.\n" % errorReply;
+        displayError(failedDownload);
         return; //failed to download, return here
     }
 
     QByteArray bytes = reply->readAll();
     QString path(tmpDir.path() + "/nero-manager/bridge.zip");
     QSaveFile bridgeZip = QSaveFile(path);
-    bridgeZip.open(QIODevice::WriteOnly);
+    if (!bridgeZip.open(QIODevice::WriteOnly)) {
+        QString error = "Error Message: " % reply->errorString();
+        QString message = "Nero failed to extract the Discord RPC Bridge.\n" % error;
+        displayError(message);
+        return; //failed to extract
+    }
     QDataStream zipStream(&bridgeZip);
     zipStream << bytes;
     bridgeZip.commit();
@@ -649,9 +803,14 @@ void NeroPrefixSettingsWindow::on_prefixInstallDiscordRPC_clicked()
     zipFile.setCurrentFile("bridge.exe");
     QuaZipFile exeToExtract(&zipFile);
 
-    if(exeToExtract.open(QIODevice::ReadOnly)) {
+    if(!exeToExtract.open(QIODevice::ReadOnly)) {
         QFile outFile(tmpDir.absoluteFilePath("nero-manager/bridge.exe"));
-        outFile.open(QIODevice::ReadWrite);
+        if (!outFile.open(QIODevice::ReadWrite)) {
+            QString error = "Error Message: " % reply->errorString();
+            QString message = "Nero failed to extract the Discord RPC Bridge.\n" % error;
+            displayError(message);
+            return;
+        }
         outFile.write(exeToExtract.readAll());
         outFile.close();
 
@@ -668,13 +827,24 @@ void NeroPrefixSettingsWindow::on_prefixInstallDiscordRPC_clicked()
         ui->infoBox->setTitle("");
         ui->infoText->setText(QString("Bridge extraction exited with the error: %1").arg(exeToExtract.errorString()));
     }
-    
+
     enableWidgets(true);
     umuRunning = false;
     NeroPrefixSettingsWindow::blockSignals(false);
 }
 
-void NeroPrefixSettingsWindow::enableWidgets(bool isEnabled) {
+void NeroPrefixSettingsWindow::displayError(QString error)
+{
+    QMessageBox::warning(this,
+                         "Error!",
+                         error);
+    ui->infoBox->setTitle("");
+    ui->infoText->setText(error);
+    enableWidgets(true);
+}
+
+void NeroPrefixSettingsWindow::enableWidgets(bool isEnabled)
+{
     ui->tabWidget->setEnabled(isEnabled);
     ui->buttonBox->setEnabled(isEnabled);
     ui->infoBox->setEnabled(isEnabled);
@@ -719,6 +889,7 @@ void NeroPrefixSettingsWindow::StartUmu(const QString command, QStringList args)
         QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
 
         env.insert("WINEPREFIX", QString("%1/%2").arg(NeroFS::GetPrefixesPath()->path(), NeroFS::GetCurrentPrefix()));
+
         env.insert("GAMEID", "0");
         env.insert("PROTONPATH", QString("%1/%2").arg(NeroFS::GetProtonsPath()->path(), NeroFS::GetCurrentRunner()));
         env.insert("PROTON_USE_XALIA", "0");
@@ -763,196 +934,231 @@ void NeroPrefixSettingsWindow::on_tabWidget_currentChanged(int index)
     ui->infoText->setText("Hover over an option to display info about it here.");
 }
 
-
 void NeroPrefixSettingsWindow::OptionSet()
 {
-    if(sender()->inherits("QComboBox")) {
-        QComboBox* comboBox = qobject_cast<QComboBox*>(sender());
+    // declaring here means that we dont have to iterate
+    // through settings map every time, plus avoids declaring
+    // in every flow and having extra braces.
+    QString val = sender()->property("isFor").toString();
+    QVariant cfg = settings.value(val);
+    // is there like a way to inline declarations in cpp? id love to just have these be declared
+    // at the start of each if else instead of this or making the flow syntax worse.
+    QComboBox* comboBox = qobject_cast<QComboBox*>(sender());
+    QCheckBox* checkBox = qobject_cast<QCheckBox*>(sender());
+    QLineEdit* lineEdit = qobject_cast<QLineEdit*>(sender());
+    QSpinBox* spinBox = qobject_cast<QSpinBox*>(sender());
+    QString type = sender()->metaObject()->className();
+    if (comboBox != nullptr) {
         // Shortcut settings: handle "use default" (blank entry)
-        if(settings.value(comboBox->property("isFor").toString()).toString().isEmpty())
-            if(comboBox->currentIndex() > 0)
-                comboBox->setFont(boldFont);
-            else comboBox->setFont(QFont());
+        if (cfg.toString().isEmpty())
+            comboBox->currentIndex() > 0
+                ? comboBox->setFont(boldFont)
+                : comboBox->setFont(QFont());
         // Global prefix settings: always set to an index
-        else if(!currentShortcutHash.isEmpty()) {
-            if(comboBox->currentIndex()-1 != settings.value(comboBox->property("isFor").toString()).toInt())
-                comboBox->setFont(boldFont);
-            else comboBox->setFont(QFont());
-        } else if(comboBox->currentIndex() != settings.value(comboBox->property("isFor").toString()).toInt())
-            comboBox->setFont(boldFont);
-        else comboBox->setFont(QFont());
+        else if (!currentShortcutHash.isEmpty())
+            comboBox->currentIndex()-1 != cfg.toInt()
+                ? comboBox->setFont(boldFont)
+                : comboBox->setFont(QFont());
+        else
+            comboBox->currentIndex() != cfg.toInt()
+                ? comboBox->setFont(boldFont)
+                : comboBox->setFont(QFont());
         // extra check for Windows box, since the index doesn't quite match the way it's listed in the UI.
-        if(comboBox == ui->winVerBox) {
-            if(settings.value("WindowsVersion").toString().isEmpty())
+        if (comboBox == ui->winVerBox) {
+            QVariant win = settings.value("WindowsVersion");
+            if(win.toString().isEmpty())
                 // ensures that the box is marked when selecting the topmost entry.
                 comboBox->setFont(boldFont);
-            else if(comboBox->currentText() == winVersionListBackwards[settings.value("WindowsVersion").toInt()])
-                comboBox->setFont(QFont()); }
-
-    } else if(sender()->inherits("QCheckBox")) {
-        QCheckBox* checkBox = qobject_cast<QCheckBox*>(sender());
+            else if(comboBox->currentText() == winVersionListBackwards[win.toInt()])
+                comboBox->setFont(QFont());
+        }
+    } else if (checkBox != nullptr) {
         // Shortcut settings: handle "use default" half-checked state (blank entry)
-        if(checkBox->isTristate())
-            if(settings.value(checkBox->property("isFor").toString()).toString().isEmpty())
-                if(checkBox->checkState() != Qt::PartiallyChecked)
-                    checkBox->setFont(boldFont);
-                else checkBox->setFont(QFont());
-            else if(checkBox->checkState() != Qt::Checked && settings.value(checkBox->property("isFor").toString()).toBool())
+        if(checkBox->isTristate()) {
+            if(cfg.toString().isEmpty())
+                checkBox->checkState() != Qt::PartiallyChecked
+                    ? checkBox->setFont(boldFont)
+                    : checkBox->setFont(QFont());
+            else if(checkBox->checkState() != Qt::Checked && cfg.toBool())
                 checkBox->setFont(boldFont);
-            else if(checkBox->checkState() != Qt::Unchecked && !settings.value(checkBox->property("isFor").toString()).toBool())
+            else if(checkBox->checkState() != Qt::Unchecked && !cfg.toBool())
                 checkBox->setFont(boldFont);
             else checkBox->setFont(QFont());
-        // Normal Global prefix style on/off toggles
-        else if(checkBox->isChecked() != settings.value(checkBox->property("isFor").toString()).toBool())
-            checkBox->setFont(boldFont);
-        else checkBox->setFont(QFont());
+        } else {
+            // Normal Global prefix style on/off toggles
+            checkBox->isChecked() != settings.value(val).toBool()
+                ? checkBox->setFont(boldFont)
+                : checkBox->setFont(QFont());
+        }
+    } else if (spinBox != nullptr) {
+        spinBox->value() != cfg.toInt()
+            ? spinBox->setFont(boldFont)
+            : spinBox->setFont(QFont());
 
-    } else if(sender()->inherits("QSpinBox")) {
-        QSpinBox* spinBox = qobject_cast<QSpinBox*>(sender());
-        if(spinBox->value() != settings.value(spinBox->property("isFor").toString()).toInt())
-            spinBox->setFont(boldFont);
-        else spinBox->setFont(QFont());
-
-    } else if(sender()->inherits("QLineEdit")) {
-        QLineEdit* lineEdit = qobject_cast<QLineEdit*>(sender());
-        if(lineEdit->text() != settings.value(lineEdit->property("isFor").toString()).toString())
-            lineEdit->setFont(boldFont);
-        else lineEdit->setFont(QFont());
+    } else if (lineEdit != nullptr) {
+        lineEdit->text() != cfg.toString()
+            ? lineEdit->setFont(boldFont)
+            : lineEdit->setFont(QFont());
     }
 }
-
 
 void NeroPrefixSettingsWindow::on_buttonBox_clicked(QAbstractButton *button)
 {
-    if(ui->buttonBox->standardButton(button) == QDialogButtonBox::Reset) {
+    switch (ui->buttonBox->standardButton(button)) {
+    case QDialogButtonBox::Reset:
         LoadSettings();
-    } else if(ui->buttonBox->standardButton(button) == QDialogButtonBox::Save) {
-        QStringList dllsToAdd;
-        for(const QString &key : dllOverrides.keys()) {
-            switch(dllOverrides.value(key)) {
-            case NeroConstant::DLLNativeThenBuiltin:
-                dllsToAdd.append(QString("%1=n,b").arg(key));
-                break;
-            case NeroConstant::DLLBuiltinOnly:
-                dllsToAdd.append(QString("%1=builtin").arg(key));
-                break;
-            case NeroConstant::DLLBuiltinThenNative:
-                dllsToAdd.append(QString("%1=b,n").arg(key));
-                break;
-            case NeroConstant::DLLNativeOnly:
-                dllsToAdd.append(QString("%1=native").arg(key));
-                break;
-            case NeroConstant::DLLDisabled:
-                dllsToAdd.append(QString("%1=disabled").arg(key));
-                break;
-            }
-        }
-
-        if(currentShortcutHash.isEmpty()) {
-            // prefix-wide settings
-
-            // for the generic input fields, changed values will have boldFont
-            for(const auto &child : this->findChildren<QCheckBox*>())
-                if(child->font() == boldFont)
-                    NeroFS::SetCurrentPrefixCfg("PrefixSettings", child->property("isFor").toString(), child->isChecked());
-
-            for(const auto &child : this->findChildren<QLineEdit*>())
-                if(child->font() == boldFont)
-                    NeroFS::SetCurrentPrefixCfg("PrefixSettings", child->property("isFor").toString(), child->text().trimmed());
-
-            for(const auto &child : this->findChildren<QComboBox*>())
-                if(child->font() == boldFont)
-                    NeroFS::SetCurrentPrefixCfg("PrefixSettings", child->property("isFor").toString(), child->currentIndex());
-
-            NeroFS::SetCurrentPrefixCfg("PrefixSettings", "CurrentRunner", ui->prefixRunner->currentText());
-
-            if(dllsToAdd.count()) NeroFS::SetCurrentPrefixCfg("PrefixSettings", "DLLoverrides", dllsToAdd);
-            else NeroFS::SetCurrentPrefixCfg("PrefixSettings", "DLLoverrides", "");
-
-
-        } else {
-            // per-shortcut settings
-
-            // check if new ico was set.
-            if(!newAppIcon.isEmpty())
-                QFile::copy(newAppIcon, QString("%1/%2/.icoCache/%3").arg(NeroFS::GetPrefixesPath()->path(),
-                                                                          NeroFS::GetCurrentPrefix(),
-                                                                          QString("%1-%2.png").arg(settings.value("Name").toString(), currentShortcutHash)));
-
-            // for the generic input fields, changed values will have boldFont
-            for(const auto &child : this->findChildren<QCheckBox*>())
-                if(child->font() == boldFont) {
-                    if(child->checkState() == Qt::PartiallyChecked)
-                        NeroFS::SetCurrentPrefixCfg("Shortcuts--"+currentShortcutHash, child->property("isFor").toString(), "");
-                    else NeroFS::SetCurrentPrefixCfg("Shortcuts--"+currentShortcutHash, child->property("isFor").toString(), child->isChecked());
-                }
-
-            for(const auto &child : this->findChildren<QLineEdit*>())
-                if(child->font() == boldFont)
-                    NeroFS::SetCurrentPrefixCfg("Shortcuts--"+currentShortcutHash, child->property("isFor").toString(), child->text().trimmed());
-
-            for(const auto &child : this->findChildren<QSpinBox*>())
-                if(child->font() == boldFont)
-                    NeroFS::SetCurrentPrefixCfg("Shortcuts--"+currentShortcutHash, child->property("isFor").toString(), child->value());
-
-            for(const auto &child : this->findChildren<QComboBox*>())
-                if(child->font() == boldFont) {
-                    if(child->currentIndex() < 1)
-                        NeroFS::SetCurrentPrefixCfg("Shortcuts--"+currentShortcutHash, child->property("isFor").toString(), "");
-                    else NeroFS::SetCurrentPrefixCfg("Shortcuts--"+currentShortcutHash, child->property("isFor").toString(), child->currentIndex()-1);
-                }
-
-            // windows version overrides are currently a one-way op (e.g. can't be unset from the UI)
-            if(ui->winVerBox->font() == boldFont) {
-                int winVerSelected = winVersionListBackwards.indexOf(ui->winVerBox->itemText(ui->winVerBox->currentIndex()));
-                NeroFS::SetCurrentPrefixCfg("Shortcuts--"+currentShortcutHash, "WindowsVersion", winVerSelected);
-
-                QDir prefixPath(NeroFS::GetPrefixesPath()->path()+'/'+NeroFS::GetCurrentPrefix());
-                if(prefixPath.exists("user.reg")) {
-                    QFile regFile(prefixPath.path()+"/user.reg");
-                    if(regFile.open(QFile::ReadWrite)) {
-                        QString newReg;
-                        QString line;
-                        const QString exe = settings.value("Path").toString().mid(settings.value("Path").toString().lastIndexOf('/')+1);
-                        const QString compareString = QString("[Software\\\\Wine\\\\AppDefaults\\\\%1]").arg(exe);
-                        bool exists = false;
-
-                        while(!regFile.atEnd()) {
-                            line = regFile.readLine();
-                            newReg.append(line);
-
-                            // winreg adds timestamp info, so just check the beginning of this line.
-                            if(line.startsWith(compareString)) {
-                                // in case this is a reg entry that's been absorbed into WinReg format (which adds timestamps)
-                                line = regFile.readLine();
-                                if(line.startsWith("#time=")) newReg.append(line), regFile.readLine();
-                                newReg.append(QString("\"Version\"=\"%1\"\n").arg(winVersionVerb.at(winVerSelected)));
-                                exists = true;
-                            }
-                        }
-
-                        if(!exists)
-                            newReg.append(QString("\n[Software\\\\Wine\\\\AppDefaults\\\\%1]\n\"Version\"=\"%2\"\n").arg(exe, winVersionVerb.at(winVerSelected)));
-
-                        regFile.resize(0);
-                        regFile.write(newReg.toUtf8());
-                        regFile.close();
-                    }
-                }
-            }
-
-            if(dllsToAdd.count()) NeroFS::SetCurrentPrefixCfg(QString("Shortcuts--%1").arg(currentShortcutHash), "DLLoverrides", dllsToAdd);
-            else NeroFS::SetCurrentPrefixCfg(QString("Shortcuts--%1").arg(currentShortcutHash), "DLLoverrides", "");
-
-
-            appName = ui->shortcutName->text().trimmed();
-
-        }
-    // cancel button case isn't needed, since we filter by font to find changed values.
+        break;
+    case QDialogButtonBox::Cancel:
+        break;
+    case QDialogButtonBox::Save:
+        SaveSettings();
+        break;
+    default:
+        break;
     }
 }
 
+void NeroPrefixSettingsWindow::SaveSettings() {
+    QStringList dllsToAdd;
+    for(const QString &key : dllOverrides.keys()) {
+        switch(dllOverrides.value(key)) {
+        case NeroConstant::DLLNativeThenBuiltin:
+            dllsToAdd.append(QString("%1=n,b").arg(key));
+            break;
+        case NeroConstant::DLLBuiltinOnly:
+            dllsToAdd.append(QString("%1=builtin").arg(key));
+            break;
+        case NeroConstant::DLLBuiltinThenNative:
+            dllsToAdd.append(QString("%1=b,n").arg(key));
+            break;
+        case NeroConstant::DLLNativeOnly:
+            dllsToAdd.append(QString("%1=native").arg(key));
+            break;
+        case NeroConstant::DLLDisabled:
+            dllsToAdd.append(QString("%1=disabled").arg(key));
+            break;
+        }
+    }
+    // iterate through each bolded (modified) field, and add that change to the config file.
+    // For checkboxes, we check if its a shortcut or prefix entry and set it accordingly.
+    bool isShortcut = !currentShortcutHash.isEmpty();
+    QString cfg = isShortcut
+                    ? QString("Shortcuts--" % currentShortcutHash)
+                    : "PrefixSettings";
+    for(const auto &child : this->findChildren<QCheckBox*>()) {
+        if(child->font() == boldFont) {
+            isShortcut && child->checkState() == Qt::PartiallyChecked
+                ? NeroFS::SetCurrentPrefixCfg(cfg, child->property("isFor").toString(), "")
+                : NeroFS::SetCurrentPrefixCfg(cfg, child->property("isFor").toString(), child->isChecked());
+        }
+    }
+    for(const auto &child : this->findChildren<QLineEdit*>())
+        if(child->font() == boldFont)
+            NeroFS::SetCurrentPrefixCfg(cfg, child->property("isFor").toString(), child->text().trimmed());
 
+    for(const auto &child : this->findChildren<QSpinBox*>())
+        if(child->font() == boldFont)
+            NeroFS::SetCurrentPrefixCfg(cfg, child->property("isFor").toString(), child->value());
+
+    for(const auto &child : this->findChildren<QComboBox*>()) {
+        if(child->font() == boldFont) {
+            int childIndex = isShortcut
+                                ? child->currentIndex() - 1
+                                : child->currentIndex();
+            QString propertyToSave = child->property("isFor").toString();
+            // if childIndex < 0, clear the value if its a shortcut.
+            if (isShortcut && childIndex < 0) {
+                NeroFS::SetCurrentPrefixCfg(cfg, propertyToSave, "");
+            } else {
+                NeroFS::SetCurrentPrefixCfg(cfg, propertyToSave, childIndex);
+            }
+        }
+    }
+    if (!isShortcut) {
+        NeroFS::SetCurrentPrefixCfg("PrefixSettings", "CurrentRunner", ui->prefixRunner->currentText());
+    }
+    // Funky Experimental Options
+    QStringList envVars;
+    //we're iterating by row here
+    for (int x = 0; x < ui->envVarTable->rowCount(); x++) {
+        QTableWidgetItem* envVar = ui->envVarTable->item(x, 0);
+        QTableWidgetItem* val = ui->envVarTable->item(x, 1);
+        // not considering if the row is currently checked or not as we want to save all values
+        if (envVar != nullptr && val != nullptr && !envVar->text().isEmpty() && !val->text().isEmpty()) {
+            QString enabled = envVar->checkState() == Qt::Checked ? "[E]" : QString();
+            envVars << enabled % envVar->text() % '=' % val->text();
+        }
+    }
+
+    // |> was the only thing i could think of that couldn't possibly show up in a path
+    // without a very good reason for it being there.
+    NeroFS::SetCurrentPrefixCfg(cfg, "EnvVars", envVars.join(NeroFS::PATH_SEPERATOR));
+    NeroFS::SetCurrentPrefixCfg(cfg, "EnvVarsEnabled", ui->envVarBox->isChecked());
+
+    QStringList checkedCpus;
+    for (int i = 0; i < ui->topologyList->count(); ++i) {
+        QListWidgetItem* item = ui->topologyList->item(i);
+        int core = item->text().mid(item->text().lastIndexOf(' ')).toInt();
+        Qt::CheckState state = item->checkState();
+        if (state == Qt::Checked) {
+            checkedCpus.append(QString::number(core));
+        }
+    }
+
+    QString topCommand = checkedCpus.length() > 0
+        ? QString::number(checkedCpus.length()) % ':' % checkedCpus.join(',')
+        : QString("");
+
+    NeroFS::SetCurrentPrefixCfg(cfg, "WineCpuTopology", QVariant(topCommand.trimmed()));
+    NeroFS::SetCurrentPrefixCfg(cfg, "CpuTopologyEnabled", ui->wineTopology->isChecked());
+    // check if new ico was set.
+    if(!newAppIcon.isEmpty() && isShortcut)
+        QFile::copy(newAppIcon, QString("%1/%2/.icoCache/%3").arg(NeroFS::GetPrefixesPath()->path(),
+                                                                  NeroFS::GetCurrentPrefix(),
+                                                                  QString("%1-%2.png").arg(settings.value("Name").toString(), currentShortcutHash)));
+
+    // windows version overrides are currently a one-way op (e.g. can't be unset from the UI)
+    if(ui->winVerBox->font() == boldFont && isShortcut) {
+        int winVerSelected = winVersionListBackwards.indexOf(ui->winVerBox->itemText(ui->winVerBox->currentIndex()));
+        NeroFS::SetCurrentPrefixCfg("Shortcuts--"+currentShortcutHash, "WindowsVersion", winVerSelected);
+
+        QDir prefixPath(NeroFS::GetPrefixesPath()->path()+'/'+NeroFS::GetCurrentPrefix());
+        if(prefixPath.exists("user.reg")) {
+            QFile regFile(prefixPath.path()+"/user.reg");
+            regFile.open(QFile::ReadWrite);
+            QString newReg;
+            QString line;
+            const QString exe = settings.value("Path").toString().mid(settings.value("Path").toString().lastIndexOf('/')+1);
+            const QString compareString = QString("[Software\\\\Wine\\\\AppDefaults\\\\%1]").arg(exe);
+            bool exists = false;
+
+            while(!regFile.atEnd()) {
+                line = regFile.readLine();
+                newReg.append(line);
+                // winreg adds timestamp info, so just check the beginning of this line.
+                if(line.startsWith(compareString)) {
+                    // in case this is a reg entry that's been absorbed into WinReg format (which adds timestamps)
+                    line = regFile.readLine();
+                    if(line.startsWith("#time=")) newReg.append(line), regFile.readLine();
+                    newReg.append(QString("\"Version\"=\"%1\"\n").arg(winVersionVerb.at(winVerSelected)));
+                    exists = true;
+                }
+            }
+
+            if(!exists)
+                newReg.append(QString("\n[Software\\\\Wine\\\\AppDefaults\\\\%1]\n\"Version\"=\"%2\"\n").arg(exe, winVersionVerb.at(winVerSelected)));
+
+            regFile.resize(0);
+            regFile.write(newReg.toUtf8());
+            regFile.close();
+        }
+    }
+    dllsToAdd.count()
+        ? NeroFS::SetCurrentPrefixCfg(cfg, "DLLoverrides", dllsToAdd)
+        : NeroFS::SetCurrentPrefixCfg(cfg, "DLLoverrides", "");
+
+    appName = ui->shortcutName->text().trimmed();
+}
 void NeroPrefixSettingsWindow::deleteShortcut_clicked()
 {
     if(QMessageBox::warning(this,
@@ -970,3 +1176,20 @@ void NeroPrefixSettingsWindow::on_openToShortcutPath_clicked()
     QDesktopServices::openUrl(QUrl::fromLocalFile(ui->shortcutPath->text().left(ui->shortcutPath->text().lastIndexOf('/'))
                                                                           .replace("C:", NeroFS::GetPrefixesPath()->path()+'/'+NeroFS::GetCurrentPrefix()+"/drive_c")));
 }
+
+void NeroPrefixSettingsWindow::on_logFolderButton_clicked()
+{
+    NeroFS::openLogDirectory();
+}
+
+void NeroPrefixSettingsWindow::on_toggleWayland_checkStateChanged(Qt::CheckState state)
+{
+    if (state == Qt::Unchecked) {
+        ui->toggleDisableHdr->setEnabled(false);
+        ui->toggleWindowDecorations->setEnabled(false);
+    } else {
+        ui->toggleDisableHdr->setEnabled(true);
+        ui->toggleWindowDecorations->setEnabled(true);
+    }
+}
+

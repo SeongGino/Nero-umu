@@ -69,8 +69,15 @@ int NeroRunner::StartShortcut(const QString &hash, const bool &prefixAlreadyRunn
 
     // Only explicit set GAMEID when not already declared by user
     // See SeongGino/Nero-umu#66 for more info
+
     if(!env.contains(CliArgs::gameId)) {
-        env.insert(CliArgs::gameId, "0");
+        auto gameId = PrefixSetting(NeroConfig::umuId, *this).toString();
+        if (gameId.isEmpty()) {
+            //This isn't a true false value, so dont use FALSE
+            env.insert(CliArgs::gameId, "0");
+        } else {
+            env.insert(CliArgs::gameId, gameId);
+        }
     }
     QString protonRunner = CombinedSetting(NeroConfig::currentRunner, *this).toString();
     QString runnerPath = NeroFS::GetProtonsPath()->path() % '/' % protonRunner;
@@ -122,13 +129,8 @@ int NeroRunner::StartShortcut(const QString &hash, const bool &prefixAlreadyRunn
     } else {
         env.insert(CliArgs::Proton::dxvkD3D8, TRUE);
     }
-    QMap<QString, QString> boolOptions{
-        {NeroConfig::enableNvApi,               CliArgs::Proton::Nvidia::forceNvapi},
-        {NeroConfig::Proton::limitGlExtensions, CliArgs::Proton::oldGl},
-        {NeroConfig::vkCapture,                 CliArgs::obsVkCapture},
-        {NeroConfig::forceIGpu,                 CliArgs::forceIgpu},
-    };
-    boolOptions = InsertArgs(boolOptions, false);
+    bool isPrefixOnly = false;
+    InsertArgs(isPrefixOnly);
     int fpsLimit = CombinedSetting(NeroConfig::limitFps, *this).toInt();
     if(fpsLimit)
         env.insert(CliArgs::dxvkFrameRate, QString::number(fpsLimit));
@@ -148,17 +150,10 @@ int NeroRunner::StartShortcut(const QString &hash, const bool &prefixAlreadyRunn
             ? env.insert(CliArgs::Proton::useXalia, TRUE)
             : env.insert(CliArgs::Proton::useXalia, FALSE);
 
-    bool isWaylandEnv = env.contains(CliArgs::waylandDisplay)
-            ? !env.value(CliArgs::waylandDisplay).isEmpty()
-            : false;
-    CombinedSetting wayland(NeroConfig::Proton::useWayland, *this);
-    if (isWaylandEnv && wayland.hasSetting() && wayland.toBool()) {
-        env.insert(CliArgs::Proton::enableWayland, TRUE);
-        bool isHdrEnabled = CombinedSetting(NeroConfig::Proton::useHdr, *this).toBool();
-        if (isHdrEnabled) {
-            env.insert(CliArgs::Proton::useHdr, TRUE);
-        }
-    }
+    Wayland(isPrefixOnly);
+    WineCpuTopology(isPrefixOnly);
+    InitImageReconstruction(isPrefixOnly);
+
     QStringList arguments = {NeroFS::GetUmU(), pathSetting.toString()};
     // some arguments are parsed as stringlists and others as string, so check which first.;
 
@@ -190,13 +185,17 @@ int NeroRunner::StartShortcut(const QString &hash, const bool &prefixAlreadyRunn
         arguments.append(args);
     }
 
+    arguments = Zink(arguments, isPrefixOnly);
+
     if(CombinedSetting(NeroConfig::gamemode, *this).toBool())
         arguments.prepend(CliArgs::gamemoderun);
 
     int scalingMode = CombinedSetting(NeroConfig::Gamescope::scalingMode, *this).toInt();
+    InitImageReconstruction(isPrefixOnly);
+    
     QStringList gamescopeArgs = SetScalingMode(scalingMode, fpsLimit, false);
     arguments = SetMangohud(gamescopeArgs, arguments);
-
+    SyncExtraEnvironmentVariables(isPrefixOnly, prefixPath, pathSetting.toString());
     runner.setProcessEnvironment(env);
     // some apps requires working directory to be in the right location
     // (corrected if path starts with Windows drive letter prefix)
@@ -256,6 +255,7 @@ QString NeroRunner::GamescopeFilterType(int filterVal) {
     }
 }
 
+
 int NeroRunner::StartOnetime(const QString &path, const bool &prefixAlreadyRunning, const QStringList &args)
 {
     // failsafe for cli runs
@@ -268,7 +268,6 @@ int NeroRunner::StartOnetime(const QString &path, const bool &prefixAlreadyRunni
     // meaning stdout is virtually unused.
     runner.setProcessChannelMode(QProcess::ForwardedOutputChannel);
     runner.setReadChannel(QProcess::StandardError);
-
     env = QProcessEnvironment::systemEnvironment();
     QString prefixPath = NeroFS::GetPrefixesPath()->path() % '/' % NeroFS::GetCurrentPrefix();
     env.insert(CliArgs::Wine::prefix, prefixPath);
@@ -276,8 +275,13 @@ int NeroRunner::StartOnetime(const QString &path, const bool &prefixAlreadyRunni
     // Only explicit set GAMEID when not already declared by user
     // See SeongGino/Nero-umu#66 for more info
     if(!env.contains(CliArgs::gameId)) {
-        //This isn't a true false value, so dont use FALSE
-        env.insert(CliArgs::gameId, "0");
+        auto gameId = PrefixSetting(NeroConfig::umuId, *this).toString();
+        if (gameId.isEmpty()) {
+            //This isn't a true false value, so dont use FALSE
+            env.insert(CliArgs::gameId, "0");
+        } else {
+            env.insert(CliArgs::gameId, gameId);
+        }
     }
     QString protonRunner = PrefixSetting(NeroConfig::currentRunner, *this).toString();
     QString runnerPath = NeroFS::GetProtonsPath()->path()% '/' % protonRunner;
@@ -315,18 +319,16 @@ int NeroRunner::StartOnetime(const QString &path, const bool &prefixAlreadyRunni
     } else if(!disableD8Vk) {
         env.insert(CliArgs::Proton::dxvkD3D8, TRUE);
     }
-    QMap<QString, QString> simpleBoolSettings {
-        {NeroConfig::enableNvApi, CliArgs::Proton::Nvidia::forceNvapi},
-        {NeroConfig::Proton::limitGlExtensions, CliArgs::Proton::oldGl},
-        {NeroConfig::vkCapture, CliArgs::obsVkCapture},
-        {NeroConfig::forceIGpu, CliArgs::forceIgpu}
-    };
+
     bool isPrefixOnly = true;
-    simpleBoolSettings = InsertArgs(simpleBoolSettings, isPrefixOnly);
+    InsertArgs(isPrefixOnly);
+
     int fileSyncMode = PrefixSetting(NeroConfig::fileSyncMode, *this).toInt();
     SetSyncMode(protonRunner, fileSyncMode);
+
     int debugVal = PrefixSetting(NeroConfig::debugOutput, *this).toInt();
     InitDebugProperties(debugVal);
+
     // Different logic for Prefix Launch of this versus shortcut; is that intentional?
     // shortcut launch doesn't check env for this or PROTON_USE_XALIA beforehand
     bool isHiDraw  = PrefixSetting(NeroConfig::Proton::allowHidraw, *this).toBool();
@@ -348,26 +350,16 @@ int NeroRunner::StartOnetime(const QString &path, const bool &prefixAlreadyRunni
             : env.insert(xalia, FALSE);
     }
 
-    bool isWaylandEnv = env.contains(CliArgs::waylandDisplay)
-            ? !env.value(CliArgs::waylandDisplay).isEmpty()
-            : false;
-
-    PrefixSetting wayland(NeroConfig::Proton::useWayland, *this);
-    if (isWaylandEnv && wayland.hasSetting() && wayland.toBool()) {
-        env.insert(CliArgs::Proton::enableWayland, TRUE);
-        bool isHdrEnabled = PrefixSetting(NeroConfig::Proton::useHdr, *this).toBool();
-        if (isHdrEnabled) {
-            env.insert(CliArgs::Proton::useHdr, TRUE);
-        }
-    }
-
-    QStringList arguments = {NeroFS::GetUmU()};
+    Wayland(isPrefixOnly);
+    WineCpuTopology(isPrefixOnly);
+    InitImageReconstruction(isPrefixOnly);
 
     // Proton/umu should be able to translate Windows-type paths on its own, no conversion needed
+    QStringList arguments(NeroFS::GetUmU());
     arguments.append(path);
-
     if(!args.isEmpty())
         arguments.append(args);
+    arguments = Zink(arguments, isPrefixOnly);
     bool gamemodeEnabled = PrefixSetting(NeroConfig::gamemode, *this).toBool();
     if(gamemodeEnabled) {
         arguments.prepend(CliArgs::gamemoderun);
@@ -376,7 +368,7 @@ int NeroRunner::StartOnetime(const QString &path, const bool &prefixAlreadyRunni
     int fpsLimit = PrefixSetting(NeroConfig::limitFps, *this).toInt();
     QStringList gamescopeArgs = SetScalingMode(scalingMode, fpsLimit, false);
     arguments = SetMangohud(gamescopeArgs, arguments);
-
+    SyncExtraEnvironmentVariables(isPrefixOnly, prefixPath, path);
     runner.setProcessEnvironment(env);
     if(path.startsWith('/') || path.startsWith("~/") || path.startsWith("./")) {
         runner.setWorkingDirectory(path.left(path.lastIndexOf("/")).replace("C:", NeroFS::GetPrefixesPath()->canonicalPath()+'/'+NeroFS::GetCurrentPrefix()+"/drive_c/"));
@@ -397,11 +389,50 @@ int NeroRunner::StartOnetime(const QString &path, const bool &prefixAlreadyRunni
         log.write(Logs::runningCommand.toLocal8Bit() % command.toLocal8Bit() % ' ' % arguments.join(' ').toLocal8Bit() % Logs::newLine.toLocal8Bit());
         log.write(Logs::blankLine.toLocal8Bit());
     }
+    qWarning("Command: %s", command.toLocal8Bit().data());
+    qWarning("Arguments: %s", arguments.join(",").toLocal8Bit().data());
     runner.start(command, arguments);
     runner.waitForStarted(-1);
     WaitLoop(runner, log);
 
     return runner.exitCode();
+}
+
+void NeroRunner::SyncExtraEnvironmentVariables(bool isPrefixOnly, QString& prefixPath, QString path) {
+    PrefixSetting s = initSetting(isPrefixOnly, NeroConfig::envVars);
+    PrefixSetting e = initSetting(isPrefixOnly, NeroConfig::envVarsEnabled);
+    if (!e.hasSetting() || !e.toBool()) {
+        return;
+    }
+    QString parsed = s.toString();
+    QStringList l = parsed.split("|>");
+    QDir logsDir(prefixPath);
+    if(!logsDir.exists(Logs::logDirName))
+        logsDir.mkdir(Logs::logDirName);
+    logsDir.cd(Logs::logDirName);
+    QFile log = QFile(logsDir.path() % '/' % path.mid(path.lastIndexOf('/')+1) % "_envVar" % ".txt");
+    if(loggingEnabled) {
+        log.open(QIODevice::WriteOnly);
+        log.resize(0);
+    }
+    for (QString q : std::as_const(l)) {
+        QStringList split = q.split("=");
+        if (split[0].startsWith("[E]")) {
+            //get all but the first 3 characters, which is the enabled flag
+            int charsToTrim = split[0].length() - 3;
+            auto var = split[0].right(charsToTrim);
+            if (!env.contains(var)) {
+                env.insert(var, split[1]);
+                if (loggingEnabled) {
+                    log.write((var % "=" % split[1] % "\n").toLocal8Bit());
+                }
+            }
+        } else {
+            if (loggingEnabled) {
+                log.write(("Skipped: " % split[0] % "=" % split[1] % "\n").toLocal8Bit());
+            }
+        }
+    }
 }
 
 QStringList NeroRunner::SetScalingMode(int scalingMode, int fpsLimit, bool isPrefixOnly) {
@@ -439,8 +470,88 @@ QStringList NeroRunner::SetScalingMode(int scalingMode, int fpsLimit, bool isPre
     return QStringList();
 }
 
-QMap<QString, QString> NeroRunner::InsertArgs(QMap<QString, QString> properties, bool isPrefixOnly)
+void NeroRunner::InitImageReconstruction(bool isPrefixOnly)
 {
+    int upgVal = isPrefixOnly
+        ? PrefixSetting(NeroConfig::ImageReconstruct::Properties::upgrade, *this).toInt()
+        : CombinedSetting(NeroConfig::ImageReconstruct::Properties::upgrade, *this).toInt();
+    switch (NeroConfig::ImageReconstruct::Upgrade(upgVal)) {
+    case NeroConfig::ImageReconstruct::Upgrade::Fsr4:
+        env.insert(CliArgs::Proton::Amd::fsr4Upgrade, TRUE);
+        break;
+    case NeroConfig::ImageReconstruct::Upgrade::Dlss:
+        env.insert(CliArgs::Proton::Nvidia::dlssUpgrade, TRUE);
+        break;
+    case NeroConfig::ImageReconstruct::Upgrade::Xess:
+        env.insert(CliArgs::Proton::Intel::xessUpgrade, TRUE);
+        break;
+    default:
+        break;
+    }
+
+    int ind = isPrefixOnly
+        ? PrefixSetting(NeroConfig::ImageReconstruct::Properties::indicator, *this).toInt()
+        : CombinedSetting(NeroConfig::ImageReconstruct::Properties::indicator, *this).toInt();
+    switch (NeroConfig::ImageReconstruct::Indicator(ind)) {
+    case NeroConfig::ImageReconstruct::Indicator::Fsr:
+        env.insert(CliArgs::Proton::Amd::fsr4Indicator, TRUE);
+        break;
+    case NeroConfig::ImageReconstruct::Indicator::Dlss:
+        env.insert(CliArgs::Proton::Nvidia::dlssIndicator, TRUE);
+        break;
+    default:
+        break;
+    }
+}
+
+void NeroRunner::Wayland(bool isPrefixOnly)
+{
+    bool isWaylandEnv = env.contains(CliArgs::waylandDisplay)
+        ? !env.value(CliArgs::waylandDisplay).isEmpty()
+        : false;
+    PrefixSetting wayland = initSetting(isPrefixOnly, NeroConfig::Proton::useWayland);
+    if (isWaylandEnv && wayland.hasSetting() && wayland.toBool()) {
+        env.insert(CliArgs::Proton::enableWayland, TRUE);
+        bool isHdrDisabled = initSetting(isPrefixOnly, NeroConfig::Proton::disableHdr).toBool();
+        if (isHdrDisabled) {
+            env.insert(CliArgs::Proton::dxvkDisableHdr, TRUE);
+        }
+        bool decorationsDisabled = initSetting(isPrefixOnly,  NeroConfig::noWindowDecoration).toBool();
+        if (decorationsDisabled) {
+            env.insert(CliArgs::Proton::noWindowDecoration, TRUE);
+        }
+    }
+}
+
+void NeroRunner::WineCpuTopology(bool isPrefixOnly)
+{
+    QString topology = initSetting(isPrefixOnly, NeroConfig::wineCpuTopology).toString();
+    bool isTopologyEnabled = initSetting(isPrefixOnly, NeroConfig::cpuTopologyEnabled).toBool();
+    if (isTopologyEnabled && !topology.isEmpty())
+        env.insert(CliArgs::Wine::cpuTopology, topology);
+}
+
+QStringList NeroRunner::Zink(QStringList arguments, bool isPrefixOnly)
+{
+    bool isZink = initSetting(isPrefixOnly, NeroConfig::zink).toBool();
+    if (isZink) {
+        arguments.prepend(CliArgs::zinkEnabled);
+    }
+    return arguments;
+}
+
+void NeroRunner::InsertArgs(bool isPrefixOnly) {
+    QMap<QString, QString> properties {
+       {NeroConfig::enableNvApi,               CliArgs::Proton::Nvidia::forceNvapi},
+       {NeroConfig::Proton::limitGlExtensions, CliArgs::Proton::oldGl},
+       {NeroConfig::vkCapture,                 CliArgs::obsVkCapture},
+       {NeroConfig::forceIGpu,                 CliArgs::forceIgpu},
+       {NeroConfig::nvidiaLibs,                CliArgs::Proton::Nvidia::libs},
+       {NeroConfig::localShaderCache,          CliArgs::Proton::localShaderCache},
+       {NeroConfig::noSteamInput,              CliArgs::Proton::noSteamInput},
+       {NeroConfig::Proton::useOptiscaler,     CliArgs::Proton::optiscaler},
+       {NeroConfig::lowLatency,                CliArgs::Proton::Amd::lowLatency},
+    };
     for (auto i = properties.begin(), end = properties.end(); i != end; i++) {
         QString neroOption = i.key();
         bool isValid = isPrefixOnly
@@ -452,7 +563,6 @@ QMap<QString, QString> NeroRunner::InsertArgs(QMap<QString, QString> properties,
         }
     }
     properties.clear();
-    return properties;
 }
 
 QStringList NeroRunner::SetMangohud(QStringList gamescopeArgs, QStringList arguments)
@@ -556,25 +666,23 @@ void NeroRunner::SetSyncMode(QString protonRunner, int syncType)
         // For older Protons, they should be safely ignoring this and fallback to fsync anyways.
         // Newer protons than GE10-9 should enable this automatically from its end, and doesn't require WOW64
         // (and currently, WOW64 seems problematic for some fringe cases, like TeknoParrot's BudgieLoader not spawning a window)
-
     switch(syncType) {
-        case NeroConstant::NTsync:
-            if(protonRunner == ge109) {
-                env.insert(CliArgs::Proton::Sync::ntSync, TRUE);
-                env.insert(CliArgs::useWow64, TRUE);
-            }
-            break;
-        case NeroConstant::Fsync:
-            env.insert(CliArgs::Proton::Sync::noNtSync, TRUE);
-            break;
-        case NeroConstant::NoSync:
-            env.insert(CliArgs::Proton::Sync::noEsync, TRUE);
-        case NeroConstant::Esync:
-            env.insert(CliArgs::Proton::Sync::noNtSync, TRUE);
-            env.insert(CliArgs::Proton::Sync::noFsync, TRUE);
-            break;
-        default:
-            break;
+    case NeroConstant::NTsync: {
+            env.insert(CliArgs::Proton::Sync::ntSync, TRUE);
+            env.insert(CliArgs::useWow64, TRUE);
+        break;
+    }
+    case NeroConstant::Fsync:
+        env.insert(CliArgs::Proton::Sync::noNtSync, TRUE);
+        break;
+    case NeroConstant::NoSync:
+        env.insert(CliArgs::Proton::Sync::noEsync, TRUE);
+    case NeroConstant::Esync:
+        env.insert(CliArgs::Proton::Sync::noNtSync, TRUE);
+        env.insert(CliArgs::Proton::Sync::noFsync, TRUE);
+        break;
+    default:
+        break;
     }
 }
 

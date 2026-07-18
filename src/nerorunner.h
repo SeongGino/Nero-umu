@@ -33,7 +33,6 @@ class NeroRunner : public QObject
     Q_OBJECT
 public:
     NeroRunner() {};
-
     int StartShortcut(const QString &, const bool & = false);
     int StartOnetime(const QString &, const bool & = false, const QStringList & = {});
     QString GetHash() {return hashVal;}
@@ -117,13 +116,16 @@ public:
                    : CombinedSetting(setting, *this);
     }
 private:
+    void SyncExtraEnvironmentVariables(bool isPrefixOnly, QString& prefixPath, QString path);
     QStringList SetMangohud(QStringList gamescope, QStringList arguments);
-    int ConvertScaling(int scalingVal);
+    void Wayland(bool isPrefixOnly);
+    void WineCpuTopology(bool isPrefixOnly);
+    void InitImageReconstruction(bool isPrefixOnly);
+    void InsertArgs(bool isPrefixOnly);
     void SetSyncMode(QString protonRunner, int syncType);
+    QStringList Zink(QStringList arguments, bool isPrefixOnly);
     QStringList SetScalingMode(int scalingType, int fpsLimit, bool isPrefixOnly);
     QStringList SetGamescopeArgs(int scalingMode, int fpsLimit, bool isPrefixOnly);
-    QStringList Gamescope(QMap<QString, QString> resMap, QStringList arguments);
-    QMap<QString, QString> InsertArgs(QMap<QString, QString> properties, bool isPrefixOnly);
     QString GamescopeFilterType(int filterVal);
 
     const QString FALSE = "0";
@@ -132,7 +134,6 @@ private:
     const QString cDrive = "C:/";
     const QString drive_c = "drive_c/";
 
-    const QString ge109 = "GE-Proton10-9";
     void InitDebugProperties(int value);
     QString hashVal;
 
@@ -144,7 +145,6 @@ signals:
 namespace CliArgs {
     const QString dash = "-";
     const QString doubleDash = dash % dash;
-
 
     //Wine Compat Options
     namespace Wine {
@@ -169,8 +169,9 @@ namespace CliArgs {
 
         //Wayland/HDR
         const QString enableWayland = "PROTON_ENABLE_WAYLAND";
-        const QString useHdr = "PROTON_ENABLE_HDR";
+        const QString dxvkDisableHdr = "DXVK_NO_HDR";
         const QString noWindowDecoration = "PROTON_NO_WM_DECORATION"; //(Disable window decorations, good for Wayland) (GE, cachyos)
+        const QString optiscaler = "PROTON_USE_OPTISCALER";
         const QString preferSdl = "PROTON_PREFER_SDL";
         const QString hiDraw = "PROTON_ENABLE_HIDRAW";
         const QString useXalia = "PROTON_USE_XALIA";
@@ -188,16 +189,16 @@ namespace CliArgs {
             const QString dlssIndicator = "PROTON_DLSS_INDICATOR"; //Show watermark when DLSS is working) (cachyos)
         }
         namespace Amd {
-            //AMD Launch Arguments
-                const QString fsr4Upgrade = "PROTON_FSR4_UPGRADE"; //(Enable FSR4 for RDNA4 cards) (GE, cachyos, EM)
-                const QString fsr4Rdna3 = "PROTON_FSR4_RDNA3_UPGRADE"; //(Enable FSR4 for RDNA3 cards) (GE, cachyos, EM)
-                const QString fsr4Indicator = "PROTON_FSR4_INDICATOR"; //(Show watermark when FSR4 is working) (cachyos, EM)
+            const QString lowLatency = "LOW_LATENCY_LAYER";
+            const QString fsr4Upgrade = "PROTON_FSR4_UPGRADE"; //(Enable FSR4 for RDNA4 cards) (GE, cachyos, EM)
+            const QString fsr4Indicator = "PROTON_FSR4_INDICATOR"; //(Show watermark when FSR4 is working) (cachyos, EM)
         }
         namespace Intel {
             //XESS Launch Arguments
             const QString xessUpgrade = "PROTON_XESS_UPGRADE"; //(Upgrade XeSS to latest version) (cachyos)
         }
     }
+    const QString zinkEnabled = "MESA_LOADER_DRIVER_OVERRIDE=zink";
     // Misc
     const QString obsVkCapture = "OBS_VKCAPTURE";
     const QString protonPath = "PROTONPATH";
@@ -207,7 +208,6 @@ namespace CliArgs {
     const QString gamemoderun = "gamemoderun";
     const QString gameId = "GAMEID";
     const QString useWow64 = "PROTON_USE_WOW64";
-
     const QString verb = "PROTON_VERB";
     const QString run = "run";
     const QString waitForExitRun = "waitforexitandrun";
@@ -261,23 +261,25 @@ namespace NeroConfig {
     const QString currentRunner = "CurrentRunner";
     const QString runtimeUpdate = "RuntimeUpdateOnLaunch";
     const QString dlssIndicator = "DlssIndicator";
-
-
+    const QString envVars = "EnvVars";
+    const QString envVarsEnabled = "EnvVarsEnabled";
     const QString path = "Path";
     //OBS
     const QString vkCapture = "VKcapture";
+    const QString umuId = "UmuId";
 
     //Force Integrated GPU
     const QString forceIGpu = "ForceiGPU";
 
-
+    const QString zink = "UseZink";
     namespace Proton {
+        const QString useOptiscaler = "UseOptiscaler";
         const QString forceWineD3D = "ForceWineD3D";
         const QString allowHidraw = "AllowHidraw";
         const QString useXalia = "UseXalia";
         const QString noD8VK = "NoD8VK";
         const QString useWayland = "UseWayland";
-        const QString useHdr = "UseHDR";
+        const QString disableHdr = "DisableHdr";
         const QString limitGlExtensions = "LimitGLextensions";
     }
 
@@ -306,17 +308,33 @@ namespace NeroConfig {
     const QString args = "Args";
 
     //TBD
-    const QString nvidiaLibs = "NvidiaLibs";
-    const QString fsr4Upgrade = "Fsr4Upgrade";
-    const QString fsr4Indicator = "Fsr4Indicator";
-    const QString fsr4Rdna3 = "Fsr4Rdna3";
-    const QString xessUpgrade = "XessUpgrade";
-    const QString noWindowDecoration = "NoDecoration";
-    const QString noSteamInput = "NoSteamInput";
+    const QString cpuTopologyEnabled = "CpuTopologyEnabled";
+    const QString lowLatency = "UseLowLatency";
+    const QString nvidiaLibs = "UseNvidiaLibs";
+    const QString noWindowDecoration = "UseNoDecorations";
+    const QString noSteamInput = "SteamInputDisabled";
     const QString wineCpuTopology = "WineCpuTopology";
     const QString localShaderCache = "LocalShaderCache";
     const QString prerunScript = "PreRunScript";
     const QString postRunScript = "PostRunScript";
     const QString mangohud = "Mangohud";
+
+    namespace ImageReconstruct {
+        enum class Upgrade {
+            None = 0,
+            Fsr4,
+            Dlss,
+            Xess,
+        };
+        enum class Indicator {
+            None = 0,
+            Fsr,
+            Dlss,
+        };
+        namespace Properties {
+        const QString upgrade = "ImageReconstructionUpgrade";
+        const QString indicator = "ImageReconstructionIndicator";
+        }
+    }
 }
 #endif // NERORUNNER_H

@@ -1,0 +1,44 @@
+{
+  "nodes": {
+    "nixpkgs": {
+      "locked": {
+        "lastModified": 1782918843,
+        "narHash": "sha256-ETYnV9U7Sr+A45dohzZdfCZKOss4qrTkO+wgNZNvEc0=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "e8273b29fe1390ec8d4603f2477357555291432e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "nixpkgs-unstable",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "quazip-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1782859670,
+        "narHash": "sha256-raQB+pI9iT62AWc2G6rCU2yJ0jEr00MAq6OVfgqbuYE=",
+        "owner": "stachenov",
+        "repo": "quazip",
+        "rev": "5afc8987daeffc2a7081af27aa829e3f0924596e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "stachenov",
+        "repo": "quazip",
+        "type": "github"
+      }
+    },
+    "root": {
+      "inputs": {
+        "nixpkgs": "nixpkgs",
+        "quazip-src": "quazip-src"
+      }
+    }
+  },
+  "root": "root",
+  "version": 7
+}
